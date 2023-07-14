@@ -10,10 +10,38 @@ public class Planet : MonoBehaviour
     private Mesh _m;
 
     private MeshFilter _mF;
+
+    
+    [Flags]
+    enum states  {
+         
+        MOUNTAIN = 0b_0001,
+        MOUNTAIN60 = 0b_0001,
+        MOUNTAINMINUS60= 0b_0001,
+        RIVER1= 0b_0001,
+        RIVER160= 0b_0001,
+        RIVER1MINUS60= 0b_0001,
+        RIVER2= 0b_0001,
+        RIVER260= 0b_0001,
+        RIVER2MINUS60= 0b_0001,
+        RIVER3= 0b_0001,
+        RIVER360= 0b_0001,
+        RIVER3MINUS60= 0b_0001
+
+    }
+
+   struct CollapsingNode{
+        public bool collapsed ;
+        
+        public states entropy;
+
+        
+
+    }
     // Start is called before the first frame update
     void Start()
     {
-      
+      print (new Vector3());
     }
 
     private void Awake()
@@ -25,6 +53,9 @@ public class Planet : MonoBehaviour
         InitializeBaseIcosahedron();
         GenerateSphereResolution(5);
 
+        //CollapsingNode a = new CollapsingNode(states.MOUNTAIN | states.MOUNTAIN60); 
+        
+        
     }
 
     // Update is called once per frame
