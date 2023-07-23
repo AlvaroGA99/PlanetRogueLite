@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class WFCGraph 
 {   
@@ -8,18 +6,25 @@ public class WFCGraph
     List<Node> elements;
     // Start is called before the first frame update
    class Node {
-    
     int id;
     int entropy;
     bool collapsed;
-    Edge a;
-    Edge b;
-    Edge c;
+    Edge a_Edge;
+    Edge b_Edge;
+    Edge c_Edge;
+
    }
 
 
    class Edge {
+        
         List<string> options;
+
+        Edge nextInternalEdge;
+
+        Edge adjacentEdge;
+
+        Node ownerNode;
 
    }
 }
