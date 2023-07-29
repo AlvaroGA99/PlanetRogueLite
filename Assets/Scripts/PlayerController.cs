@@ -118,14 +118,14 @@ public class PlayerController : MonoBehaviour
     public void FixedUpdate()
     {
 
-         // if (notGamepad)
-         // {
+          if (notGamepad)
+          {
             // _tWeapon.position = transform.position;
 
              Vector3 aux = cam.WorldToScreenPoint(_t.position);
              _wieldVector = new Vector3(Mouse.current.position.x.ReadValue() - aux.x,0,Mouse.current.position.y.ReadValue() - aux.y)  ;
              _wieldVector.Normalize();
-         // }
+          }
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
         _toCenter = (_SphereT.position - _t.position).normalized;
