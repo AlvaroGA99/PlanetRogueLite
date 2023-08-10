@@ -1,23 +1,50 @@
 using System.Collections.Generic;
 
-public class WFCGraph 
-{   
+public class WFCGraph
+{
     Node currentNode;
     List<Node> elements;
-    // Start is called before the first frame update
-   class Node {
-    int id;
-    int entropy;
-    bool collapsed;
-    Edge a_Edge;
-    Edge b_Edge;
-    Edge c_Edge;
 
-   }
+    public WFCGraph(ref int[] triangleList, int resolution){
+          elements = new List<Node>(triangleList.Length/3);
+
+          // Data extraction from triangleList, and element initialization
+
+          for (int i = 0; i < triangleList.Length/3; i++){
+               elements[i] = new Node();
+          }
+
+          currentNode = elements[0];
+    }
+    
+    public void RecalculateEntropy(){
+          //Recalculate Entropy
+
+    }
+
+    public GetLowestEntropyElement(){
+
+    }
+    class Node
+    {
+        int id;
+        int entropy;
+        bool collapsed;
+        Edge a_Edge;
+        Edge b_Edge;
+        Edge c_Edge;
+
+        public Node()
+        {
+
+        }
+
+    }
 
 
-   class Edge {
-        
+    class Edge
+    {
+
         List<string> options;
 
         Edge nextInternalEdge;
@@ -26,5 +53,9 @@ public class WFCGraph
 
         Node ownerNode;
 
-   }
+        public Edge()
+        {
+
+        }
+    }
 }
