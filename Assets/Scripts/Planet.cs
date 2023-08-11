@@ -23,7 +23,7 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(5);
+        GenerateSphereResolution(0);
         
         
     }
@@ -135,18 +135,18 @@ public class Planet : MonoBehaviour
 
             if(r == resolution - 1)
             {
-               newVertices[0] += newVertices[0]*SampleNoiseHeight( newVertices[0] );
-                newVertices[1] += newVertices[1]*SampleNoiseHeight( newVertices[1] );
-                newVertices[2] += newVertices[2]*SampleNoiseHeight( newVertices[2] );
-                newVertices[3] += newVertices[3]*SampleNoiseHeight( newVertices[3] );
-                newVertices[4] += newVertices[4]*SampleNoiseHeight( newVertices[4] );
-                newVertices[5] += newVertices[5]*SampleNoiseHeight( newVertices[5] );
-                newVertices[6] += newVertices[6]*SampleNoiseHeight( newVertices[6] );
-                newVertices[7] += newVertices[7]*SampleNoiseHeight( newVertices[7] );
-                newVertices[8] += newVertices[8]*SampleNoiseHeight( newVertices[8] );
-                newVertices[9] += newVertices[9]*SampleNoiseHeight( newVertices[9] );
-                newVertices[10] +=  newVertices[10]*SampleNoiseHeight( newVertices[10] );
-                newVertices[11] +=  newVertices[11]*SampleNoiseHeight( newVertices[11] );
+               newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
+                newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
+                newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
+                newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
+                newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
+                newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
+                newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
+                newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
+                newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
+                newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
+                newVertices[10] +=  newVertices[10];//*SampleNoiseHeight( newVertices[10] );
+                newVertices[11] +=  newVertices[11];//*SampleNoiseHeight( newVertices[11] );
 
             }
 
@@ -197,7 +197,7 @@ public class Planet : MonoBehaviour
     Vector3 v0 = newVertices[i0];
     Vector3 v1 = newVertices[i1];
     Vector3 newVertex = ((v0 + v1) / 2f).normalized;
-    newVertex += newVertex*SampleNoiseHeight(newVertex);
+    newVertex += newVertex;//*SampleNoiseHeight(newVertex);
     newVertices[newIndex] = newVertex;
     newVertexIndices[edgeKey] = newIndex;
 
