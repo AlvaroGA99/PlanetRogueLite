@@ -11,6 +11,8 @@ public class Planet : MonoBehaviour
 
     private MeshFilter _mF;
 
+    public int res;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,11 +21,11 @@ public class Planet : MonoBehaviour
 
     private void Awake()
     {
-
+    
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(0);
+        GenerateSphereResolution(res);
         
         
     }
