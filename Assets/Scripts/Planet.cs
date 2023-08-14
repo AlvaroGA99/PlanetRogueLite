@@ -6,20 +6,15 @@ using UnityEngine;
 
 public class Planet : MonoBehaviour
 {
-    [NonSerialized]
-    public Mesh _m;
+
+    private Mesh _m;
 
     private MeshFilter _mF;
-
-    private WFCGraph _tilesGraph;
-
-    public int resolution;
 
     // Start is called before the first frame update
     void Start()
     {
       print (new Vector3());
-
     }
 
     private void Awake()
@@ -28,9 +23,8 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(resolution);
-        int[] trianglesRef = _m.triangles;
-        _tilesGraph =  new WFCGraph( ref trianglesRef,resolution);
+        GenerateSphereResolution(0);
+        
         
     }
 
@@ -40,7 +34,7 @@ public class Planet : MonoBehaviour
         
     }
 
-    public void InitializeBaseIcosahedron()
+    private void InitializeBaseIcosahedron()
     {
         int radius = 1;
 
@@ -91,7 +85,7 @@ public class Planet : MonoBehaviour
         _m.RecalculateNormals();
     }
 
-    public void GenerateSphereResolution(int resolution)
+    private void GenerateSphereResolution(int resolution)
     {
 
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
@@ -219,7 +213,6 @@ private long EdgeKey(int i0, int i1)
     edgeIndex |= maxIndex;
     return edgeIndex;
 }
-
 
 
 }
