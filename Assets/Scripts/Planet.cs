@@ -16,7 +16,7 @@ public class Planet : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-      print (new Vector3());
+      //print (new Vector3());
     }
 
     private void Awake()
@@ -25,7 +25,7 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(res);
+        GenerateSphereResolution(3);
         
         
     }
@@ -93,7 +93,7 @@ public class Planet : MonoBehaviour
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
         int newIndex = 0;
 
-        for (int r = 0; r < resolution ; r++)
+        for (int r = 0; r < resolution - 1; r++)
         {
 
             int originalLength = _m.triangles.Length;
@@ -112,9 +112,9 @@ public class Planet : MonoBehaviour
                 int i1 = _m.triangles[i + 1];
                 int i2 = _m.triangles[i + 2];
 
-                int newIndex0 = GetNewVertexIndex(i0, i1, ref newVertexIndices, ref newVertices, ref newIndex);          
-                int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices, ref newVertices, ref newIndex);
-                int newIndex2 = GetNewVertexIndex(i2, i0, ref newVertexIndices, ref newVertices, ref newIndex);
+                int newIndex0 = GetNewVertexIndex(i0, i1,  ref newVertexIndices,  ref newVertices, ref newIndex);          
+                int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices,  ref newVertices, ref newIndex);
+                int newIndex2 = GetNewVertexIndex(i2, i0, ref  newVertexIndices,  ref newVertices, ref newIndex);
 
                 newTriangles[i * 4 + 9] = i0;
                 newTriangles[i * 4 + 10] = newIndex0;
@@ -137,18 +137,18 @@ public class Planet : MonoBehaviour
 
             if(r == resolution - 1)
             {
-               newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
-                newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
-                newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
-                newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
-                newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
-                newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
-                newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
-                newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
-                newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
-                newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
-                newVertices[10] +=  newVertices[10];//*SampleNoiseHeight( newVertices[10] );
-                newVertices[11] +=  newVertices[11];//*SampleNoiseHeight( newVertices[11] );
+            //    newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
+            //     newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
+            //     newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
+            //     newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
+            //     newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
+            //     newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
+            //     newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
+            //     newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
+            //     newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
+            //     newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
+            //     newVertices[10] +=  newVertices[10];//*SampleNoiseHeight( newVertices[10] );
+            //     newVertices[11] +=  newVertices[11];//*SampleNoiseHeight( newVertices[11] );
 
             }
 
@@ -158,18 +158,18 @@ public class Planet : MonoBehaviour
         }
 
        
-        print(_m.vertices[0]);
-        print(_m.vertices[1]);
-        print(_m.vertices[2]);
-        print(_m.vertices[3]);
-        print(_m.vertices[4]);
-        print(_m.vertices[5]);
-        print(_m.vertices[6]);
-        print(_m.vertices[7]);
-        print(_m.vertices[8]);
-        print(_m.vertices[9]);
-        print(_m.vertices[10]);
-        print(_m.vertices[11]);
+        // print(_m.vertices[0]);
+        // print(_m.vertices[1]);
+        // print(_m.vertices[2]);
+        // print(_m.vertices[3]);
+        // print(_m.vertices[4]);
+        // print(_m.vertices[5]);
+        // print(_m.vertices[6]);
+        // print(_m.vertices[7]);
+        // print(_m.vertices[8]);
+        // print(_m.vertices[9]);
+        // print(_m.vertices[10]);
+        // print(_m.vertices[11]);
 
         _m.RecalculateNormals();
     }
@@ -185,7 +185,7 @@ public class Planet : MonoBehaviour
         return  l1 + l2 + l3 + l4;
     }
  
-    private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
+    private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices,  ref Vector3[] newVertices, ref int newIndex)
 {
     long edgeKey = EdgeKey(i0, i1);
     int vertexIndex;
@@ -199,7 +199,7 @@ public class Planet : MonoBehaviour
     Vector3 v0 = newVertices[i0];
     Vector3 v1 = newVertices[i1];
     Vector3 newVertex = ((v0 + v1) / 2f).normalized;
-    newVertex += newVertex;//*SampleNoiseHeight(newVertex);
+    //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
     newVertices[newIndex] = newVertex;
     newVertexIndices[edgeKey] = newIndex;
 
