@@ -13,6 +13,8 @@ public class Planet : MonoBehaviour
 
     public int res;
 
+    private WFCGraph tiles;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +27,9 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(3);
+        GenerateSphereResolution(1);
+        //tiles = new WFCGraph(_mF.mesh.triangles,0);
+
         
         
     }
@@ -93,7 +97,7 @@ public class Planet : MonoBehaviour
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
         int newIndex = 0;
 
-        for (int r = 0; r < resolution - 1; r++)
+        for (int r = 0; r < resolution ; r++)
         {
 
             int originalLength = _m.triangles.Length;
@@ -135,8 +139,8 @@ public class Planet : MonoBehaviour
 
             }
 
-            if(r == resolution - 1)
-            {
+            // if(r == resolution - 1)
+            // {
             //    newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
             //     newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
             //     newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
@@ -150,7 +154,7 @@ public class Planet : MonoBehaviour
             //     newVertices[10] +=  newVertices[10];//*SampleNoiseHeight( newVertices[10] );
             //     newVertices[11] +=  newVertices[11];//*SampleNoiseHeight( newVertices[11] );
 
-            }
+            // }
 
             _m.vertices = newVertices;
             _m.triangles = newTriangles;
