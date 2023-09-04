@@ -5,69 +5,72 @@ using Unity.VisualScripting;
 
 public class WFCGraph
 {
-    Node currentNode;
-    Node[] elements;
+    public Node currentNode;
+    public Node[] elements;
     Random sampler;
 
     List<Node> toProcess;
 
-    public WFCGraph(int[] triangleList, int resolution)
+    public WFCGraph(int[] triangleList, int resolution, Random sampler)
     {
         elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
 
         toProcess = new List<Node>();
 
         // Data extraction from triangleList, and element initialization
+        Dictionary<EdgeId, int> edgeMatching = new Dictionary<EdgeId, int>();
 
         Edge[] edges = new Edge[elements.Length * 3];
 
-        for (int i = 0; i < elements.Length; i++)
-        {   
-            elements[i] = new Node(i, edges[3 * i], edges[3 * i + 1], edges[3 * i + 2], resolution);
-        }
-
-        sampler = new Random();
-
-        currentNode = elements[sampler.Next(0, elements.Length - 1)];
-
-
-
-
-    }
-
-    public WFCGraph(int[] triangleList, int resolution, int seed)
-    {
-        elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
-
-        toProcess = new List<Node>();
-
-        // Data extraction from triangleList, and element initialization
-        Dictionary<int, int> edgeMatching = new Dictionary<int, int>();
-        Edge[] edges = new Edge[elements.Length * 3];
+        int matchId;
 
         for (int i = 0; i < elements.Length; i++)
         {
-            edges[i*3].edgeId.a = triangleList[i*3];
-            edges[i*3].edgeId.b = triangleList[i*3 + 1];
+            int id0 = i * 3;
+            int id1 = i * 3 + 1;
+            int id2 = i * 3 + 2;
 
-            edges[i*3 + 1].edgeId.a = triangleList[i*3 + 1];
-            edges[i*3 + 1].edgeId.b = triangleList[i*3 + 2];
+            edges[id0] = new Edge();
+            edges[id1] = new Edge();
+            edges[id2] = new Edge();
 
-            edges[i*3 + 2].edgeId.a = triangleList[i*3 + 2];
-            edges[i*3 + 2].edgeId.b = triangleList[i*3];
+            edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
+            edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
+            edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
 
+            edges[id0].edgeId.a = triangleList[id0];
+            edges[id0].edgeId.b = triangleList[id1];
 
-            // edges[i*3].adjacentEdge = edges[*3 + ];
-            // edges[i*3 + 1].adjacentEdge = edges[*3 + ];
-            // edges[i*3 + 2].adjacentEdge = edges[*3 + ];
+            edgeMatching.Add(edges[id0].edgeId, id0);
+            if (edgeMatching.TryGetValue(edges[id0].GetReversedEdgeId(), out matchId))
+            {
+                edges[id0].adjacentEdge = edges[matchId];
+            }
 
-            elements[i] = new Node(i, edges[3 * i], edges[3 * i + 1], edges[3 * i + 2], resolution);
+            edges[id1].edgeId.a = triangleList[id1];
+            edges[id1].edgeId.b = triangleList[id2];
+
+            edgeMatching.Add(edges[id1].edgeId, id1);
+            if (edgeMatching.TryGetValue(edges[id1].GetReversedEdgeId(), out matchId))
+            {
+                edges[id1].adjacentEdge = edges[matchId];
+            }
+
+            edges[id2].edgeId.a = triangleList[id2];
+            edges[id2].edgeId.b = triangleList[id0];
+
+            edgeMatching.Add(edges[id2].edgeId, id2);
+            if (edgeMatching.TryGetValue(edges[id2].GetReversedEdgeId(), out matchId))
+            {
+                edges[id2].adjacentEdge = edges[matchId];
+            }
+
+            elements[i] = new Node(i, edges[id0], edges[id1], edges[id2], resolution);
         }
 
-        sampler = new Random(seed);
+        this.sampler = sampler;
 
         currentNode = elements[sampler.Next(0, elements.Length - 1)];
-
 
     }
 
@@ -96,9 +99,6 @@ public class WFCGraph
 
         return lowestEntropyElements[sampler.Next(0, lowestEntropyElements.Count - 1)];
     }
-
-
-
     public bool Step()
     {
 
@@ -106,7 +106,7 @@ public class WFCGraph
         Node collapsingNode = elements[GetLowestEntropyElementId()];
         collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
         toProcess.Add(collapsingNode);
-        int localLength = 0;
+        int localLength;
         while (toProcess.Count > 0)
         {
             localLength = toProcess.Count;
@@ -209,7 +209,7 @@ public class WFCGraph
             n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
         }
     }
-    class Node
+    public class Node
     {
         public int id;
         public int entropy;
@@ -237,14 +237,6 @@ public class WFCGraph
                 this.edges[i].ownerNode = this;
             }
 
-            if (resolution == 0)
-            {
-
-            }
-            else
-            {
-
-            }
         }
 
         public void Collapse(int option)
@@ -264,8 +256,7 @@ public class WFCGraph
 
     }
 
-
-    class Edge
+    public class Edge
     {
         public EdgeId edgeId;
         public List<string> options;
@@ -273,19 +264,22 @@ public class WFCGraph
         public Edge adjacentEdge;
         public Node ownerNode;
 
-        public EdgeId GetReversedEdgeId(){
-            return new EdgeId(edgeId.b,edgeId.a);
+        public EdgeId GetReversedEdgeId()
+        {
+            return new EdgeId(edgeId.b, edgeId.a);
         }
 
 
     }
 
-    struct EdgeId {
+    public struct EdgeId
+    {
         public int a;
 
         public int b;
 
-        public EdgeId(int a, int b){
+        public EdgeId(int a, int b)
+        {
             this.a = a;
 
             this.b = b;

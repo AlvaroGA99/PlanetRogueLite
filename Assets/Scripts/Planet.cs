@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -12,6 +13,8 @@ public class Planet : MonoBehaviour
     private MeshFilter _mF;
 
     public int res;
+
+    public GameObject testSphere;
 
     private WFCGraph tiles;
 
@@ -28,10 +31,10 @@ public class Planet : MonoBehaviour
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
         GenerateSphereResolution(0);
-        tiles = new WFCGraph(_mF.mesh.triangles,0);
-
-        
-        
+        tiles = new WFCGraph(_mF.mesh.triangles,0, new System.Random());        
+        // bool succesful = true;
+        // succesful = tiles.Step();
+        TestEdgesUpdate();
     }
 
     // Update is called once per frame
@@ -91,6 +94,33 @@ public class Planet : MonoBehaviour
         _m.RecalculateNormals();
     }
 
+    private void TestEdgesUpdate(){
+        foreach(WFCGraph.Node n in tiles.elements){
+            foreach(WFCGraph.Edge e in n.edges){
+                if(e.options.Count > 0){
+                    switch(e.options[0]){
+                        case "AB":
+                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                        break;
+                        case "BA":
+                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                        break;
+                        case "AA":
+                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
+                           // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                        break;
+                        case "BB":
+                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                        break;
+                    }
+                }
+                
+            }
+        }
+    }
     private void GenerateSphereResolution(int resolution)
     {
 
