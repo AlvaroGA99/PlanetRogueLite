@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -14,9 +13,12 @@ public class Planet : MonoBehaviour
 
     public int res;
 
+    public int seed;
+
     public GameObject testSphere;
 
     private WFCGraph tiles;
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,11 +32,16 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        GenerateSphereResolution(0);
+        //GenerateSphereResolution(0);
         tiles = new WFCGraph(_mF.mesh.triangles,0, new System.Random());        
-        // bool succesful = true;
-        // succesful = tiles.Step();
+        WFCGraph.StateInfo succesful;
+        succesful = tiles.Step();
+        //succesful = tiles.Step();
+        
+        print(succesful);
         TestEdgesUpdate();
+        GenerateSphereResolution(5);
+
     }
 
     // Update is called once per frame
@@ -96,29 +103,40 @@ public class Planet : MonoBehaviour
 
     private void TestEdgesUpdate(){
         foreach(WFCGraph.Node n in tiles.elements){
+            //print(n.id);
+            Vector3 pos = new Vector3();
             foreach(WFCGraph.Edge e in n.edges){
-                if(e.options.Count > 0){
-                    switch(e.options[0]){
-                        case "AB":
-                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                        break;
-                        case "BA":
-                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                        break;
-                        case "AA":
-                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
-                           // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                        break;
-                        case "BB":
-                            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                        break;
-                    }
-                }
+                if(e.adjacentEdge.ownerNode.id == 8)
+                    print(e.adjacentEdge.ownerNode.id);
+                
+                // print(e.adjacentEdge.ownerNode.entropy);
+                // if(e.options.Count > 0){
+                //     switch(e.options[0]){
+                //         case "AB":
+                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                //         break;
+                //         case "BA":
+                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                //         break;
+                //         case "AA":
+                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
+                //            // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                //         break;
+                //         case "BB":
+                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
+                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                //         break;
+                //     }
+                // }
+
+                pos += transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] );
                 
             }
+            pos /= 3;
+            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+
         }
     }
     private void GenerateSphereResolution(int resolution)

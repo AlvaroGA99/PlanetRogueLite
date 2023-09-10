@@ -2,16 +2,17 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.Profiling;
 using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem.Interactions;
 
 public class WFCGraph
 {
     public Node currentNode;
     public Node[] elements;
-    Random sampler;
-
+    System.Random sampler;
     List<Node> toProcess;
 
-    public WFCGraph(int[] triangleList, int resolution, Random sampler)
+    public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
         elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
 
@@ -41,28 +42,34 @@ public class WFCGraph
             edges[id0].edgeId.a = triangleList[id0];
             edges[id0].edgeId.b = triangleList[id1];
 
-            edgeMatching.Add(edges[id0].edgeId, id0);
-            if (edgeMatching.TryGetValue(edges[id0].GetReversedEdgeId(), out matchId))
-            {
-                edges[id0].adjacentEdge = edges[matchId];
-            }
-
             edges[id1].edgeId.a = triangleList[id1];
             edges[id1].edgeId.b = triangleList[id2];
-
-            edgeMatching.Add(edges[id1].edgeId, id1);
-            if (edgeMatching.TryGetValue(edges[id1].GetReversedEdgeId(), out matchId))
-            {
-                edges[id1].adjacentEdge = edges[matchId];
-            }
 
             edges[id2].edgeId.a = triangleList[id2];
             edges[id2].edgeId.b = triangleList[id0];
 
+            edgeMatching.Add(edges[id0].edgeId, id0);
+            if (edgeMatching.TryGetValue(edges[id0].GetReversedEdgeId(), out matchId))
+            {
+                // Debug.Log("ALREADY MATCHED");
+                edges[id0].adjacentEdge = edges[matchId];
+                edges[matchId].adjacentEdge = edges[id0];
+            }
+
+            edgeMatching.Add(edges[id1].edgeId, id1);
+            if (edgeMatching.TryGetValue(edges[id1].GetReversedEdgeId(), out matchId))
+            {
+                // Debug.Log("ALREADY MATCHED");
+                edges[id1].adjacentEdge = edges[matchId];
+                edges[matchId].adjacentEdge = edges[id1];
+            }
+
             edgeMatching.Add(edges[id2].edgeId, id2);
             if (edgeMatching.TryGetValue(edges[id2].GetReversedEdgeId(), out matchId))
             {
+                // Debug.Log("ALREADY MATCHED");
                 edges[id2].adjacentEdge = edges[matchId];
+                edges[matchId].adjacentEdge = edges[id2];
             }
 
             elements[i] = new Node(i, edges[id0], edges[id1], edges[id2], resolution);
@@ -96,55 +103,98 @@ public class WFCGraph
 
 
         }
+        if (lowestEntropyElements.Count > 0)
+        {
+            return lowestEntropyElements[sampler.Next(0, lowestEntropyElements.Count - 1)];
+        }
+        else
+        {
+            return -1;
+        }
 
-        return lowestEntropyElements[sampler.Next(0, lowestEntropyElements.Count - 1)];
     }
-    public bool Step()
+    public StateInfo Step()
     {
 
         toProcess.Clear();
-        Node collapsingNode = elements[GetLowestEntropyElementId()];
-        collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
-        toProcess.Add(collapsingNode);
-        int localLength;
-        while (toProcess.Count > 0)
+        int collapsingId = GetLowestEntropyElementId();
+        StateInfo state = StateInfo.SUCCESFUL;
+        if (collapsingId != -1)
         {
-            localLength = toProcess.Count;
-            for (int i = 0; i < localLength; i++)
-            {
-                if (!Propagate(toProcess[i], i))
+            Node collapsingNode = elements[collapsingId];
+            collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
+            toProcess.Add(collapsingNode);
+            int localLength;
+
+            //int lastIndex = -1;
+            while (toProcess.Count > 0)
+            {   
+                state = StateInfo.SUCCESFUL;
+                localLength = toProcess.Count;
+                ///currentNode = 
+                //Debug.Log("Local length : " + localLength);
+                for (int i = 0; i < localLength; i++)
                 {
-                    return false;
+                    state = Propagate(toProcess[0]);
+                    if (state == StateInfo.ERROR)
+                    {
+                        return StateInfo.ERROR;
+                    }
+
                 }
+
+                //Debug.Log(elements);
+                //Debug.Log("\n ///////////////////////////////////////////////////////////////////");
+
             }
         }
 
-        return true;
+        return state;
+
+
+
+
 
     }
 
-    private bool Propagate(Node elementToProcess, int index)
+    private StateInfo Propagate(Node elementToProcess)
     {
 
         toProcess.RemoveAt(0);
 
+        StateInfo localState = StateInfo.UPDATE_LIMIT;
+
         for (int i = 0; i < 3; i++)
         {
-            if (i != index)
-            {
-                if (UpdateNeighbour(elementToProcess.edges[i]))
-                {
-                    elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
-                    toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
-                }
-                if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy == 0)
-                {
-                    return false;
-                }
+            // if (elementToProcess.edges[i].adjacentEdge.ownerNode.id != id)
+            // {
+            if (UpdateNeighbour(elementToProcess.edges[i]))
+            {   
+                Debug.Log("UPDATED");
+                elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
+                toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
+                localState = StateInfo.SUCCESFUL;
+
             }
+
+            if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy == 0)
+            {
+                
+                //return StateInfo.ERROR;
+            }else{
+                for (int j = 0; j < elementToProcess.edges[i].adjacentEdge.options.Count; j++)
+                {
+                   // Debug.Log( elementToProcess.edges[i].adjacentEdge.options[j]+ "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.options[j] + "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.nextInternalEdge.options[j]);
+
+                }
+               
+
+            }
+            // }
+
         }
 
-        return true;
+        return localState;
 
     }
 
@@ -177,6 +227,10 @@ public class WFCGraph
                 index++;
             }
         }
+
+        // edge.adjacentEdge.options.Clear();
+        // edge.adjacentEdge.options.Add("AB");
+
         if (originalLength != edge.adjacentEdge.options.Count)
         {
             return true;
@@ -192,11 +246,11 @@ public class WFCGraph
 
         if (seed >= 0)
         {
-            sampler = new Random(seed);
+            sampler = new System.Random(seed);
         }
         else
         {
-            sampler = new Random();
+            sampler = new System.Random();
         }
 
 
@@ -284,5 +338,13 @@ public class WFCGraph
 
             this.b = b;
         }
+    }
+
+    public enum StateInfo
+    {
+        SUCCESFUL,
+        UPDATE_LIMIT,
+        ERROR
+
     }
 }
