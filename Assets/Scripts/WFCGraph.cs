@@ -8,12 +8,16 @@ using UnityEngine.InputSystem.Interactions;
 public class WFCGraph
 {
     public Node currentNode;
+
+    public bool subStateFlag;
     public Node[] elements;
     System.Random sampler;
     List<Node> toProcess;
 
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
+        subStateFlag = true;
+
         elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
 
         toProcess = new List<Node>();
@@ -127,7 +131,7 @@ public class WFCGraph
             int localLength;
 
             //int lastIndex = -1;
-            while (toProcess.Count > 0)
+            while (toProcess.Count > 0 )
             {   
                 state = StateInfo.SUCCESFUL;
                 localLength = toProcess.Count;

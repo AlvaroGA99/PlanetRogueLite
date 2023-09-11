@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 public class Planet : MonoBehaviour
@@ -19,6 +20,8 @@ public class Planet : MonoBehaviour
 
     private WFCGraph tiles;
 
+    private List<GameObject> gameobjectReferences ; 
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,26 +31,44 @@ public class Planet : MonoBehaviour
 
     private void Awake()
     {
-    
+        gameobjectReferences = new List<GameObject>();
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
         //GenerateSphereResolution(0);
         tiles = new WFCGraph(_mF.mesh.triangles,0, new System.Random());        
         WFCGraph.StateInfo succesful;
-        succesful = tiles.Step();
+        //succesful = tiles.Step();
         //succesful = tiles.Step();
         
-        print(succesful);
+        //print(succesful);
         TestEdgesUpdate();
-        GenerateSphereResolution(5);
+        //GenerateSphereResolution(5);
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(Keyboard.current.jKey.wasReleasedThisFrame){
+             foreach (var item in gameobjectReferences)
+            {
+                Destroy(item);
+            }
+            gameobjectReferences.Clear();
+            tiles.Step();
+            TestEdgesUpdate();
+            
+        }
+        if(Keyboard.current.rKey.wasReleasedThisFrame){
+             foreach (var item in gameobjectReferences)
+            {
+                Destroy(item);
+            }
+            gameobjectReferences.Clear();
+            tiles.Reset(-1);
+            TestEdgesUpdate();
+        }
     }
 
     private void InitializeBaseIcosahedron()
@@ -131,11 +152,15 @@ public class Planet : MonoBehaviour
                 //     }
                 // }
 
-                pos += transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] );
+                pos += _m.vertices[e.edgeId.a] ;
                 
             }
             pos /= 3;
-            Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
+            for (int i = 0; i < n.entropy; i++)
+            {
+                gameobjectReferences.Add(Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f*i*(pos - transform.position)),Quaternion.identity));
+            }
+            
 
         }
     }
