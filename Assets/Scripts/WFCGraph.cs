@@ -39,9 +39,9 @@ public class WFCGraph
             edges[id1] = new Edge();
             edges[id2] = new Edge();
 
-            edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
-            edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
+            edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
 
             edges[id0].edgeId.a = triangleList[id0];
             edges[id0].edgeId.b = triangleList[id1];
@@ -127,16 +127,14 @@ public class WFCGraph
         {
             Node collapsingNode = elements[collapsingId];
             collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
+            Debug.Log(collapsingNode.edges[0].options[0] + collapsingNode.edges[1].options[0] + collapsingNode.edges[2].options[0]);
             toProcess.Add(collapsingNode);
-            int localLength;
 
-            //int lastIndex = -1;
-            while (toProcess.Count > 0 )
-            {   
+            int localLength;
+            while (toProcess.Count > 0)
+            {
                 state = StateInfo.SUCCESFUL;
                 localLength = toProcess.Count;
-                ///currentNode = 
-                //Debug.Log("Local length : " + localLength);
                 for (int i = 0; i < localLength; i++)
                 {
                     state = Propagate(toProcess[0]);
@@ -144,12 +142,7 @@ public class WFCGraph
                     {
                         return StateInfo.ERROR;
                     }
-
                 }
-
-                //Debug.Log(elements);
-                //Debug.Log("\n ///////////////////////////////////////////////////////////////////");
-
             }
         }
 
@@ -159,6 +152,19 @@ public class WFCGraph
 
 
 
+    }
+
+    public void TestSubState()
+    {
+        int localLength = 0;
+        if (toProcess.Count > 0)
+        {
+            localLength = toProcess.Count;
+            for (int i = 0; i < localLength; i++)
+            {
+                Propagate(toProcess[0]);
+            }
+        }
     }
 
     private StateInfo Propagate(Node elementToProcess)
@@ -173,8 +179,8 @@ public class WFCGraph
             // if (elementToProcess.edges[i].adjacentEdge.ownerNode.id != id)
             // {
             if (UpdateNeighbour(elementToProcess.edges[i]))
-            {   
-                Debug.Log("UPDATED");
+            {
+                //Debug.Log("UPDATED");
                 elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
                 toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
                 localState = StateInfo.SUCCESFUL;
@@ -183,15 +189,17 @@ public class WFCGraph
 
             if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy == 0)
             {
-                
+
                 //return StateInfo.ERROR;
-            }else{
+            }
+            else
+            {
                 for (int j = 0; j < elementToProcess.edges[i].adjacentEdge.options.Count; j++)
                 {
-                   // Debug.Log( elementToProcess.edges[i].adjacentEdge.options[j]+ "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.options[j] + "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.nextInternalEdge.options[j]);
+                    // Debug.Log( elementToProcess.edges[i].adjacentEdge.options[j]+ "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.options[j] + "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.nextInternalEdge.options[j]);
 
                 }
-               
+
 
             }
             // }
@@ -207,21 +215,31 @@ public class WFCGraph
         int originalLength = edge.adjacentEdge.options.Count;
         int index = 0;
         bool optionCompatible;
+        int debugCount = 0;
         while (index < edge.adjacentEdge.options.Count)
         {
-            optionCompatible = true;
+            optionCompatible = false;
+            debugCount = 0;
             foreach (string option in edge.options)
-            {
-                char[] reversedOption = option.ToCharArray();
-                Array.Reverse(reversedOption);
-                if (!edge.adjacentEdge.options[index].Equals(reversedOption))
-                {
-                    optionCompatible = false;
+            {   
+                char[] edgeOption = edge.adjacentEdge.options[index].ToCharArray();
+                char[] adjacentReversedOption = option.ToCharArray();
+                Array.Reverse(adjacentReversedOption);
+                debugCount ++;
+                
+                //Debug.Log();
+                Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
+                if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1])
+                {   
+                    //Debug.Log("-------");
+                    optionCompatible = true;
                     break;
                 }
+                
             }
             if (!optionCompatible)
             {
+                
                 edge.adjacentEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.nextInternalEdge.options.RemoveAt(index);
@@ -260,11 +278,11 @@ public class WFCGraph
 
         foreach (Node n in elements)
         {
-            n.entropy = 8;
             //n.collapsed = false;
-            n.edges[0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
-            n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            n.edges[0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
+            n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
+            n.entropy = n.edges[0].options.Count;
         }
     }
     public class Node
@@ -278,7 +296,7 @@ public class WFCGraph
         {
             this.id = id;
             //this.collapsed = false;
-            this.entropy = 8;
+            this.entropy = a_Edge.options.Count;
 
             this.edges = new Edge[3];
 

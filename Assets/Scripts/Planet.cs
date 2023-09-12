@@ -20,13 +20,13 @@ public class Planet : MonoBehaviour
 
     private WFCGraph tiles;
 
-    private List<GameObject> gameobjectReferences ; 
+    private List<GameObject> gameobjectReferences;
 
 
     // Start is called before the first frame update
     void Start()
     {
-      //print (new Vector3());
+        //print (new Vector3());
     }
 
     private void Awake()
@@ -36,11 +36,11 @@ public class Planet : MonoBehaviour
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
         //GenerateSphereResolution(0);
-        tiles = new WFCGraph(_mF.mesh.triangles,0, new System.Random());        
+        tiles = new WFCGraph(_mF.mesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo succesful;
         //succesful = tiles.Step();
         //succesful = tiles.Step();
-        
+
         //print(succesful);
         TestEdgesUpdate();
         //GenerateSphereResolution(5);
@@ -50,23 +50,35 @@ public class Planet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Keyboard.current.jKey.wasReleasedThisFrame){
-             foreach (var item in gameobjectReferences)
+        if (Keyboard.current.jKey.wasReleasedThisFrame)
+        {
+            foreach (var item in gameobjectReferences)
             {
                 Destroy(item);
             }
             gameobjectReferences.Clear();
             tiles.Step();
             TestEdgesUpdate();
-            
+
         }
-        if(Keyboard.current.rKey.wasReleasedThisFrame){
-             foreach (var item in gameobjectReferences)
+        if (Keyboard.current.rKey.wasReleasedThisFrame)
+        {
+            foreach (var item in gameobjectReferences)
             {
                 Destroy(item);
             }
             gameobjectReferences.Clear();
             tiles.Reset(-1);
+            TestEdgesUpdate();
+        }
+        if (Keyboard.current.sKey.wasReleasedThisFrame)
+        {
+            foreach (var item in gameobjectReferences)
+            {
+                Destroy(item);
+            }
+            gameobjectReferences.Clear();
+            tiles.TestSubState();
             TestEdgesUpdate();
         }
     }
@@ -122,14 +134,17 @@ public class Planet : MonoBehaviour
         _m.RecalculateNormals();
     }
 
-    private void TestEdgesUpdate(){
-        foreach(WFCGraph.Node n in tiles.elements){
+    private void TestEdgesUpdate()
+    {
+        foreach (WFCGraph.Node n in tiles.elements)
+        {
             //print(n.id);
             Vector3 pos = new Vector3();
-            foreach(WFCGraph.Edge e in n.edges){
-                if(e.adjacentEdge.ownerNode.id == 8)
-                    print(e.adjacentEdge.ownerNode.id);
-                
+            foreach (WFCGraph.Edge e in n.edges)
+            {
+                //if (e.adjacentEdge.ownerNode.id == 8)
+                    //print(e.adjacentEdge.ownerNode.id);
+
                 // print(e.adjacentEdge.ownerNode.entropy);
                 // if(e.options.Count > 0){
                 //     switch(e.options[0]){
@@ -152,15 +167,15 @@ public class Planet : MonoBehaviour
                 //     }
                 // }
 
-                pos += _m.vertices[e.edgeId.a] ;
-                
+                pos += _m.vertices[e.edgeId.a];
+
             }
             pos /= 3;
             for (int i = 0; i < n.entropy; i++)
             {
-                gameobjectReferences.Add(Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f*i*(pos - transform.position)),Quaternion.identity));
+                gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
             }
-            
+
 
         }
     }
@@ -170,13 +185,13 @@ public class Planet : MonoBehaviour
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
         int newIndex = 0;
 
-        for (int r = 0; r < resolution ; r++)
+        for (int r = 0; r < resolution; r++)
         {
 
             int originalLength = _m.triangles.Length;
 
             int[] newTriangles = new int[_m.triangles.Length * 4];
-            Vector3[] newVertices = new Vector3[2*_m.vertexCount + (_m.triangles.Length/3) - 2];
+            Vector3[] newVertices = new Vector3[2 * _m.vertexCount + (_m.triangles.Length / 3) - 2];
 
             newIndex = _m.vertexCount;
 
@@ -189,9 +204,9 @@ public class Planet : MonoBehaviour
                 int i1 = _m.triangles[i + 1];
                 int i2 = _m.triangles[i + 2];
 
-                int newIndex0 = GetNewVertexIndex(i0, i1,  ref newVertexIndices,  ref newVertices, ref newIndex);          
-                int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices,  ref newVertices, ref newIndex);
-                int newIndex2 = GetNewVertexIndex(i2, i0, ref  newVertexIndices,  ref newVertices, ref newIndex);
+                int newIndex0 = GetNewVertexIndex(i0, i1, ref newVertexIndices, ref newVertices, ref newIndex);
+                int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices, ref newVertices, ref newIndex);
+                int newIndex2 = GetNewVertexIndex(i2, i0, ref newVertexIndices, ref newVertices, ref newIndex);
 
                 newTriangles[i * 4 + 9] = i0;
                 newTriangles[i * 4 + 10] = newIndex0;
@@ -212,9 +227,9 @@ public class Planet : MonoBehaviour
 
             }
 
-            if(r == resolution - 1)
+            if (r == resolution - 1)
             {
-               newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
+                newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
                 newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
                 newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
                 newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
@@ -224,8 +239,8 @@ public class Planet : MonoBehaviour
                 newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
                 newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
                 newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
-                newVertices[10] +=  newVertices[10];//*SampleNoiseHeight( newVertices[10] );
-                newVertices[11] +=  newVertices[11];//*SampleNoiseHeight( newVertices[11] );
+                newVertices[10] += newVertices[10];//*SampleNoiseHeight( newVertices[10] );
+                newVertices[11] += newVertices[11];//*SampleNoiseHeight( newVertices[11] );
 
             }
 
@@ -234,7 +249,7 @@ public class Planet : MonoBehaviour
 
         }
 
-       
+
         // print(_m.vertices[0]);
         // print(_m.vertices[1]);
         // print(_m.vertices[2]);
@@ -254,44 +269,44 @@ public class Planet : MonoBehaviour
     private float SampleNoiseHeight(Vector3 pointOnSphere)
     {
 
-        float l1 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f,0.2f),UnityEngine.Random.Range(0f,0.1f))/4f;
-        float l2 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f,0.1f),UnityEngine.Random.Range(0f,0.1f))/8f;
-        float l3 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f,0.1f),UnityEngine.Random.Range(0f,0.1f))/16f;
-        float l4 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f,0.1f),UnityEngine.Random.Range(0f,0.1f))/32f;
+        float l1 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.2f), UnityEngine.Random.Range(0f, 0.1f)) / 4f;
+        float l2 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 8f;
+        float l3 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 16f;
+        float l4 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 32f;
 
-        return  l1 + l2 + l3 + l4;
+        return l1 + l2 + l3 + l4;
     }
- 
-    private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices,  ref Vector3[] newVertices, ref int newIndex)
-{
-    long edgeKey = EdgeKey(i0, i1);
-    int vertexIndex;
 
-    if (newVertexIndices.TryGetValue(edgeKey, out vertexIndex))
+    private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
     {
-        // Vertex already exists, return its index
-        return vertexIndex;
+        long edgeKey = EdgeKey(i0, i1);
+        int vertexIndex;
+
+        if (newVertexIndices.TryGetValue(edgeKey, out vertexIndex))
+        {
+            // Vertex already exists, return its index
+            return vertexIndex;
+        }
+
+        Vector3 v0 = newVertices[i0];
+        Vector3 v1 = newVertices[i1];
+        Vector3 newVertex = ((v0 + v1) / 2f).normalized;
+        //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
+        newVertices[newIndex] = newVertex;
+        newVertexIndices[edgeKey] = newIndex;
+
+        return newIndex++;
     }
 
-    Vector3 v0 = newVertices[i0];
-    Vector3 v1 = newVertices[i1];
-    Vector3 newVertex = ((v0 + v1) / 2f).normalized;
-    //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
-    newVertices[newIndex] = newVertex;
-    newVertexIndices[edgeKey] = newIndex;
-
-    return newIndex++;
-}
-
-private long EdgeKey(int i0, int i1)
-{
-    long minIndex = Mathf.Min(i0, i1);
-    long maxIndex = Mathf.Max(i0, i1);
-    long edgeIndex = minIndex;
-    edgeIndex <<= 32;
-    edgeIndex |= maxIndex;
-    return edgeIndex;
-}
+    private long EdgeKey(int i0, int i1)
+    {
+        long minIndex = Mathf.Min(i0, i1);
+        long maxIndex = Mathf.Max(i0, i1);
+        long edgeIndex = minIndex;
+        edgeIndex <<= 32;
+        edgeIndex |= maxIndex;
+        return edgeIndex;
+    }
 
 
 }
