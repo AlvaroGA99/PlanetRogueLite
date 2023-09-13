@@ -129,11 +129,10 @@ public class WFCGraph
             collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
             Debug.Log(collapsingNode.edges[0].options[0] + collapsingNode.edges[1].options[0] + collapsingNode.edges[2].options[0]);
             toProcess.Add(collapsingNode);
-
             int localLength;
             while (toProcess.Count > 0)
             {
-                state = StateInfo.SUCCESFUL;
+                
                 localLength = toProcess.Count;
                 for (int i = 0; i < localLength; i++)
                 {
@@ -172,7 +171,7 @@ public class WFCGraph
 
         toProcess.RemoveAt(0);
 
-        StateInfo localState = StateInfo.UPDATE_LIMIT;
+        StateInfo localState = StateInfo.IN_PROGRESS;
 
         for (int i = 0; i < 3; i++)
         {
@@ -183,24 +182,14 @@ public class WFCGraph
                 //Debug.Log("UPDATED");
                 elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
                 toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
-                localState = StateInfo.SUCCESFUL;
+                //localState = StateInfo.IN_PROGRESS;
 
             }
 
             if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy == 0)
             {
 
-                //return StateInfo.ERROR;
-            }
-            else
-            {
-                for (int j = 0; j < elementToProcess.edges[i].adjacentEdge.options.Count; j++)
-                {
-                    // Debug.Log( elementToProcess.edges[i].adjacentEdge.options[j]+ "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.options[j] + "-"+ elementToProcess.edges[i].adjacentEdge.nextInternalEdge.nextInternalEdge.options[j]);
-
-                }
-
-
+                return StateInfo.ERROR;
             }
             // }
 
@@ -272,7 +261,7 @@ public class WFCGraph
         }
         else
         {
-            sampler = new System.Random();
+            sampler = new System.Random(sampler.Next());
         }
 
 
@@ -365,7 +354,7 @@ public class WFCGraph
     public enum StateInfo
     {
         SUCCESFUL,
-        UPDATE_LIMIT,
+        IN_PROGRESS,
         ERROR
 
     }

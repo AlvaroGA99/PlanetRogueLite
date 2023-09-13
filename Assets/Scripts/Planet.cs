@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -37,12 +38,23 @@ public class Planet : MonoBehaviour
         InitializeBaseIcosahedron();
         //GenerateSphereResolution(0);
         tiles = new WFCGraph(_mF.mesh.triangles, 0, new System.Random());
-        WFCGraph.StateInfo succesful;
-        //succesful = tiles.Step();
-        //succesful = tiles.Step();
+        WFCGraph.StateInfo state;
+        state = tiles.Step();
+        print(state);
+        while (state != WFCGraph.StateInfo.SUCCESFUL)
+        {
+            if (state == WFCGraph.StateInfo.ERROR)
+            {
+                tiles.Reset(-1);
+            }
+            state = tiles.Step();
+            //print(state);
 
+        }
+
+        UpdateVertexPositions();
         //print(succesful);
-        TestEdgesUpdate();
+        //TestEdgesUpdate();
         //GenerateSphereResolution(5);
 
     }
@@ -50,37 +62,37 @@ public class Planet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.jKey.wasReleasedThisFrame)
-        {
-            foreach (var item in gameobjectReferences)
-            {
-                Destroy(item);
-            }
-            gameobjectReferences.Clear();
-            tiles.Step();
-            TestEdgesUpdate();
+        // if (Keyboard.current.jKey.wasReleasedThisFrame)
+        // {
+        //     foreach (var item in gameobjectReferences)
+        //     {
+        //         Destroy(item);
+        //     }
+        //     gameobjectReferences.Clear();
+        //     tiles.Step();
+        //     TestEdgesUpdate();
 
-        }
-        if (Keyboard.current.rKey.wasReleasedThisFrame)
-        {
-            foreach (var item in gameobjectReferences)
-            {
-                Destroy(item);
-            }
-            gameobjectReferences.Clear();
-            tiles.Reset(-1);
-            TestEdgesUpdate();
-        }
-        if (Keyboard.current.sKey.wasReleasedThisFrame)
-        {
-            foreach (var item in gameobjectReferences)
-            {
-                Destroy(item);
-            }
-            gameobjectReferences.Clear();
-            tiles.TestSubState();
-            TestEdgesUpdate();
-        }
+        // }
+        // if (Keyboard.current.rKey.wasReleasedThisFrame)
+        // {
+        //     foreach (var item in gameobjectReferences)
+        //     {
+        //         Destroy(item);
+        //     }
+        //     gameobjectReferences.Clear();
+        //     tiles.Reset(-1);
+        //     TestEdgesUpdate();
+        // }
+        // if (Keyboard.current.sKey.wasReleasedThisFrame)
+        // {
+        //     foreach (var item in gameobjectReferences)
+        //     {
+        //         Destroy(item);
+        //     }
+        //     gameobjectReferences.Clear();
+        //     tiles.TestSubState();
+        //     TestEdgesUpdate();
+        // }
     }
 
     private void InitializeBaseIcosahedron()
@@ -134,6 +146,69 @@ public class Planet : MonoBehaviour
         _m.RecalculateNormals();
     }
 
+    private void UpdateVertexPositions()
+    {
+        Vector3[] vertices = new Vector3[_m.vertexCount];
+
+        Array.Copy(_m.vertices, 0, vertices, 0, _m.vertexCount);
+
+
+       
+
+        foreach (WFCGraph.Node n in tiles.elements)
+        {
+            foreach (WFCGraph.Edge e in n.edges)
+            {
+                if (e.options.Count > 0)
+                {
+                    switch (e.options[0])
+                    {
+                        case "AB":
+                            vertices[e.edgeId.a] *= 1.05f;
+                            break;
+                        case "BA":
+                            vertices[e.edgeId.b] *=  1.05f;
+                            break;
+                        case "AA":
+                            vertices[e.edgeId.a] *=  1.05f;
+                            vertices[e.edgeId.b] *=  1.05f;
+                            break;
+                        case "BB":
+                            break;
+                    }
+                }
+            }
+        }
+         int[] triangles = new int[]
+        {
+            0, 11, 5,
+            0, 5, 1,
+            0, 1, 7,
+            0, 7, 10,
+            0, 10, 11,
+            1, 5, 9,
+            5, 11, 4,
+            11, 10, 2,
+            10, 7, 6,
+            7, 1, 8,
+            3, 9, 4,
+            3, 4, 2,
+            3, 2, 6,
+            3, 6, 8,
+            3, 8, 9,
+            4, 9, 5,
+            2, 4, 11,
+            6, 2, 10,
+            8, 6, 7,
+            9, 8, 1
+        };
+
+        
+            _m.vertices = vertices;
+            _m.triangles = triangles;
+            _m.RecalculateNormals();
+    }
+
     private void TestEdgesUpdate()
     {
         foreach (WFCGraph.Node n in tiles.elements)
@@ -143,29 +218,35 @@ public class Planet : MonoBehaviour
             foreach (WFCGraph.Edge e in n.edges)
             {
                 //if (e.adjacentEdge.ownerNode.id == 8)
-                    //print(e.adjacentEdge.ownerNode.id);
+                //print(e.adjacentEdge.ownerNode.id);
 
                 // print(e.adjacentEdge.ownerNode.entropy);
-                // if(e.options.Count > 0){
-                //     switch(e.options[0]){
-                //         case "AB":
-                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
-                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                //         break;
-                //         case "BA":
-                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a] ),Quaternion.identity);
-                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                //         break;
-                //         case "AA":
-                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
-                //            // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                //         break;
-                //         case "BB":
-                //             Instantiate(testSphere,transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]),Quaternion.identity);
-                //             //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                //         break;
-                //     }
-                // }
+                if (e.options.Count > 0)
+                {
+                    switch (e.options[0])
+                    {
+                        case "AB":
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            break;
+                        case "BA":
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            break;
+                        case "AA":
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            break;
+                        case "BB":
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
+                            // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            break;
+                    }
+                }
 
                 pos += _m.vertices[e.edgeId.a];
 
@@ -173,7 +254,7 @@ public class Planet : MonoBehaviour
             pos /= 3;
             for (int i = 0; i < n.entropy; i++)
             {
-                gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
+                //gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
             }
 
 
