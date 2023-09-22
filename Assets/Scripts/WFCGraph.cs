@@ -8,22 +8,20 @@ using UnityEngine.InputSystem.Interactions;
 public class WFCGraph
 {
     public Node currentNode;
-
-    public bool subStateFlag;
     public Node[] elements;
+    public Dictionary<EdgeId, int> edgeMatching;
     System.Random sampler;
     List<Node> toProcess;
-
+    
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
-        subStateFlag = true;
 
-        elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
-
+        //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
+        elements = new Node[((triangleList.Length / 3) )];
         toProcess = new List<Node>();
 
         // Data extraction from triangleList, and element initialization
-        Dictionary<EdgeId, int> edgeMatching = new Dictionary<EdgeId, int>();
+        edgeMatching = new Dictionary<EdgeId, int>();
 
         Edge[] edges = new Edge[elements.Length * 3];
 

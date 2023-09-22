@@ -36,7 +36,6 @@ public class Planet : MonoBehaviour
         _mF = gameObject.AddComponent<MeshFilter>();
         _m = _mF.mesh;
         InitializeBaseIcosahedron();
-        //GenerateSphereResolution(0);
         tiles = new WFCGraph(_mF.mesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
         state = tiles.Step();
@@ -48,11 +47,11 @@ public class Planet : MonoBehaviour
                 tiles.Reset(-1);
             }
             state = tiles.Step();
-            //print(state);
-
         }
-
-        UpdateVertexPositions();
+        
+        Debug.Log(_m.triangles.Length/3);
+        GenerateSphereResolution(4);
+        //UpdateVertexPositions();
         //print(succesful);
         //TestEdgesUpdate();
         //GenerateSphereResolution(5);
@@ -152,9 +151,6 @@ public class Planet : MonoBehaviour
 
         Array.Copy(_m.vertices, 0, vertices, 0, _m.vertexCount);
 
-
-       
-
         foreach (WFCGraph.Node n in tiles.elements)
         {
             foreach (WFCGraph.Edge e in n.edges)
@@ -164,14 +160,14 @@ public class Planet : MonoBehaviour
                     switch (e.options[0])
                     {
                         case "AB":
-                            vertices[e.edgeId.a] *= 1.05f;
+                            vertices[e.edgeId.a] *= 1.025f;
                             break;
                         case "BA":
-                            vertices[e.edgeId.b] *=  1.05f;
+                            vertices[e.edgeId.b] *=  1.025f;
                             break;
                         case "AA":
-                            vertices[e.edgeId.a] *=  1.05f;
-                            vertices[e.edgeId.b] *=  1.05f;
+                            vertices[e.edgeId.a] *=  1.025f;
+                            vertices[e.edgeId.b] *=  1.025f;
                             break;
                         case "BB":
                             break;
@@ -179,33 +175,7 @@ public class Planet : MonoBehaviour
                 }
             }
         }
-         int[] triangles = new int[]
-        {
-            0, 11, 5,
-            0, 5, 1,
-            0, 1, 7,
-            0, 7, 10,
-            0, 10, 11,
-            1, 5, 9,
-            5, 11, 4,
-            11, 10, 2,
-            10, 7, 6,
-            7, 1, 8,
-            3, 9, 4,
-            3, 4, 2,
-            3, 2, 6,
-            3, 6, 8,
-            3, 8, 9,
-            4, 9, 5,
-            2, 4, 11,
-            6, 2, 10,
-            8, 6, 7,
-            9, 8, 1
-        };
-
-        
             _m.vertices = vertices;
-            _m.triangles = triangles;
             _m.RecalculateNormals();
     }
 
@@ -310,18 +280,18 @@ public class Planet : MonoBehaviour
 
             if (r == resolution - 1)
             {
-                newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
-                newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
-                newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
-                newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
-                newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
-                newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
-                newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
-                newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
-                newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
-                newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
-                newVertices[10] += newVertices[10];//*SampleNoiseHeight( newVertices[10] );
-                newVertices[11] += newVertices[11];//*SampleNoiseHeight( newVertices[11] );
+                // newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
+                // newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
+                // newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
+                // newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
+                // newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
+                // newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
+                // newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
+                // newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
+                // newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
+                // newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
+                // newVertices[10] += newVertices[10];//*SampleNoiseHeight( newVertices[10] );
+                // newVertices[11] += newVertices[11];//*SampleNoiseHeight( newVertices[11] );
 
             }
 

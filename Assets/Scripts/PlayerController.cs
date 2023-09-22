@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -34,6 +35,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _rotationVector ;
     private Vector3 _toCenter;
     private Vector3 _wieldVector;
+
+    public static Vector3 _lastForward;
     
     private float _rotationSpeed;
     
@@ -69,6 +72,7 @@ public class PlayerController : MonoBehaviour
         _lastLocalRotation = _tChild.localRotation;
         _lastLocalWieldRotation = _tWeapon.localRotation;
         cam = Camera.main;
+        _lastForward = _tWeapon.transform.forward;
 
     }
  
@@ -117,15 +121,14 @@ public class PlayerController : MonoBehaviour
     }
     public void FixedUpdate()
     {
+        _lastForward = _tWeapon.transform.forward;
+        
+        // _tWeapon.position = transform.position;
 
-          if (notGamepad)
-          {
-            // _tWeapon.position = transform.position;
-
-             Vector3 aux = cam.WorldToScreenPoint(_t.position);
-             _wieldVector = new Vector3(Mouse.current.position.x.ReadValue() - aux.x,0,Mouse.current.position.y.ReadValue() - aux.y)  ;
-             _wieldVector.Normalize();
-          }
+        Vector3 aux = cam.WorldToScreenPoint(_t.position);
+        _wieldVector = new Vector3(Mouse.current.position.x.ReadValue() - aux.x,0,Mouse.current.position.y.ReadValue() - aux.y)  ;
+        _wieldVector.Normalize();
+          
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
         _toCenter = (_SphereT.position - _t.position).normalized;
@@ -146,6 +149,8 @@ public class PlayerController : MonoBehaviour
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
 
         _lastLocalWieldRotation = _tWeapon.localRotation;
+
+        
  
     }
 
@@ -153,5 +158,10 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter(Collision col)
     {
         onFloor = true;
+        
+    }
+
+    public static Vector3 GetLastWeaponForward(){
+        return _lastForward;
     }
 }

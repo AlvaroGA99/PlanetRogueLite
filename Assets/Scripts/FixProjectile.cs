@@ -22,17 +22,17 @@ public class FixProjectile : MonoBehaviour
     private void FixedUpdate()
     {   
         
-        _rb.AddForce(-transform.position.normalized*10, ForceMode.Acceleration);
+        _rb.AddForce(-transform.position.normalized*30, ForceMode.Acceleration);
     }
     
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "Weapon")
-        {
-            _rb.velocity = (transform.position - collision.transform.position).normalized * 1000;
+        {   
             
+            _rb.velocity = Vector3.Cross(Vector3.Cross(collision.gameObject.transform.forward,PlayerController._lastForward)*100,collision.gameObject.transform.forward)*-1 + collision.gameObject.GetComponentInParent<Rigidbody>().velocity;
             
-            print("COLLISION");
+            print("COLLISION" + Vector3.Cross(collision.gameObject.transform.forward,PlayerController._lastForward));
         }
        
     }

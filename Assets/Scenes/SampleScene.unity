@@ -261,7 +261,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9216107727088389650, guid: 86221c07f9d0aa0458059e6b21ee7188, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.2946336
+      value: -7.6
       objectReference: {fileID: 0}
     - target: {fileID: 9216107727088389650, guid: 86221c07f9d0aa0458059e6b21ee7188, type: 3}
       propertyPath: m_LocalPosition.y
@@ -305,7 +305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9216107727088389663, guid: 86221c07f9d0aa0458059e6b21ee7188, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86221c07f9d0aa0458059e6b21ee7188, type: 3}
@@ -634,9 +634,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1024585299}
+  - component: {fileID: 1024585301}
   m_Layer: 0
   m_Name: Weapon
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -648,7 +649,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1024585298}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -657,6 +658,19 @@ Transform:
   m_Father: {fileID: 1591222659}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1024585301
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024585298}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.39246327, y: 1.5575047, z: 2.1334696}
+  m_Center: {x: -0.018323928, y: -0.2312975, z: 2.0251827}
 --- !u!4 &1366280389 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5699372761463504401, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
@@ -673,7 +687,6 @@ GameObject:
   - component: {fileID: 1492539505}
   - component: {fileID: 1492539508}
   - component: {fileID: 1492539507}
-  - component: {fileID: 1492539509}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Weapon
@@ -746,19 +759,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1492539504}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &1492539509
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1492539504}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 2.0000005, z: 5.107099}
-  m_Center: {x: 0, y: 0, z: 0.8}
 --- !u!1001 &1517073101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -769,6 +769,10 @@ PrefabInstance:
     - target: {fileID: 5699372761463504400, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
       propertyPath: seed
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5699372761463504400, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5699372761463504400, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
       propertyPath: testSphere
@@ -829,6 +833,14 @@ PrefabInstance:
     - target: {fileID: 5699372761463504413, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
       propertyPath: m_Name
       value: Planet
+      objectReference: {fileID: 0}
+    - target: {fileID: 5699372761463504413, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5699372761463504413, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
