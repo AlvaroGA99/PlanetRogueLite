@@ -25,9 +25,10 @@ public class PlayerController : MonoBehaviour
     private InputAction jump;
     private InputAction wield;
     
-    [SerializeField] private Transform _SphereT;
+    public Transform _SphereT;
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tWeapon;
+    [SerializeField] private Transform _tWeaponReversed;
     private Transform _t;
 
     private Rigidbody _rb;
@@ -147,6 +148,8 @@ public class PlayerController : MonoBehaviour
         _lastLocalRotation = _tChild.localRotation;
         
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
+        _tWeaponReversed.localRotation = _tWeapon.localRotation;
+        _tWeaponReversed.transform.Rotate(new Vector3(0,0,-180));
 
         _lastLocalWieldRotation = _tWeapon.localRotation;
 

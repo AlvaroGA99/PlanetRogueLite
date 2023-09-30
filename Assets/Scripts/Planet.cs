@@ -9,9 +9,9 @@ using UnityEngine.InputSystem;
 public class Planet : MonoBehaviour
 {
 
-    private Mesh _m;
+    public Mesh m;
 
-    private MeshFilter _mF;
+    public MeshFilter mF;
 
     public int res;
 
@@ -28,30 +28,39 @@ public class Planet : MonoBehaviour
     void Start()
     {
         //print (new Vector3());
+
     }
+
+    // public void Init(){
+    //     tiles = new WFCGraph(mF.mesh.triangles, 0, new System.Random());
+    //     WFCGraph.StateInfo state;
+    //     state = tiles.Step();
+    //     print(state);
+    //     while (state != WFCGraph.StateInfo.SUCCESFUL)
+    //     {
+    //         if (state == WFCGraph.StateInfo.ERROR)
+    //         {
+    //             tiles.Reset(-1);
+    //         }
+    //         state = tiles.Step();
+    //     }
+
+    //     UpdateVertexPositions();
+    // }
 
     private void Awake()
     {
         gameobjectReferences = new List<GameObject>();
-        _mF = gameObject.AddComponent<MeshFilter>();
-        _m = _mF.mesh;
-        InitializeBaseIcosahedron();
-        tiles = new WFCGraph(_mF.mesh.triangles, 0, new System.Random());
-        WFCGraph.StateInfo state;
-        state = tiles.Step();
-        print(state);
-        while (state != WFCGraph.StateInfo.SUCCESFUL)
-        {
-            if (state == WFCGraph.StateInfo.ERROR)
-            {
-                tiles.Reset(-1);
-            }
-            state = tiles.Step();
-        }
+        mF = gameObject.AddComponent<MeshFilter>();
+        m = mF.mesh;
+        //InitializeBaseIcosahedron();
+        //GenerateSphereResolution(2);
         
-        Debug.Log(_m.triangles.Length/3);
-        GenerateSphereResolution(4);
-        //UpdateVertexPositions();
+        
+        //Debug.Log(m.triangles.Length/3);
+        //GenerateSphereResolution(2);
+        
+        
         //print(succesful);
         //TestEdgesUpdate();
         //GenerateSphereResolution(5);
@@ -140,18 +149,18 @@ public class Planet : MonoBehaviour
             9, 8, 1
         };
 
-        _m.vertices = vertices;
-        _m.triangles = triangles;
-        _m.RecalculateNormals();
+        m.vertices = vertices;
+        m.triangles = triangles;
+        m.RecalculateNormals();
     }
 
-    private void UpdateVertexPositions()
+    public void UpdateVertexPositions(WFCGraph nodeGraph)
     {
-        Vector3[] vertices = new Vector3[_m.vertexCount];
+        Vector3[] vertices = new Vector3[m.vertexCount];
 
-        Array.Copy(_m.vertices, 0, vertices, 0, _m.vertexCount);
+        Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
 
-        foreach (WFCGraph.Node n in tiles.elements)
+        foreach (WFCGraph.Node n in nodeGraph.elements)
         {
             foreach (WFCGraph.Edge e in n.edges)
             {
@@ -175,8 +184,8 @@ public class Planet : MonoBehaviour
                 }
             }
         }
-            _m.vertices = vertices;
-            _m.RecalculateNormals();
+            m.vertices = vertices;
+            m.RecalculateNormals();
     }
 
     private void TestEdgesUpdate()
@@ -196,29 +205,29 @@ public class Planet : MonoBehaviour
                     switch (e.options[0])
                     {
                         case "AB":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + (_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + (m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
                             break;
                         case "BA":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
                             break;
                         case "AA":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
                             break;
                         case "BB":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(_m.vertices[e.edgeId.b]), Quaternion.identity);
-                            // Instantiate(testSphere,_m.vertices[e.edgeId.b] + 10*(_m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+                            // Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
                             break;
                     }
                 }
 
-                pos += _m.vertices[e.edgeId.a];
+                pos += m.vertices[e.edgeId.a];
 
             }
             pos /= 3;
@@ -239,21 +248,21 @@ public class Planet : MonoBehaviour
         for (int r = 0; r < resolution; r++)
         {
 
-            int originalLength = _m.triangles.Length;
+            int originalLength = m.triangles.Length;
 
-            int[] newTriangles = new int[_m.triangles.Length * 4];
-            Vector3[] newVertices = new Vector3[2 * _m.vertexCount + (_m.triangles.Length / 3) - 2];
+            int[] newTriangles = new int[m.triangles.Length * 4];
+            Vector3[] newVertices = new Vector3[2 * m.vertexCount + (m.triangles.Length / 3) - 2];
 
-            newIndex = _m.vertexCount;
+            newIndex = m.vertexCount;
 
-            Array.Copy(_m.vertices, 0, newVertices, 0, _m.vertexCount);
+            Array.Copy(m.vertices, 0, newVertices, 0, m.vertexCount);
 
             for (int i = 0; i < originalLength; i += 3)
             {
 
-                int i0 = _m.triangles[i];
-                int i1 = _m.triangles[i + 1];
-                int i2 = _m.triangles[i + 2];
+                int i0 = m.triangles[i];
+                int i1 = m.triangles[i + 1];
+                int i2 = m.triangles[i + 2];
 
                 int newIndex0 = GetNewVertexIndex(i0, i1, ref newVertexIndices, ref newVertices, ref newIndex);
                 int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices, ref newVertices, ref newIndex);
@@ -280,41 +289,41 @@ public class Planet : MonoBehaviour
 
             if (r == resolution - 1)
             {
-                // newVertices[0] += newVertices[0];//*SampleNoiseHeight( newVertices[0] );
-                // newVertices[1] += newVertices[1];//*SampleNoiseHeight( newVertices[1] );
-                // newVertices[2] += newVertices[2];//*SampleNoiseHeight( newVertices[2] );
-                // newVertices[3] += newVertices[3];//*SampleNoiseHeight( newVertices[3] );
-                // newVertices[4] += newVertices[4];//*SampleNoiseHeight( newVertices[4] );
-                // newVertices[5] += newVertices[5];//*SampleNoiseHeight( newVertices[5] );
-                // newVertices[6] += newVertices[6];//*SampleNoiseHeight( newVertices[6] );
-                // newVertices[7] += newVertices[7];//*SampleNoiseHeight( newVertices[7] );
-                // newVertices[8] += newVertices[8];//*SampleNoiseHeight( newVertices[8] );
-                // newVertices[9] += newVertices[9];//*SampleNoiseHeight( newVertices[9] );
-                // newVertices[10] += newVertices[10];//*SampleNoiseHeight( newVertices[10] );
-                // newVertices[11] += newVertices[11];//*SampleNoiseHeight( newVertices[11] );
+                newVertices[0] = newVertices[0].normalized;
+                newVertices[1] = newVertices[1].normalized;
+                newVertices[2] = newVertices[2].normalized;
+                newVertices[3] = newVertices[3].normalized;
+                newVertices[4] = newVertices[4].normalized;
+                newVertices[5] = newVertices[5].normalized;
+                newVertices[6] = newVertices[6].normalized;
+                newVertices[7] = newVertices[7].normalized;
+                newVertices[8] = newVertices[8].normalized;
+                newVertices[9] = newVertices[9].normalized;
+                newVertices[10] = newVertices[10].normalized;
+                newVertices[11] = newVertices[11].normalized;
 
             }
 
-            _m.vertices = newVertices;
-            _m.triangles = newTriangles;
+            m.vertices = newVertices;
+            m.triangles = newTriangles;
 
         }
 
 
-        // print(_m.vertices[0]);
-        // print(_m.vertices[1]);
-        // print(_m.vertices[2]);
-        // print(_m.vertices[3]);
-        // print(_m.vertices[4]);
-        // print(_m.vertices[5]);
-        // print(_m.vertices[6]);
-        // print(_m.vertices[7]);
-        // print(_m.vertices[8]);
-        // print(_m.vertices[9]);
-        // print(_m.vertices[10]);
-        // print(_m.vertices[11]);
+        // print(m.vertices[0]);
+        // print(m.vertices[1]);
+        // print(m.vertices[2]);
+        // print(m.vertices[3]);
+        // print(m.vertices[4]);
+        // print(m.vertices[5]);
+        // print(m.vertices[6]);
+        // print(m.vertices[7]);
+        // print(m.vertices[8]);
+        // print(m.vertices[9]);
+        // print(m.vertices[10]);
+        // print(m.vertices[11]);
 
-        _m.RecalculateNormals();
+        m.RecalculateNormals();
     }
 
     private float SampleNoiseHeight(Vector3 pointOnSphere)

@@ -129,8 +129,7 @@ public class WFCGraph
             toProcess.Add(collapsingNode);
             int localLength;
             while (toProcess.Count > 0)
-            {
-                
+            {  
                 localLength = toProcess.Count;
                 for (int i = 0; i < localLength; i++)
                 {
