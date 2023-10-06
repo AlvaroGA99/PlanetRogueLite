@@ -12,13 +12,18 @@ public class WFCGraph
     public Dictionary<EdgeId, int> edgeMatching;
     System.Random sampler;
     List<Node> toProcess;
-    
+    Stack<RollbackInfo> rollbackRegistry;
+
+    List<int> entropyList;
+
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
 
         //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
-        elements = new Node[((triangleList.Length / 3) )];
+        elements = new Node[((triangleList.Length / 3))];
         toProcess = new List<Node>();
+        rollbackRegistry = new Stack<RollbackInfo>();
+        entr
 
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
@@ -75,6 +80,7 @@ public class WFCGraph
             }
 
             elements[i] = new Node(i, edges[id0], edges[id1], edges[id2], resolution);
+            entropyList.
         }
 
         this.sampler = sampler;
@@ -83,11 +89,8 @@ public class WFCGraph
 
     }
 
-
-
-    private int GetLowestEntropyElementId()
+    private List<int> GetLowestEntropyList()
     {
-        // Returns the id of a random Node with the non-one(collasped) lowest entropy
         List<int> lowestEntropyElements = new List<int>();
         int minEntropy = 64;
         foreach (Node n in elements)
@@ -105,6 +108,14 @@ public class WFCGraph
 
 
         }
+
+
+        return lowestEntropyElements;
+    }
+
+    private int GetLowestEntropyElementId(List<int> lowestEntropyElements)
+    {
+        // Returns the id of a random Node with the non-one(collasped) lowest entropy
         if (lowestEntropyElements.Count > 0)
         {
             return lowestEntropyElements[sampler.Next(0, lowestEntropyElements.Count - 1)];
@@ -115,11 +126,31 @@ public class WFCGraph
         }
 
     }
+
+    private RollbackInfo GenerateRollbackInfo(List<int> lowestEntropyElements)
+    {
+        RollbackInfo result = new RollbackInfo(lowestEntropyElements);
+        foreach (Node n in elements)
+        {
+            result.AddOptions(n.edges[0].options.ToArray(),n.edges[1].options.ToArray(),n.edges[2].options.ToArray());   
+        }
+        return result;
+    }
+    public void Rollback()
+    {
+        RollbackInfo rb = rollbackRegistry.Pop();
+
+        foreach (Node n in elements){
+
+        }
+    }
+
     public StateInfo Step()
     {
 
         toProcess.Clear();
-        int collapsingId = GetLowestEntropyElementId();
+        List<int> lowestEntropyElements = GetLowestEntropyList();
+        int collapsingId = GetLowestEntropyElementId(lowestEntropyElements);
         StateInfo state = StateInfo.SUCCESFUL;
         if (collapsingId != -1)
         {
@@ -129,7 +160,7 @@ public class WFCGraph
             toProcess.Add(collapsingNode);
             int localLength;
             while (toProcess.Count > 0)
-            {  
+            {
                 localLength = toProcess.Count;
                 for (int i = 0; i < localLength; i++)
                 {
@@ -142,11 +173,9 @@ public class WFCGraph
             }
         }
 
+        rollbackRegistry.Push(GenerateRollbackInfo(lowestEntropyElements));
+
         return state;
-
-
-
-
 
     }
 
@@ -207,25 +236,25 @@ public class WFCGraph
             optionCompatible = false;
             debugCount = 0;
             foreach (string option in edge.options)
-            {   
+            {
                 char[] edgeOption = edge.adjacentEdge.options[index].ToCharArray();
                 char[] adjacentReversedOption = option.ToCharArray();
                 Array.Reverse(adjacentReversedOption);
-                debugCount ++;
-                
+                debugCount++;
+
                 //Debug.Log();
                 Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
                 if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1])
-                {   
+                {
                     //Debug.Log("-------");
                     optionCompatible = true;
                     break;
                 }
-                
+
             }
             if (!optionCompatible)
             {
-                
+
                 edge.adjacentEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.nextInternalEdge.options.RemoveAt(index);
@@ -331,15 +360,12 @@ public class WFCGraph
             return new EdgeId(edgeId.b, edgeId.a);
         }
 
-
     }
 
     public struct EdgeId
     {
         public int a;
-
         public int b;
-
         public EdgeId(int a, int b)
         {
             this.a = a;
@@ -354,5 +380,29 @@ public class WFCGraph
         IN_PROGRESS,
         ERROR
 
+    }
+
+    private class RollbackInfo
+    {
+        public List<string[]> NodeAOptions;
+        public List<string[]> NodeBOptions;
+        public List<string[]> NodeCOptions;
+        public List<int> NodesToTest;
+
+        public void AddOptions(string[] aOption, string[] bOption, string[] cOption)
+        {
+            NodeAOptions.Add(aOption);
+            NodeBOptions.Add(aOption);
+            NodeCOptions.Add(aOption);
+        }
+        public RollbackInfo(List<int> NodesToTest)
+        {
+
+            this.NodesToTest = NodesToTest;
+            this.NodeAOptions = new List<string[]>();
+            this.NodeBOptions = new List<string[]>();
+            this.NodeCOptions = new List<string[]>();
+
+        }
     }
 }
