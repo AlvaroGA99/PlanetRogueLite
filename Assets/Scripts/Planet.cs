@@ -188,58 +188,58 @@ public class Planet : MonoBehaviour
             m.RecalculateNormals();
     }
 
-    private void TestEdgesUpdate()
-    {
-        foreach (WFCGraph.Node n in tiles.elements)
-        {
-            //print(n.id);
-            Vector3 pos = new Vector3();
-            foreach (WFCGraph.Edge e in n.edges)
-            {
-                //if (e.adjacentEdge.ownerNode.id == 8)
-                //print(e.adjacentEdge.ownerNode.id);
+    // private void TestEdgesUpdate()
+    // {
+    //     foreach (WFCGraph.Node n in tiles.elements)
+    //     {
+    //         //print(n.id);
+    //         Vector3 pos = new Vector3();
+    //         foreach (WFCGraph.Edge e in n.edges)
+    //         {
+    //             //if (e.adjacentEdge.ownerNode.id == 8)
+    //             //print(e.adjacentEdge.ownerNode.id);
 
-                // print(e.adjacentEdge.ownerNode.entropy);
-                if (e.options.Count > 0)
-                {
-                    switch (e.options[0])
-                    {
-                        case "AB":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + (m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                            break;
-                        case "BA":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                            break;
-                        case "AA":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-                            //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                            break;
-                        case "BB":
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-                            Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-                            // Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-                            break;
-                    }
-                }
+    //             // print(e.adjacentEdge.ownerNode.entropy);
+    //             if (e.options.Count > 0)
+    //             {
+    //                 switch (e.options[0])
+    //                 {
+    //                     case "AB":
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + (m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+    //                         break;
+    //                     case "BA":
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+    //                         break;
+    //                     case "AA":
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+    //                         break;
+    //                     case "BB":
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
+    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
+    //                         // Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
+    //                         break;
+    //                 }
+    //             }
 
-                pos += m.vertices[e.edgeId.a];
+    //             pos += m.vertices[e.edgeId.a];
 
-            }
-            pos /= 3;
-            for (int i = 0; i < n.entropy; i++)
-            {
-                //gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
-            }
+    //         }
+    //         pos /= 3;
+    //         for (int i = 0; i < n.entropy; i++)
+    //         {
+    //             //gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
+    //         }
 
 
-        }
-    }
-    private void GenerateSphereResolution(int resolution)
+    //     }
+    // }
+    public void GenerateSphereResolution(int resolution)
     {
 
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();

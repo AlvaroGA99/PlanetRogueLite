@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Unity.VisualScripting;
 
 public class PlanetGenerator : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class PlanetGenerator : MonoBehaviour
         for (int i = 0; i < _orbits.Length - 1; i++)
         {
             angle = UnityEngine.Random.Range(0.66f * Mathf.PI, Mathf.PI / 3);
-            print(angle);
+//            print(angle);
             _orbits[i] = Instantiate(planetPrefab, transform.position + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
             _player._SphereT = _orbits[6].transform;
         }
@@ -30,21 +31,27 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
+        Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(1);
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
         
-        for (int i = 0; i < _orbits.Length; i++)
+        for (int i = 0; i <_orbits.Length ; i++)
         {   
-            _orbits[i].mF.mesh = initialMesh;
-            _orbits[i].m = initialMesh;
+            
+            _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
+            _orbits[i].m = _orbits[i].mF.mesh;
+            _orbits[i].GenerateSphereResolution(1);
             state = tiles.Step();
-        print(state);
+        //print(state);
         while (state != WFCGraph.StateInfo.SUCCESFUL)
         {
             if (state == WFCGraph.StateInfo.ERROR)
-            {
-                tiles.Reset(-1);
+            {   
+                //state = tiles.Rollback();
+                //sprint(state);
+                if(state == WFCGraph.StateInfo.ERROR){
+                    tiles.Reset(-1);
+                }     
             }
             state = tiles.Step();
         }
