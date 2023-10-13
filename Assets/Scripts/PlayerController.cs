@@ -134,7 +134,7 @@ public class PlayerController : MonoBehaviour
         //print(_rotationVector);
         _toCenter = (_SphereT.position - _t.position).normalized;
         _rb.AddForce(_toCenter * 115);
-        _rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed);
+        _rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
 
         if (_rb.velocity.magnitude > 10)
         {

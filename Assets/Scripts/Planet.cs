@@ -13,6 +13,8 @@ public class Planet : MonoBehaviour
 
     public MeshFilter mF;
 
+    private MeshCollider mC;
+
     public int res;
 
     public int seed;
@@ -53,6 +55,7 @@ public class Planet : MonoBehaviour
         gameobjectReferences = new List<GameObject>();
         mF = gameObject.AddComponent<MeshFilter>();
         m = mF.mesh;
+        mC = gameObject.GetComponent<MeshCollider>();
         //InitializeBaseIcosahedron();
         //GenerateSphereResolution(2);
         
@@ -186,6 +189,8 @@ public class Planet : MonoBehaviour
         }
             m.vertices = vertices;
             m.RecalculateNormals();
+
+        mC.sharedMesh = m;
     }
 
     // private void TestEdgesUpdate()

@@ -31,7 +31,7 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(1);
+        Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
         
@@ -40,7 +40,7 @@ public class PlanetGenerator : MonoBehaviour
             
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-            _orbits[i].GenerateSphereResolution(1);
+            _orbits[i].GenerateSphereResolution(3);
             state = tiles.Step();
         //print(state);
         while (state != WFCGraph.StateInfo.SUCCESFUL)
