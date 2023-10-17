@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,7 +23,7 @@ public class Planet : MonoBehaviour
 
     public GameObject testSphere;
 
-    private WFCGraph tiles;
+    //private WFCGraph tiles;
 
     private List<GameObject> gameobjectReferences;
 
@@ -162,9 +164,10 @@ public class Planet : MonoBehaviour
         Vector3[] vertices = new Vector3[m.vertexCount];
 
         Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
-
+//print(nodeGraph.elements.Length);
         foreach (WFCGraph.Node n in nodeGraph.elements)
-        {
+        {   
+           //print(n.tileVertices.Count);
             foreach (WFCGraph.Edge e in n.edges)
             {
                 if (e.options.Count > 0)
@@ -244,14 +247,14 @@ public class Planet : MonoBehaviour
 
     //     }
     // }
-    public void GenerateSphereResolution(int resolution)
+    public void GenerateSphereResolution(int resolution, WFCGraph tiles)
     {
 
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
         int newIndex = 0;
-
+        int denom = 1;
         for (int r = 0; r < resolution; r++)
-        {
+        {   
 
             int originalLength = m.triangles.Length;
 
@@ -289,11 +292,19 @@ public class Planet : MonoBehaviour
                 newTriangles[i * 4 + 7] = newIndex1;
                 newTriangles[i * 4 + 8] = newIndex2;
 
+                
+
+                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex0);
+                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex1);
+                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex2);
+
+                
 
             }
-
+            //print(originalLength/3);
             if (r == resolution - 1)
             {
+                
                 newVertices[0] = newVertices[0].normalized;
                 newVertices[1] = newVertices[1].normalized;
                 newVertices[2] = newVertices[2].normalized;
@@ -309,37 +320,13 @@ public class Planet : MonoBehaviour
 
             }
 
+            denom*= 4;
             m.vertices = newVertices;
             m.triangles = newTriangles;
 
         }
 
-
-        // print(m.vertices[0]);
-        // print(m.vertices[1]);
-        // print(m.vertices[2]);
-        // print(m.vertices[3]);
-        // print(m.vertices[4]);
-        // print(m.vertices[5]);
-        // print(m.vertices[6]);
-        // print(m.vertices[7]);
-        // print(m.vertices[8]);
-        // print(m.vertices[9]);
-        // print(m.vertices[10]);
-        // print(m.vertices[11]);
-
         m.RecalculateNormals();
-    }
-
-    private float SampleNoiseHeight(Vector3 pointOnSphere)
-    {
-
-        float l1 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.2f), UnityEngine.Random.Range(0f, 0.1f)) / 4f;
-        float l2 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 8f;
-        float l3 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 16f;
-        float l4 = Mathf.PerlinNoise(UnityEngine.Random.Range(0f, 0.1f), UnityEngine.Random.Range(0f, 0.1f)) / 32f;
-
-        return l1 + l2 + l3 + l4;
     }
 
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)

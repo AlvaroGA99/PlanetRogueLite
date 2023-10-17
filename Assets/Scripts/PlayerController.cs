@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 _toCenter;
     private Vector3 _wieldVector;
 
-    public static Vector3 _lastForward;
+    public Vector3 _lastForward;
     
     private float _rotationSpeed;
     
@@ -148,8 +148,8 @@ public class PlayerController : MonoBehaviour
         _lastLocalRotation = _tChild.localRotation;
         
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
-        _tWeaponReversed.localRotation = _tWeapon.localRotation;
-        _tWeaponReversed.transform.Rotate(new Vector3(0,0,-180));
+        //_tWeaponReversed.localRotation = _tWeapon.localRotation;
+        //_tWeaponReversed.transform.Rotate(new Vector3(0,0,-180));
 
         _lastLocalWieldRotation = _tWeapon.localRotation;
 
@@ -164,7 +164,5 @@ public class PlayerController : MonoBehaviour
         
     }
 
-    public static Vector3 GetLastWeaponForward(){
-        return _lastForward;
-    }
+   
 }

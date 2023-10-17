@@ -303,6 +303,8 @@ public class WFCGraph
         public int entropy;
         // public bool collapsed;
         public Edge[] edges;
+
+        public List<int> tileVertices;
         public Node(int id, Edge a_Edge, Edge b_Edge, Edge c_Edge, int resolution)
 
         {
@@ -324,6 +326,8 @@ public class WFCGraph
             {
                 this.edges[i].ownerNode = this;
             }
+
+            this.tileVertices = new List<int> {edges[0].edgeId.a,edges[1].edgeId.a,edges[2].edgeId.a};
 
         }
 

@@ -40,7 +40,7 @@ public class PlanetGenerator : MonoBehaviour
             
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-            _orbits[i].GenerateSphereResolution(3);
+            
             state = tiles.Step();
         //print(state);
         while (state != WFCGraph.StateInfo.SUCCESFUL)
@@ -55,6 +55,7 @@ public class PlanetGenerator : MonoBehaviour
             }
             state = tiles.Step();
         }
+            _orbits[i].GenerateSphereResolution(3,tiles);
             _orbits[i].UpdateVertexPositions(tiles);
             tiles.Reset(-1);
         }
