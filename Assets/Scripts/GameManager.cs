@@ -6,19 +6,22 @@ using UnityEngine.Pool;
 
 public class GameManager : MonoBehaviour
 {   
-    Projectile _projPrefab;
+    public Projectile _projPrefab;
 
-    Transform _playerT;
-    EnemyController _enemyPrefab;
+    public Transform _playerT;
+    public EnemyController _enemyPrefab;
 
     ObjectPool<Projectile> _projectilePool;
 
     ObjectPool<EnemyController> _enemyPool;
-    // Start is called before the first frame update
-    void Start()
-    {
-        _projectilePool = new ObjectPool<Projectile>(() => {
-            return Instantiate(_projPrefab);
+
+    EnemyController a;
+
+    void Awake(){
+         _projectilePool = new ObjectPool<Projectile>(() => {
+            Projectile aux = Instantiate(_projPrefab);
+            aux.Init(_playerT, _projectilePool);
+            return aux ;
         }, proj => {
             proj.gameObject.SetActive(true);
         }, proj => {
@@ -40,7 +43,13 @@ public class GameManager : MonoBehaviour
         }, enemy => {
             Destroy(enemy.gameObject);
         }, false, 5, 15);
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
 
+       a = _enemyPool.Get();
+       a.transform.position = new Vector3(.4711895f,14.53f,6.3f); 
 
     }
 

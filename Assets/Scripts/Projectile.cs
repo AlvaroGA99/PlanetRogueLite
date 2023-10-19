@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class Projectile : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class Projectile : MonoBehaviour
     private Transform _redirectTransform;
 
     private Transform _enemySourceTransform;
+
+    ObjectPool<Projectile> _projPool;
 
     private bool colliding;
     void Start()
@@ -29,8 +32,13 @@ public class Projectile : MonoBehaviour
         
     }
 
-    public void Init(Transform redirect, Transform enemy){
+    public void Init(Transform redirect, ObjectPool<Projectile> pool){
         _redirectTransform = redirect;
+        _projPool = pool;
+        
+    }
+
+    public void InitEnemySource(Transform enemy){
         _enemySourceTransform = enemy;
     }
 
@@ -57,5 +65,9 @@ public class Projectile : MonoBehaviour
              colliding = false;
         }
        
+    }
+
+    void OnCollisionEnter(){
+        _projPool.Release(this);
     }
 }

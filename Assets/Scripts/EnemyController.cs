@@ -28,6 +28,8 @@ public class EnemyController : MonoBehaviour
     void Awake(){
 
         timer = 0;
+
+        shouldSpawn = true;
         
         char_T = GameObject.Find("Char_position").transform;
 
@@ -58,9 +60,11 @@ public class EnemyController : MonoBehaviour
         if (timer > 1 )
         {   
             if(shouldSpawn){
-            Projectile projRef = Instantiate(_projPrefab, _t.position + _t.forward, Quaternion.identity );
+            Projectile projRef = _projPool.Get();
 
-            projRef.Init(char_T,_t);
+            projRef.transform.position = _t.position + _t.forward;
+
+            projRef.InitEnemySource(_t);
 
             projRef.GetComponent<Rigidbody>().AddForce((char_T.position - _t.position)*5,ForceMode.Impulse);
 

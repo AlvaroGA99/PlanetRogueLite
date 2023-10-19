@@ -30,7 +30,7 @@ public class Weapon : MonoBehaviour
             
         }
         if (Mouse.current.leftButton.wasReleasedThisFrame){
-            OnReleaseShot.Invoke(force);
+            OnReleaseShot?.Invoke(force);
             force = 0;
         }
     }
