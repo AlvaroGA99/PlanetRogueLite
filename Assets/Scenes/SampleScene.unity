@@ -734,6 +734,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PRSH-00
       objectReference: {fileID: 0}
+    - target: {fileID: 8728532197784655476, guid: 8cedec9a3eb66d44ca6a62e15bdb392d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cedec9a3eb66d44ca6a62e15bdb392d, type: 3}
 --- !u!1 &1024585298
@@ -992,6 +996,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54f7d595838cb3f429844328bc749ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _projPrefab: {fileID: 6300043562538509887, guid: 86221c07f9d0aa0458059e6b21ee7188, type: 3}
+  _playerT: {fileID: 1591222659}
+  _enemyPrefab: {fileID: 7743818068257472705, guid: 8cedec9a3eb66d44ca6a62e15bdb392d, type: 3}
 --- !u!4 &1626039718
 Transform:
   m_ObjectHideFlags: 0

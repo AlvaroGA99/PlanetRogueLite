@@ -57,16 +57,16 @@ public class EnemyController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(transform.forward,transform.position).normalized,transform.position);
         //transform.position += transform.forward/10;
 
-        if (timer > 1 )
+        if (timer > 2 )
         {   
             if(shouldSpawn){
             Projectile projRef = _projPool.Get();
 
-            projRef.transform.position = _t.position + _t.forward;
+            projRef.transform.position = _t.position +(char_T.position - _t.position).normalized;
 
             projRef.InitEnemySource(_t);
 
-            projRef.GetComponent<Rigidbody>().AddForce((char_T.position - _t.position)*5,ForceMode.Impulse);
+            projRef.GetComponent<Rigidbody>().AddForce((char_T.position - _t.position).normalized + _t.up*2,ForceMode.Impulse);
 
             timer = 0;
             }

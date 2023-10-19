@@ -175,14 +175,14 @@ public class Planet : MonoBehaviour
                     switch (e.options[0])
                     {
                         case "AB":
-                            vertices[e.edgeId.a] *= 1.025f;
+                            vertices[e.edgeId.a] *= 1.005f;
                             break;
                         case "BA":
-                            vertices[e.edgeId.b] *=  1.025f;
+                            vertices[e.edgeId.b] *=  1.005f;
                             break;
                         case "AA":
-                            vertices[e.edgeId.a] *=  1.025f;
-                            vertices[e.edgeId.b] *=  1.025f;
+                            vertices[e.edgeId.a] *=  1.005f;
+                            vertices[e.edgeId.b] *=  1.005f;
                             break;
                         case "BB":
                             break;
@@ -302,23 +302,23 @@ public class Planet : MonoBehaviour
 
             }
             //print(originalLength/3);
-            if (r == resolution - 1)
-            {
+            // if (r == resolution - 1)
+            // {
                 
-                newVertices[0] = newVertices[0].normalized;
-                newVertices[1] = newVertices[1].normalized;
-                newVertices[2] = newVertices[2].normalized;
-                newVertices[3] = newVertices[3].normalized;
-                newVertices[4] = newVertices[4].normalized;
-                newVertices[5] = newVertices[5].normalized;
-                newVertices[6] = newVertices[6].normalized;
-                newVertices[7] = newVertices[7].normalized;
-                newVertices[8] = newVertices[8].normalized;
-                newVertices[9] = newVertices[9].normalized;
-                newVertices[10] = newVertices[10].normalized;
-                newVertices[11] = newVertices[11].normalized;
+            //     newVertices[0] = newVertices[0].normalized;
+            //     newVertices[1] = newVertices[1].normalized;
+            //     newVertices[2] = newVertices[2].normalized;
+            //     newVertices[3] = newVertices[3].normalized;
+            //     newVertices[4] = newVertices[4].normalized;
+            //     newVertices[5] = newVertices[5].normalized;
+            //     newVertices[6] = newVertices[6].normalized;
+            //     newVertices[7] = newVertices[7].normalized;
+            //     newVertices[8] = newVertices[8].normalized;
+            //     newVertices[9] = newVertices[9].normalized;
+            //     newVertices[10] = newVertices[10].normalized;
+            //     newVertices[11] = newVertices[11].normalized;
 
-            }
+            // }
 
             denom*= 4;
             m.vertices = newVertices;
@@ -342,7 +342,7 @@ public class Planet : MonoBehaviour
 
         Vector3 v0 = newVertices[i0];
         Vector3 v1 = newVertices[i1];
-        Vector3 newVertex = ((v0 + v1) / 2f).normalized;
+        Vector3 newVertex = ((v0 + v1) / 2f);
         //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
         newVertices[newIndex] = newVertex;
         newVertexIndices[edgeKey] = newIndex;

@@ -44,7 +44,7 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {   
-        _rb.AddForce(_redirectTransform.position - transform.position , ForceMode.Acceleration);
+        //_rb.AddForce(_redirectTransform.position - transform.position , ForceMode.Acceleration);
         _rb.AddForce(-transform.position.normalized*50, ForceMode.Acceleration);
     }
     

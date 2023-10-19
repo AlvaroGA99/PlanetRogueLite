@@ -55,8 +55,9 @@ public class PlanetGenerator : MonoBehaviour
             }
             state = tiles.Step();
         }
-            _orbits[i].GenerateSphereResolution(3,tiles);
             _orbits[i].UpdateVertexPositions(tiles);
+            _orbits[i].GenerateSphereResolution(3,tiles);
+            
             tiles.Reset(-1);
         }
     }
@@ -164,22 +165,22 @@ public class PlanetGenerator : MonoBehaviour
 
             }
 
-            if (r == resolution - 1)
-            {
-                newVertices[0] = newVertices[0].normalized;
-                newVertices[1] = newVertices[1].normalized;
-                newVertices[2] = newVertices[2].normalized;
-                newVertices[3] = newVertices[3].normalized;
-                newVertices[4] = newVertices[4].normalized;
-                newVertices[5] = newVertices[5].normalized;
-                newVertices[6] = newVertices[6].normalized;
-                newVertices[7] = newVertices[7].normalized;
-                newVertices[8] = newVertices[8].normalized;
-                newVertices[9] = newVertices[9].normalized;
-                newVertices[10] = newVertices[10].normalized;
-                newVertices[11] = newVertices[11].normalized;
+            // if (r == resolution - 1)
+            // {
+            //     newVertices[0] = newVertices[0].normalized;
+            //     newVertices[1] = newVertices[1].normalized;
+            //     newVertices[2] = newVertices[2].normalized;
+            //     newVertices[3] = newVertices[3].normalized;
+            //     newVertices[4] = newVertices[4].normalized;
+            //     newVertices[5] = newVertices[5].normalized;
+            //     newVertices[6] = newVertices[6].normalized;
+            //     newVertices[7] = newVertices[7].normalized;
+            //     newVertices[8] = newVertices[8].normalized;
+            //     newVertices[9] = newVertices[9].normalized;
+            //     newVertices[10] = newVertices[10].normalized;
+            //     newVertices[11] = newVertices[11].normalized;
 
-            }
+            // }
 
             m.vertices = newVertices;
             m.triangles = newTriangles;
