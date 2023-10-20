@@ -175,14 +175,14 @@ public class Planet : MonoBehaviour
                     switch (e.options[0])
                     {
                         case "AB":
-                            vertices[e.edgeId.a] *= 1.005f;
+                            vertices[e.edgeId.a] = vertices[e.edgeId.a].normalized;//*1.005f;
                             break;
                         case "BA":
-                            vertices[e.edgeId.b] *=  1.005f;
+                            vertices[e.edgeId.b] =  vertices[e.edgeId.b].normalized;
                             break;
                         case "AA":
-                            vertices[e.edgeId.a] *=  1.005f;
-                            vertices[e.edgeId.b] *=  1.005f;
+                            vertices[e.edgeId.a] = vertices[e.edgeId.a].normalized;;
+                            vertices[e.edgeId.b] =  vertices[e.edgeId.b].normalized;
                             break;
                         case "BB":
                             break;

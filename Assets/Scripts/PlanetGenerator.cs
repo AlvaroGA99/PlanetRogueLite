@@ -206,7 +206,7 @@ public class PlanetGenerator : MonoBehaviour
 
         Vector3 v0 = newVertices[i0];
         Vector3 v1 = newVertices[i1];
-        Vector3 newVertex = ((v0 + v1) / 2f).normalized;
+        Vector3 newVertex = ((v0 + v1) / 2f);
         //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
         newVertices[newIndex] = newVertex;
         newVertexIndices[edgeKey] = newIndex;
