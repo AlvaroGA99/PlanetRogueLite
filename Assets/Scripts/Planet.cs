@@ -193,7 +193,7 @@ public class Planet : MonoBehaviour
             m.vertices = vertices;
             m.RecalculateNormals();
 
-        mC.sharedMesh = m;
+       
     }
 
     // private void TestEdgesUpdate()
@@ -327,6 +327,7 @@ public class Planet : MonoBehaviour
         }
 
         m.RecalculateNormals();
+        mC.sharedMesh = m;
     }
 
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
@@ -342,7 +343,7 @@ public class Planet : MonoBehaviour
 
         Vector3 v0 = newVertices[i0];
         Vector3 v1 = newVertices[i1];
-        Vector3 newVertex = ((v0 + v1) / 2f);
+        Vector3 newVertex = ((v0 + v1) / 2f).normalized;
         //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
         newVertices[newIndex] = newVertex;
         newVertexIndices[edgeKey] = newIndex;

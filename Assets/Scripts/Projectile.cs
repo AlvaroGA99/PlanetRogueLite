@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Callbacks;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -20,54 +21,71 @@ public class Projectile : MonoBehaviour
 
     private bool colliding;
     void Start()
-    {   
+    {
         colliding = false;
-        _rb = GetComponent<Rigidbody>();
         Weapon.OnReleaseShot += TriggerForce;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    public void Init(Transform redirect, ObjectPool<Projectile> pool){
+
+    public void Init(Transform redirect, ObjectPool<Projectile> pool)
+    {
+        _rb = GetComponent<Rigidbody>();
         _redirectTransform = redirect;
         _projPool = pool;
-        
+
     }
 
-    public void InitEnemySource(Transform enemy){
+    public void InitEnemySource(Transform enemy)
+    {
         _enemySourceTransform = enemy;
     }
 
-    private void FixedUpdate()
-    {   
-        //_rb.AddForce(_redirectTransform.position - transform.position , ForceMode.Acceleration);
-        _rb.AddForce(-transform.position.normalized*50, ForceMode.Acceleration);
-    }
-    
-    private void OnTriggerEnter(Collider other){
-        colliding = true;
-        _savedVector = other.transform.forward + other.transform.up;
+    public void Reset(Transform redirect)
+    {
+        _redirectTransform = redirect;
+        _rb.velocity = new Vector3(0, 0, 0);
+        _rb.angularVelocity = new Vector3(0, 0, 0);
     }
 
-     private void OnTriggerExit(Collider other){
+    private void FixedUpdate()
+    {
+        _rb.AddForce(_redirectTransform.position - transform.position, ForceMode.Acceleration);
+        _rb.AddForce(-transform.position.normalized * 50, ForceMode.Acceleration);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        colliding = true;
+        _savedVector =  Vector3.ProjectOnPlane( _enemySourceTransform.position - _redirectTransform.position ,-other.transform.up) + other.transform.up*2;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
         colliding = false;
     }
 
-    private void TriggerForce(int force){
+    private void TriggerForce(float force)
+    {
         print("ACTIVADO");
-        if(colliding){
-             _rb.AddForce((_savedVector)*force,ForceMode.Impulse);
-             _redirectTransform = _enemySourceTransform;
-             colliding = false;
+        if (colliding)
+        {
+            _rb.velocity = new Vector3(0, 0, 0);
+            _rb.angularVelocity = new Vector3(0, 0, 0);
+            _rb.AddForce((_savedVector) * force, ForceMode.Impulse);
+            _redirectTransform = _enemySourceTransform;
+            colliding = false;
         }
-       
+
     }
 
-    void OnCollisionEnter(){
+    void OnCollisionEnter()
+    {
         _projPool.Release(this);
     }
 }

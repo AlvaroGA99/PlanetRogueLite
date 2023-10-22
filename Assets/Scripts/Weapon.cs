@@ -7,8 +7,8 @@ using UnityEngine.InputSystem;
 public class Weapon : MonoBehaviour
 {
 
-    public static event Action<int> OnReleaseShot;
-    int force;
+    public static event Action<float> OnReleaseShot;
+    float force;
 
     // Start is called before the first frame update
     void Start()
@@ -22,9 +22,9 @@ public class Weapon : MonoBehaviour
     {
         if (Mouse.current.leftButton.isPressed)
         {
-            if (force < 100)
+            if (force < 2)
             {
-                force += 1;
+                force += Time.deltaTime;
             }
 
             

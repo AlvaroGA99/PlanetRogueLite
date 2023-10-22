@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -8,6 +9,11 @@ public class GameManager : MonoBehaviour
 {   
     public Projectile _projPrefab;
 
+    public Image Health;
+    public Image Energy;
+    public Image PlanetIntegrity;
+
+    
     public Transform _playerT;
     public EnemyController _enemyPrefab;
 
@@ -23,6 +29,7 @@ public class GameManager : MonoBehaviour
             aux.Init(_playerT, _projectilePool);
             return aux ;
         }, proj => {
+            proj.Reset(_playerT);
             proj.gameObject.SetActive(true);
         }, proj => {
             proj.gameObject.SetActive(false);
