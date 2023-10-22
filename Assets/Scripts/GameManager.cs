@@ -8,14 +8,11 @@ using UnityEngine.Pool;
 public class GameManager : MonoBehaviour
 {   
     public Projectile _projPrefab;
-
-    public Image Health;
-    public Image Energy;
-    public Image PlanetIntegrity;
-
     
     public Transform _playerT;
     public EnemyController _enemyPrefab;
+
+    Planet _currentPlanet;
 
     ObjectPool<Projectile> _projectilePool;
 

@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 
 public class Planet : MonoBehaviour
@@ -22,6 +23,11 @@ public class Planet : MonoBehaviour
     public int seed;
 
     public GameObject testSphere;
+
+    
+    public Image Health;
+    public Image Energy;
+    public Image PlanetIntegrity;
 
     //private WFCGraph tiles;
 
