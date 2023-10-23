@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
@@ -17,13 +17,14 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     private InputActionMap _ingameControl;
 
-    private Player a;
-
+    private float _healthPoints;
     [SerializeField] private InputActionAsset input;
 
     private InputAction movement;
     private InputAction jump;
     private InputAction wield;
+
+    public Image Health;
     
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
@@ -53,7 +54,7 @@ public class PlayerController : MonoBehaviour
 
 
     void Start()
-    {
+    {   _healthPoints = 1.0f;
         onFloor = false;
         _t = transform;
         _ingameControl = input.FindActionMap("Ingame");
@@ -158,9 +159,21 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private void UpdateHealth(){
+       Health.transform.localScale = new Vector3(_healthPoints,1,1);
+    }
     private void OnCollisionEnter(Collision col)
-    {
-        onFloor = true;
+    {   
+        if(col.gameObject.tag == "Planet"){
+            onFloor = true;
+        }else if(col.gameObject.tag == "Projectile"){
+            if(_healthPoints > 0){
+                _healthPoints-= 0.1f;
+                UpdateHealth();
+            }
+            
+        }
+        
         
     }
 

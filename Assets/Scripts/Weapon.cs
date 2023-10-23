@@ -3,39 +3,56 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Weapon : MonoBehaviour
 {
 
     public static event Action<float> OnReleaseShot;
     float force;
+    private float _energyPoints;
+
+    public Image Energy;
 
     // Start is called before the first frame update
     void Start()
     {
-
-        // targetBody = null;
+        _energyPoints = 1.0f;
+        // targetBody = null;s
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Mouse.current.leftButton.isPressed)
-        {
-            if (force < 2)
-            {
-                force += Time.deltaTime;
+        {  
+            if(_energyPoints > 0){
+                _energyPoints -= Time.deltaTime/2;
+                UpdateEnergy();
+                if (force < 2 )
+                {
+                    force += Time.deltaTime;
+                }
             }
-
             
         }
+        // else{
+        //     if(_energyPoints < 1.0f){
+        //         _energyPoints += Time.deltaTime/2;
+        //         UpdateEnergy();
+        //     }
+        // }
         if (Mouse.current.leftButton.wasReleasedThisFrame){
             OnReleaseShot?.Invoke(force);
+            _energyPoints =  1.0f;
+            UpdateEnergy();
             force = 0;
         }
     }
 
-
+    private void UpdateEnergy(){
+        Energy.transform.localScale = new Vector3(_energyPoints,1,1);
+    }
     // void OnTriggerEnter(Collider other){
     //     if(other.tag == "Projectile"){
     //        colliding = true;

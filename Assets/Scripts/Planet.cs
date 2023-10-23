@@ -24,10 +24,8 @@ public class Planet : MonoBehaviour
 
     public GameObject testSphere;
 
-    
-    public Image Health;
-    public Image Energy;
-    public Image PlanetIntegrity;
+    private float _planetIntegrity;
+    //public Image PlanetIntegrity;
 
     //private WFCGraph tiles;
 

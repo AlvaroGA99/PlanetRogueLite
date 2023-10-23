@@ -897,6 +897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21c24d4f92412984ea98633bd98b7ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Energy: {fileID: 1309977589}
 --- !u!1 &1283149244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1146,7 +1147,7 @@ GameObject:
   - component: {fileID: 1591222661}
   m_Layer: 0
   m_Name: Char_position
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1164,6 +1165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: -944628639613478452, guid: ac15bde46e159904095c01c7a4dfbef2, type: 3}
+  Health: {fileID: 1283149246}
   _SphereT: {fileID: 0}
   _tChild: {fileID: 1702871100}
   _tWeapon: {fileID: 1024585299}
