@@ -302,6 +302,24 @@ public class Planet : MonoBehaviour
                 tiles.elements[(i/3)/denom].tileVertices.Add(newIndex1);
                 tiles.elements[(i/3)/denom].tileVertices.Add(newIndex2);
 
+                if (r == resolution - 1){
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(i1);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
+
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(i2);
+
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
+
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(i0);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
+                }
+
                 
 
             }
@@ -332,6 +350,8 @@ public class Planet : MonoBehaviour
 
         m.RecalculateNormals();
         mC.sharedMesh = m;
+
+        Debug.Log(tiles.elements[0].tileVertices.Count);
     }
 
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)

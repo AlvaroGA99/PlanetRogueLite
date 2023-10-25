@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Unity.VisualScripting;
+using System.IO;
+using UnityEngine.InputSystem.Controls;
 
 public class PlanetGenerator : MonoBehaviour
 {
@@ -18,12 +20,12 @@ public class PlanetGenerator : MonoBehaviour
     void Awake()
     {
         _orbits = new Planet[7];
-        _orbits[6] = Instantiate(planetPrefab, new Vector3(0,0,0) , Quaternion.identity);
+        _orbits[6] = Instantiate(planetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         float angle = 0.0f;
         for (int i = 0; i < _orbits.Length - 1; i++)
         {
             angle = UnityEngine.Random.Range(0.66f * Mathf.PI, Mathf.PI / 3);
-//            print(angle);
+            //            print(angle);
             _orbits[i] = Instantiate(planetPrefab, transform.position + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
             _player._SphereT = _orbits[6].transform;
         }
@@ -31,33 +33,55 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Dictionary<String, List<int>> generationModuleValues = new Dictionary<string, List<int>>();
+        List<int> readValues = new List<int>();
+        String line;
+        try
+        {
+            StreamReader sr = new StreamReader("C:\\AAA.txt");
+            line = sr.ReadLine();
+            readValues.Add(int.Parse(line));
+            while (line != null)
+            {
+                line = sr.ReadLine();
+                readValues.Add(int.Parse(line));
+            }
+            sr.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: " + e.Message);
+        }
+        generationModuleValues.Add("AAA",readValues);
+
         Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
-        
-        for (int i = 0; i <_orbits.Length ; i++)
-        {   
-            
+
+        for (int i = 0; i < _orbits.Length; i++)
+        {
+
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-            
+
             state = tiles.Step();
-        //print(state);
-        while (state != WFCGraph.StateInfo.SUCCESFUL)
-        {
-            if (state == WFCGraph.StateInfo.ERROR)
-            {   
-                //state = tiles.Rollback();
-                //sprint(state);
-                if(state == WFCGraph.StateInfo.ERROR){
-                    tiles.Reset(-1);
-                }     
+            //print(state);
+            while (state != WFCGraph.StateInfo.SUCCESFUL)
+            {
+                if (state == WFCGraph.StateInfo.ERROR)
+                {
+                    //state = tiles.Rollback();
+                    //sprint(state);
+                    if (state == WFCGraph.StateInfo.ERROR)
+                    {
+                        tiles.Reset(-1);
+                    }
+                }
+                state = tiles.Step();
             }
-            state = tiles.Step();
-        }
             //_orbits[i].UpdateVertexPositions(tiles);
-            _orbits[i].GenerateSphereResolution(3,tiles);
-            
+            _orbits[i].GenerateSphereResolution(3, tiles);
+
             tiles.Reset(-1);
         }
     }
@@ -193,7 +217,7 @@ public class PlanetGenerator : MonoBehaviour
     }
 
 
-        private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
+    private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
     {
         long edgeKey = EdgeKey(i0, i1);
         int vertexIndex;

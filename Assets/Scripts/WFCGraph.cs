@@ -15,7 +15,7 @@ public class WFCGraph
     List<Node> toProcess;
 
     int minEntropy;
-    List<int> nonExploredNodes;
+    //List<int> nonExploredNodes;
     //Stack<RollbackInfo> rollbackRegistry;
 
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
@@ -27,7 +27,7 @@ public class WFCGraph
         minEntropy = 64;
         //rollbackRegistry = new Stack<RollbackInfo>();
         //RollbackInfo firstInfo = new RollbackInfo();
-        nonExploredNodes = new List<int>();
+        //nonExploredNodes = new List<int>();
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
 
@@ -135,7 +135,7 @@ public class WFCGraph
 
         toProcess.Clear();
         int collapsingId = GetLowestEntropyElementId();
-        nonExploredNodes.Clear();
+        //nonExploredNodes.Clear();
         StateInfo state = StateInfo.SUCCESFUL;
         if (collapsingId != -1)
         {   
@@ -277,7 +277,7 @@ public class WFCGraph
             sampler = new System.Random(sampler.Next());
         }
 
-        nonExploredNodes.Clear();
+        //nonExploredNodes.Clear();
         //rollbackRegistry.Clear();
         //RollbackInfo firstInfo = new RollbackInfo();
 
@@ -289,7 +289,10 @@ public class WFCGraph
             n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
             n.entropy = n.edges[0].options.Count;
 
-            nonExploredNodes.Add(n.id);
+            n.tileVertices = new List<int> {n.edges[0].edgeId.a,n.edges[1].edgeId.a,n.edges[2].edgeId.a};
+            n.tileTriangles = new List<int>();
+
+            //nonExploredNodes.Add(n.id);
             //firstInfo.NodesToTest.Add(n.id);
             //firstInfo.AddOptions(elements[n.id].edges[0].options.ToArray(), elements[n.id].edges[1].options.ToArray(), elements[n.id].edges[2].options.ToArray());
         }
@@ -305,6 +308,8 @@ public class WFCGraph
         public Edge[] edges;
 
         public List<int> tileVertices;
+        public List<int> tileTriangles;
+
         public Node(int id, Edge a_Edge, Edge b_Edge, Edge c_Edge, int resolution)
 
         {
@@ -328,7 +333,7 @@ public class WFCGraph
             }
 
             this.tileVertices = new List<int> {edges[0].edgeId.a,edges[1].edgeId.a,edges[2].edgeId.a};
-
+            this.tileTriangles = new List<int>();
         }
 
         public void Collapse(int option)
