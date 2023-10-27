@@ -33,26 +33,16 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Dictionary<String, List<int>> generationModuleValues = new Dictionary<string, List<int>>();
-        List<int> readValues = new List<int>();
-        String line;
-        try
-        {
-            StreamReader sr = new StreamReader("C:\\AAA.txt");
-            line = sr.ReadLine();
-            readValues.Add(int.Parse(line));
-            while (line != null)
-            {
-                line = sr.ReadLine();
-                readValues.Add(int.Parse(line));
-            }
-            sr.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Exception: " + e.Message);
-        }
-        generationModuleValues.Add("AAA",readValues);
+        Dictionary<String, List<float>> generationModuleValues = new Dictionary<string, List<float>>();
+        generationModuleValues.Add("AAA",GenerateValuesList("AAA"));
+        //generationModuleValues.Add("AAB",GenerateValuesList("AAB"));
+        //generationModuleValues.Add("ABA",GenerateValuesList("ABA"));
+        // generationModuleValues.Add("ABB",GenerateValuesList("ABB"));
+        // generationModuleValues.Add("BAA",GenerateValuesList("BAA"));
+        // generationModuleValues.Add("BAB",GenerateValuesList("BAB"));
+        // generationModuleValues.Add("BBA",GenerateValuesList("BBA"));
+        generationModuleValues.Add("BBB",GenerateValuesList("BBB"));
+        
 
         Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
@@ -79,8 +69,9 @@ public class PlanetGenerator : MonoBehaviour
                 }
                 state = tiles.Step();
             }
-            //_orbits[i].UpdateVertexPositions(tiles);
+            
             _orbits[i].GenerateSphereResolution(3, tiles);
+            _orbits[i].UpdateVertexPositions(tiles,generationModuleValues);
 
             tiles.Reset(-1);
         }
@@ -246,5 +237,28 @@ public class PlanetGenerator : MonoBehaviour
         edgeIndex <<= 32;
         edgeIndex |= maxIndex;
         return edgeIndex;
+    }
+
+    private List<float> GenerateValuesList(String key){
+        List<float> readValues = new List<float>();
+        String line;
+        try
+        {
+            StreamReader sr = new StreamReader(Application.dataPath + "/GenerationModules/" + key+ ".txt");
+            line = sr.ReadLine();
+            readValues.Add(float.Parse(line));
+            while (line != null)
+            {
+                line = sr.ReadLine();
+                readValues.Add(float.Parse(line));
+            }
+            sr.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: " + e.Message);
+        }
+        return readValues;
+
     }
 }

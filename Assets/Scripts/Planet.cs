@@ -64,12 +64,12 @@ public class Planet : MonoBehaviour
         mC = gameObject.GetComponent<MeshCollider>();
         //InitializeBaseIcosahedron();
         //GenerateSphereResolution(2);
-        
-        
+
+
         //Debug.Log(m.triangles.Length/3);
         //GenerateSphereResolution(2);
-        
-        
+
+
         //print(succesful);
         //TestEdgesUpdate();
         //GenerateSphereResolution(5);
@@ -163,94 +163,30 @@ public class Planet : MonoBehaviour
         m.RecalculateNormals();
     }
 
-    public void UpdateVertexPositions(WFCGraph nodeGraph)
+    public void UpdateVertexPositions(WFCGraph nodeGraph, Dictionary<String, List<float>> generationModuleValues)
     {
         Vector3[] vertices = new Vector3[m.vertexCount];
 
         Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
-//print(nodeGraph.elements.Length);
+        //print(nodeGraph.elements.Length);
+        List<float> values;
         foreach (WFCGraph.Node n in nodeGraph.elements)
-        {   
-           //print(n.tileVertices.Count);
-            foreach (WFCGraph.Edge e in n.edges)
+        {
+            String a = n.edges[0].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(0, 1);
+            if (generationModuleValues.TryGetValue(a, out values))
             {
-                if (e.options.Count > 0)
+                for (int i = 0; i < n.tileVertices.Count; i++)
                 {
-                    switch (e.options[0])
-                    {
-                        case "AB":
-                            vertices[e.edgeId.a] = vertices[e.edgeId.a].normalized;//*1.005f;
-                            break;
-                        case "BA":
-                            vertices[e.edgeId.b] =  vertices[e.edgeId.b].normalized;
-                            break;
-                        case "AA":
-                            vertices[e.edgeId.a] = vertices[e.edgeId.a].normalized;;
-                            vertices[e.edgeId.b] =  vertices[e.edgeId.b].normalized;
-                            break;
-                        case "BB":
-                            break;
-                    }
+                    vertices[n.tileVertices[i]] = vertices[n.tileVertices[i]].normalized + vertices[n.tileVertices[i]].normalized * values[i]/3;
                 }
             }
-        }
-            m.vertices = vertices;
-            m.RecalculateNormals();
 
-       
+        }
+        m.vertices = vertices;
+        m.RecalculateNormals();
+        mC.sharedMesh = m;
     }
 
-    // private void TestEdgesUpdate()
-    // {
-    //     foreach (WFCGraph.Node n in tiles.elements)
-    //     {
-    //         //print(n.id);
-    //         Vector3 pos = new Vector3();
-    //         foreach (WFCGraph.Edge e in n.edges)
-    //         {
-    //             //if (e.adjacentEdge.ownerNode.id == 8)
-    //             //print(e.adjacentEdge.ownerNode.id);
-
-    //             // print(e.adjacentEdge.ownerNode.entropy);
-    //             if (e.options.Count > 0)
-    //             {
-    //                 switch (e.options[0])
-    //                 {
-    //                     case "AB":
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + (m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-    //                         break;
-    //                     case "BA":
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-    //                         break;
-    //                     case "AA":
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-    //                         //Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-    //                         break;
-    //                     case "BB":
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.a]), Quaternion.identity);
-    //                         Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(m.vertices[e.edgeId.b]), Quaternion.identity);
-    //                         // Instantiate(testSphere,m.vertices[e.edgeId.b] + 10*(m.vertices[e.edgeId.b] - transform.position),Quaternion.identity);
-    //                         break;
-    //                 }
-    //             }
-
-    //             pos += m.vertices[e.edgeId.a];
-
-    //         }
-    //         pos /= 3;
-    //         for (int i = 0; i < n.entropy; i++)
-    //         {
-    //             //gameobjectReferences.Add(Instantiate(testSphere, transform.localToWorldMatrix.MultiplyPoint(pos + 0.1f * i * (pos - transform.position)), Quaternion.identity));
-    //         }
-
-
-    //     }
-    // }
     public void GenerateSphereResolution(int resolution, WFCGraph tiles)
     {
 
@@ -258,7 +194,7 @@ public class Planet : MonoBehaviour
         int newIndex = 0;
         int denom = 1;
         for (int r = 0; r < resolution; r++)
-        {   
+        {
 
             int originalLength = m.triangles.Length;
 
@@ -296,37 +232,38 @@ public class Planet : MonoBehaviour
                 newTriangles[i * 4 + 7] = newIndex1;
                 newTriangles[i * 4 + 8] = newIndex2;
 
-                
 
-                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex0);
-                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex1);
-                tiles.elements[(i/3)/denom].tileVertices.Add(newIndex2);
 
-                if (r == resolution - 1){
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(i1);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
+                tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex0);
+                tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex1);
+                tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex2);
 
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(i2);
+                if (r == resolution - 1)
+                {
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i1);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
 
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex1);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i2);
 
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(i0);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i/3)/denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
+
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i0);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
                 }
 
-                
+
 
             }
             //print(originalLength/3);
             // if (r == resolution - 1)
             // {
-                
+
             //     newVertices[0] = newVertices[0].normalized;
             //     newVertices[1] = newVertices[1].normalized;
             //     newVertices[2] = newVertices[2].normalized;
@@ -342,14 +279,14 @@ public class Planet : MonoBehaviour
 
             // }
 
-            denom*= 4;
+            denom *= 4;
             m.vertices = newVertices;
             m.triangles = newTriangles;
 
         }
 
         m.RecalculateNormals();
-        mC.sharedMesh = m;
+        
 
         Debug.Log(tiles.elements[0].tileVertices.Count);
     }

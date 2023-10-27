@@ -32,6 +32,9 @@ public class Projectile : MonoBehaviour
 
     }
 
+    private void OnDisable(){
+        colliding = false;
+    }
 
     public void Init(Transform redirect, ObjectPool<Projectile> pool)
     {
