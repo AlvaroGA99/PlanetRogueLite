@@ -112,72 +112,25 @@ public class Planet : MonoBehaviour
         // }
     }
 
-    private void InitializeBaseIcosahedron()
-    {
-        int radius = 1;
-
-        float t = (1f + Mathf.Sqrt(5f)) / 2f;
-
-        Vector3[] vertices = new Vector3[]
-        {
-            new Vector3(-1f,  t,  0f).normalized * radius,
-            new Vector3( 1f,  t,  0f).normalized * radius,
-            new Vector3(-1f, -t,  0f).normalized * radius,
-            new Vector3( 1f, -t,  0f).normalized * radius,
-            new Vector3( 0f, -1f,  t).normalized * radius,
-            new Vector3( 0f,  1f,  t).normalized * radius,
-            new Vector3( 0f, -1f, -t).normalized * radius,
-            new Vector3( 0f,  1f, -t).normalized * radius,
-            new Vector3( t,  0f, -1f).normalized * radius,
-            new Vector3( t,  0f,  1f).normalized * radius,
-            new Vector3(-t,  0f, -1f).normalized * radius,
-            new Vector3(-t,  0f,  1f).normalized * radius
-        };
-
-        int[] triangles = new int[]
-        {
-            0, 11, 5,
-            0, 5, 1,
-            0, 1, 7,
-            0, 7, 10,
-            0, 10, 11,
-            1, 5, 9,
-            5, 11, 4,
-            11, 10, 2,
-            10, 7, 6,
-            7, 1, 8,
-            3, 9, 4,
-            3, 4, 2,
-            3, 2, 6,
-            3, 6, 8,
-            3, 8, 9,
-            4, 9, 5,
-            2, 4, 11,
-            6, 2, 10,
-            8, 6, 7,
-            9, 8, 1
-        };
-
-        m.vertices = vertices;
-        m.triangles = triangles;
-        m.RecalculateNormals();
-    }
-
-    public void UpdateVertexPositions(WFCGraph nodeGraph, Dictionary<String, List<float>> generationModuleValues)
+    public void UpdateVertexPositions(WFCGraph nodeGraph, Dictionary<String, List<float>> generationModuleWedgesValues, Dictionary<String, List<float>> generationModuleCentresValues)
     {
         Vector3[] vertices = new Vector3[m.vertexCount];
 
         Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
         //print(nodeGraph.elements.Length);
-        List<float> values;
+        List<float> WedgeValues;
+        List<float> CentreValues;
         foreach (WFCGraph.Node n in nodeGraph.elements)
-        {
-            String a = n.edges[0].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(0, 1);
-            if (generationModuleValues.TryGetValue(a, out values))
+        {   
+            print(n.edges[0].options[0].Substring(0, 1) + n.edges[0].options[0].Substring(1, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(1, 1) + n.edges[2].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(1, 1));
+            String wedges = n.edges[0].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(0, 1);
+            String centres = n.edges[0].options[0].Substring(1, 1) + n.edges[1].options[0].Substring(1, 1) + n.edges[2].options[0].Substring(1, 1);
+            
+            if (generationModuleWedgesValues.TryGetValue(wedges, out WedgeValues) && generationModuleCentresValues.TryGetValue(centres, out CentreValues) )
             {
                 for (int i = 0; i < n.tileVertices.Count; i++)
                 {
-                    vertices[n.tileVertices[i]] = vertices[n.tileVertices[i]].normalized + vertices[n.tileVertices[i]].normalized * values[i]/3;
+                    vertices[n.tileVertices[i]] = vertices[n.tileVertices[i]].normalized + vertices[n.tileVertices[i]].normalized * (WedgeValues[i] + CentreValues[i])/100;
                 }
             }
 
@@ -260,35 +213,13 @@ public class Planet : MonoBehaviour
 
 
             }
-            //print(originalLength/3);
-            // if (r == resolution - 1)
-            // {
-
-            //     newVertices[0] = newVertices[0].normalized;
-            //     newVertices[1] = newVertices[1].normalized;
-            //     newVertices[2] = newVertices[2].normalized;
-            //     newVertices[3] = newVertices[3].normalized;
-            //     newVertices[4] = newVertices[4].normalized;
-            //     newVertices[5] = newVertices[5].normalized;
-            //     newVertices[6] = newVertices[6].normalized;
-            //     newVertices[7] = newVertices[7].normalized;
-            //     newVertices[8] = newVertices[8].normalized;
-            //     newVertices[9] = newVertices[9].normalized;
-            //     newVertices[10] = newVertices[10].normalized;
-            //     newVertices[11] = newVertices[11].normalized;
-
-            // }
-
             denom *= 4;
             m.vertices = newVertices;
             m.triangles = newTriangles;
-
         }
 
         m.RecalculateNormals();
-        
-
-        Debug.Log(tiles.elements[0].tileVertices.Count);
+        //Debug.Log(tiles.elements[0].tileVertices.Count);
     }
 
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)

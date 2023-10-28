@@ -33,17 +33,90 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Dictionary<String, List<float>> generationModuleValues = new Dictionary<string, List<float>>();
-        generationModuleValues.Add("AAA",GenerateValuesList("AAA"));
-        //generationModuleValues.Add("AAB",GenerateValuesList("AAB"));
-        //generationModuleValues.Add("ABA",GenerateValuesList("ABA"));
-        // generationModuleValues.Add("ABB",GenerateValuesList("ABB"));
-        // generationModuleValues.Add("BAA",GenerateValuesList("BAA"));
-        // generationModuleValues.Add("BAB",GenerateValuesList("BAB"));
-        // generationModuleValues.Add("BBA",GenerateValuesList("BBA"));
-        generationModuleValues.Add("BBB",GenerateValuesList("BBB"));
-        
+        Dictionary<String, List<float>> generationModuleWedgesValues = new Dictionary<string, List<float>>();
+        Dictionary<String, List<float>> generationModuleCentresValues = new Dictionary<string, List<float>>();
+        generationModuleWedgesValues.Add("AAA",GenerateWedgesValuesList("AAA"));
+        generationModuleCentresValues.Add("AAA",GenerateCentresValuesList("AAA"));
 
+        generationModuleWedgesValues.Add("AAB",GenerateWedgesValuesList("AAB"));
+        generationModuleCentresValues.Add("AAB",GenerateCentresValuesList("AAB"));
+        
+        generationModuleWedgesValues.Add("AAC",GenerateWedgesValuesList("AAC"));
+        generationModuleCentresValues.Add("AAC",GenerateCentresValuesList("AAC"));
+
+        generationModuleWedgesValues.Add("ABA",GenerateWedgesValuesList("ABA"));
+        generationModuleCentresValues.Add("ABA",GenerateCentresValuesList("ABA"));
+
+        generationModuleWedgesValues.Add("ABB",GenerateWedgesValuesList("ABB"));
+        generationModuleCentresValues.Add("ABB",GenerateCentresValuesList("ABB"));
+
+        generationModuleWedgesValues.Add("ABC",GenerateWedgesValuesList("ABC"));
+        generationModuleCentresValues.Add("ABC",GenerateCentresValuesList("ABC"));
+
+        generationModuleWedgesValues.Add("ACA",GenerateWedgesValuesList("ACA"));
+        generationModuleCentresValues.Add("ACA",GenerateCentresValuesList("ACA"));
+
+        generationModuleWedgesValues.Add("ACB",GenerateWedgesValuesList("ACB"));
+        generationModuleCentresValues.Add("ACB",GenerateCentresValuesList("ACB"));
+
+        generationModuleWedgesValues.Add("ACC",GenerateWedgesValuesList("ACC"));
+        generationModuleCentresValues.Add("ACC",GenerateCentresValuesList("ACC"));
+
+        generationModuleWedgesValues.Add("BAA",GenerateWedgesValuesList("BAA"));
+        generationModuleCentresValues.Add("BAA",GenerateCentresValuesList("BAA"));
+
+        generationModuleWedgesValues.Add("BAB",GenerateWedgesValuesList("BAB"));
+        generationModuleCentresValues.Add("BAB",GenerateCentresValuesList("BAB"));
+
+        generationModuleWedgesValues.Add("BAC",GenerateWedgesValuesList("BAC"));
+        generationModuleCentresValues.Add("BAC",GenerateCentresValuesList("BAC"));
+
+        generationModuleWedgesValues.Add("BBA",GenerateWedgesValuesList("BBA"));
+        generationModuleCentresValues.Add("BBA",GenerateCentresValuesList("BBA"));
+
+        generationModuleWedgesValues.Add("BBB",GenerateWedgesValuesList("BBB"));
+        generationModuleCentresValues.Add("BBB",GenerateCentresValuesList("BBB"));
+
+        generationModuleWedgesValues.Add("BBC",GenerateWedgesValuesList("BBC"));
+        generationModuleCentresValues.Add("BBC",GenerateCentresValuesList("BBC"));
+
+        generationModuleWedgesValues.Add("BCA",GenerateWedgesValuesList("BCA"));
+        generationModuleCentresValues.Add("BCA",GenerateCentresValuesList("BCA"));
+
+        generationModuleWedgesValues.Add("BCB",GenerateWedgesValuesList("BCB"));
+        generationModuleCentresValues.Add("BCB",GenerateCentresValuesList("BCB"));
+
+        generationModuleWedgesValues.Add("BCC",GenerateWedgesValuesList("BCC"));
+        generationModuleCentresValues.Add("BCC",GenerateCentresValuesList("BCC"));
+
+        generationModuleWedgesValues.Add("CAA",GenerateWedgesValuesList("CAA"));
+        generationModuleCentresValues.Add("CAA",GenerateCentresValuesList("CAA"));
+
+        generationModuleWedgesValues.Add("CAB",GenerateWedgesValuesList("CAB"));
+        generationModuleCentresValues.Add("CAB",GenerateCentresValuesList("CAB"));
+
+        generationModuleWedgesValues.Add("CAC",GenerateWedgesValuesList("CAC"));
+        generationModuleCentresValues.Add("CAC",GenerateCentresValuesList("CAC"));
+
+        generationModuleWedgesValues.Add("CBA",GenerateWedgesValuesList("CBA"));
+        generationModuleCentresValues.Add("CBA",GenerateCentresValuesList("CBA"));
+
+        generationModuleWedgesValues.Add("CBB",GenerateWedgesValuesList("CBB"));
+        generationModuleCentresValues.Add("CBB",GenerateCentresValuesList("CBB"));
+
+        generationModuleWedgesValues.Add("CBC",GenerateWedgesValuesList("CBC"));
+        generationModuleCentresValues.Add("CBC",GenerateCentresValuesList("CBC"));
+
+        generationModuleWedgesValues.Add("CCA",GenerateWedgesValuesList("CCA"));
+        generationModuleCentresValues.Add("CCA",GenerateCentresValuesList("CCA"));
+
+        generationModuleWedgesValues.Add("CCB",GenerateWedgesValuesList("CCB"));
+        generationModuleCentresValues.Add("CCB",GenerateCentresValuesList("CCB"));
+
+        generationModuleWedgesValues.Add("CCC",GenerateWedgesValuesList("CCC"));
+        generationModuleCentresValues.Add("CCC",GenerateCentresValuesList("CCC"));
+
+        
         Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
@@ -71,7 +144,7 @@ public class PlanetGenerator : MonoBehaviour
             }
             
             _orbits[i].GenerateSphereResolution(3, tiles);
-            _orbits[i].UpdateVertexPositions(tiles,generationModuleValues);
+            _orbits[i].UpdateVertexPositions(tiles,generationModuleWedgesValues,generationModuleCentresValues);
 
             tiles.Reset(-1);
         }
@@ -239,12 +312,35 @@ public class PlanetGenerator : MonoBehaviour
         return edgeIndex;
     }
 
-    private List<float> GenerateValuesList(String key){
+    private List<float> GenerateWedgesValuesList(String key){
         List<float> readValues = new List<float>();
         String line;
         try
         {
-            StreamReader sr = new StreamReader(Application.dataPath + "/GenerationModules/" + key+ ".txt");
+            StreamReader sr = new StreamReader(Application.dataPath + "/GenerationModules/Wedges/" + key+ ".txt");
+            line = sr.ReadLine();
+            readValues.Add(float.Parse(line));
+            while (line != null)
+            {
+                line = sr.ReadLine();
+                readValues.Add(float.Parse(line));
+            }
+            sr.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: " + e.Message);
+        }
+        return readValues;
+
+    }
+
+        private List<float> GenerateCentresValuesList(String key){
+        List<float> readValues = new List<float>();
+        String line;
+        try
+        {
+            StreamReader sr = new StreamReader(Application.dataPath + "/GenerationModules/Centres/" + key+ ".txt");
             line = sr.ReadLine();
             readValues.Add(float.Parse(line));
             while (line != null)

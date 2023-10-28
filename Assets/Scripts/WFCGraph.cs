@@ -24,7 +24,7 @@ public class WFCGraph
         //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
         elements = new Node[((triangleList.Length / 3))];
         toProcess = new List<Node>();
-        minEntropy = 64;
+        minEntropy = 1000;
         //rollbackRegistry = new Stack<RollbackInfo>();
         //RollbackInfo firstInfo = new RollbackInfo();
         //nonExploredNodes = new List<int>();
@@ -45,10 +45,14 @@ public class WFCGraph
             edges[id1] = new Edge();
             edges[id2] = new Edge();
 
-            edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
-            edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
+            //edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
+            //edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            //edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
 
+            edges[id0].ResetID0Option();
+            edges[id1].ResetID1Option();
+            edges[id2].ResetID2Option();
+            
             edges[id0].edgeId.a = triangleList[id0];
             edges[id0].edgeId.b = triangleList[id1];
 
@@ -101,7 +105,7 @@ public class WFCGraph
     {
         //Returns the id of a random Node with the non-one(collasped) lowest entropy
         List<int> lowestEntropyElements = new List<int>();
-        int minEntropy = 64;
+        int minEntropy = 1000;
         //foreach (int i in nonExploredNodes)
         for (int i = 0; i < elements.Length; i ++)
         {
@@ -231,7 +235,7 @@ public class WFCGraph
 
                 //Debug.Log();
                 //Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
-                if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1])
+                if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1] && edgeOption[2] == adjacentReversedOption[2])
                 {
                     //Debug.Log("-------");
                     optionCompatible = true;
@@ -284,9 +288,14 @@ public class WFCGraph
         foreach (Node n in elements)
         {
             //n.collapsed = false;
-            n.edges[0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
-            n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
+            //n.edges[0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
+            //n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
+            //n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
+            
+             n.edges[0].ResetID0Option();
+             n.edges[1].ResetID1Option();
+             n.edges[2].ResetID2Option();
+
             n.entropy = n.edges[0].options.Count;
 
             n.tileVertices = new List<int> {n.edges[0].edgeId.a,n.edges[1].edgeId.a,n.edges[2].edgeId.a};
@@ -297,7 +306,7 @@ public class WFCGraph
             //firstInfo.AddOptions(elements[n.id].edges[0].options.ToArray(), elements[n.id].edges[1].options.ToArray(), elements[n.id].edges[2].options.ToArray());
         }
 
-        minEntropy = 64;
+        minEntropy = 1000;
         //rollbackRegistry.Push(firstInfo);
     }
     public class Node
@@ -361,6 +370,152 @@ public class WFCGraph
         public Edge adjacentEdge;
         public Node ownerNode;
 
+        public void ResetID0Option(){
+            options = new List<string>() {"AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA",
+            "AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA",
+            "AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB",
+            "AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAC","AAC","AAC","AAC","AAC",
+            "AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC",
+            "AAC","AAC","AAC","AAC","AAC","AAC","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA",
+            "ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA",
+            "ABA","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB",
+            "ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABC","ABC","ABC","ABC",
+            "ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC",
+            "ABC","ABC","ABC","ABC","ABC","ABC","ABC","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA",
+            "ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA",
+            "ACA","ACA","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB",
+            "ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACC","ACC","ACC",
+            "ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC",
+            "ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA",
+            "BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA",
+            "BAA","BAA","BAA","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB",
+            "BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAC","BAC",
+            "BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC",
+            "BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BBA","BBA","BBA","BBA","BBA","BBA","BBA",
+            "BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA",
+            "BBA","BBA","BBA","BBA","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB",
+            "BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBC",
+            "BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC",
+            "BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BCA","BCA","BCA","BCA","BCA","BCA",
+            "BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA",
+            "BCA","BCA","BCA","BCA","BCA","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB",
+            "BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB",
+            "BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC",
+            "BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","CAA","CAA","CAA","CAA","CAA",
+            "CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA",
+            "CAA","CAA","CAA","CAA","CAA","CAA","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB",
+            "CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB",
+            "CAB","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC",
+            "CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CBA","CBA","CBA","CBA",
+            "CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA",
+            "CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB",
+            "CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB",
+            "CBB","CBB","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC",
+            "CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CCA","CCA","CCA",
+            "CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA",
+            "CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB",
+            "CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB",
+            "CCB","CCB","CCB","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC",
+            "CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC"};
+        }
+
+        public void ResetID1Option(){
+            options = new List<string>() {"AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABA",
+            "ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB","ACB","ACC","ACC","ACC",
+            "BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA","BBA","BBB","BBB","BBB","BBC",
+            "BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC","CAA","CAA","CAA","CAB","CAB",
+            "CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA","CCA","CCA",
+            "CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA",
+            "ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB","ACB","ACC","ACC",
+            "ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA","BBA","BBB","BBB","BBB",
+            "BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC","CAA","CAA","CAA","CAB",
+            "CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA","CCA",
+            "CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC",
+            "ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB","ACB","ACC",
+            "ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA","BBA","BBB","BBB",
+            "BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC","CAA","CAA","CAA",
+            "CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA",
+            "CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC",
+            "AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB","ACB",
+            "ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA","BBA","BBB",
+            "BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC","CAA","CAA",
+            "CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC",
+            "CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC",
+            "AAC","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB",
+            "ACB","ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA","BBA",
+            "BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC","CAA",
+            "CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC",
+            "CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB",
+            "AAC","AAC","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB",
+            "ACB","ACB","ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBA",
+            "BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC","BCC",
+            "CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC",
+            "CBC","CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB","AAB",
+            "AAB","AAC","AAC","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA",
+            "ACB","ACB","ACB","ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA",
+            "BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC","BCC",
+            "BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB","CBB",
+            "CBC","CBC","CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA","AAB",
+            "AAB","AAB","AAC","AAC","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA",
+            "ACA","ACB","ACB","ACB","ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC",
+            "BBA","BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB","BCC",
+            "BCC","BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB","CBB",
+            "CBB","CBC","CBC","CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAA",
+            "AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA",
+            "ACA","ACA","ACB","ACB","ACB","ACC","ACC","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC",
+            "BAC","BBA","BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCA","BCA","BCB","BCB","BCB",
+            "BCC","BCC","BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBA","CBA","CBB",
+            "CBB","CBB","CBC","CBC","CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC"};
+        }
+
+        public void ResetID2Option(){
+            options = new List<string>() {"AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA",
+            "ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA",
+            "AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA",
+            "CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA",
+            "BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA",
+            "BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA",
+            "ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA",
+            "CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA",
+            "CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA",
+            "BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA",
+            "ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA",
+            "AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA",
+            "CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA",
+            "BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA",
+            "BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA",
+            "ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB",
+            "CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB",
+            "CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB",
+            "BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB",
+            "ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB",
+            "AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB",
+            "CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB",
+            "BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB",
+            "BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB",
+            "ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB",
+            "CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB",
+            "CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB",
+            "BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB",
+            "ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB",
+            "AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB",
+            "CBB","CCB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAC","ABC","ACC","BAC","BBC",
+            "BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC",
+            "BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC",
+            "ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC",
+            "CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC",
+            "CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC",
+            "BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC",
+            "ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC",
+            "AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC",
+            "CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC",
+            "BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC",
+            "BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC",
+            "ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC",
+            "CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC",
+            "CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC",
+            "BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC"};
+        }
         public EdgeId GetReversedEdgeId()
         {
             return new EdgeId(edgeId.b, edgeId.a);
