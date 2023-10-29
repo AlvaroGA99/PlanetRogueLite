@@ -145,7 +145,7 @@ public class PlanetGenerator : MonoBehaviour
             
             _orbits[i].GenerateSphereResolution(3, tiles);
             _orbits[i].UpdateVertexPositions(tiles,generationModuleWedgesValues,generationModuleCentresValues);
-
+            _orbits[i].G(3);
             tiles.Reset(-1);
         }
     }
@@ -275,7 +275,8 @@ public class PlanetGenerator : MonoBehaviour
 
         }
 
-        m.RecalculateNormals();
+        //m.RecalculateNormals();
+        //m.RecalculateTangents();
         return m;
 
     }
