@@ -52,14 +52,14 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rb.AddForce(_redirectTransform.position - transform.position, ForceMode.Acceleration);
+        //_rb.AddForce((_redirectTransform.position - transform.position)*8, ForceMode.Acceleration);
         _rb.AddForce(-transform.position.normalized * 50, ForceMode.Acceleration);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         colliding = true;
-        _savedVector =  Vector3.ProjectOnPlane( _enemySourceTransform.position - _redirectTransform.position ,-other.transform.up) + other.transform.up*2;
+        _savedVector =  Vector3.ProjectOnPlane( _enemySourceTransform.position - _redirectTransform.position ,-other.transform.up)*4 + other.transform.up*2;
     }
 
     private void OnTriggerExit(Collider other)

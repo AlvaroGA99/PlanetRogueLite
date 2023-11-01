@@ -67,7 +67,7 @@ public class EnemyController : MonoBehaviour
             UnityEngine.Debug.DrawLine(_t.position,projRef.transform.position,Color.red,2);
             projRef.InitEnemySource(_t);
             //projRef.Stop();
-            projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position),-_t.up)*2 + _t.up*4,ForceMode.Impulse);
+            projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position),-_t.up)*4 + _t.up*2,ForceMode.Impulse);
 
             timer = 0;
             }

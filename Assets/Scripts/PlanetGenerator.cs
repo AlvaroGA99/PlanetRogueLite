@@ -22,13 +22,14 @@ public class PlanetGenerator : MonoBehaviour
         _orbits = new Planet[7];
         _orbits[6] = Instantiate(planetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         float angle = 0.0f;
-        for (int i = 0; i < _orbits.Length - 1; i++)
-        {
-            angle = UnityEngine.Random.Range(0.66f * Mathf.PI, Mathf.PI / 3);
-            //            print(angle);
-            _orbits[i] = Instantiate(planetPrefab, transform.position + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
-            _player._SphereT = _orbits[6].transform;
-        }
+        // for (int i = 0; i < _orbits.Length - 1; i++)
+        // {
+        //     angle = UnityEngine.Random.Range(0.66f * Mathf.PI, Mathf.PI / 3);
+        //     //            print(angle);
+        //     _orbits[i] = Instantiate(planetPrefab, transform.position + -transform.forward*250 + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
+        //    
+        // }
+         _player._SphereT = _orbits[6].transform;
     }
     // Start is called before the first frame update
     void Start()
@@ -121,7 +122,7 @@ public class PlanetGenerator : MonoBehaviour
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
 
-        for (int i = 0; i < _orbits.Length; i++)
+        for (int i = 6; i < _orbits.Length ; i++)
         {
 
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
@@ -145,7 +146,7 @@ public class PlanetGenerator : MonoBehaviour
             
             _orbits[i].GenerateSphereResolution(3, tiles);
             _orbits[i].UpdateVertexPositions(tiles,generationModuleWedgesValues,generationModuleCentresValues);
-            _orbits[i].G(3);
+            //_orbits[i].G(3);
             tiles.Reset(-1);
         }
     }

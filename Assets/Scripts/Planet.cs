@@ -76,7 +76,7 @@ public class Planet : MonoBehaviour
         }
         m.vertices = vertices;
         m.RecalculateNormals();
-        //m.RecalculateTangents();
+        
         mC.sharedMesh = m;
     }
 
@@ -158,8 +158,9 @@ public class Planet : MonoBehaviour
             m.triangles = newTriangles;
         }
         
-       // m.RecalculateNormals();
-        //m.RecalculateTangents();
+        m.RecalculateNormals();
+        
+        mC.sharedMesh = m;
         //Debug.Log(tiles.elements[0].tileVertices.Count);
     }
 
