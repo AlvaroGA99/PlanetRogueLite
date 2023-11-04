@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public Transform _playerT;
     public EnemyController _enemyPrefab;
 
-    PlanetGenerator _planetGen;
+    public PlanetGenerator _planetGen;
 
     ObjectPool<Projectile> _projectilePool;
 
@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
        a = _enemyPool.Get();
-       a.transform.position = new Vector3(.4711895f,14.53f,6.3f); 
+       a.transform.position = new Vector3(.4711895f,54.53f,6.3f); 
     }
 
     // Update is called once per frame

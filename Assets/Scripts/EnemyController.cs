@@ -42,6 +42,7 @@ public class EnemyController : MonoBehaviour
         shouldSpawn = true;
 
         //char_T = GameObject.Find("Char_position").transform;
+        _rb = GetComponent<Rigidbody>();
 
         _t = transform;
     }
@@ -73,6 +74,7 @@ public class EnemyController : MonoBehaviour
     {
 
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
+        _rb.AddForce((_SphereT.position - _t.position).normalized*115);
         float sqrDistance = (char_T.position - _t.position).sqrMagnitude;
 
         if (BehaviourState == State.AttackState)
@@ -82,7 +84,7 @@ public class EnemyController : MonoBehaviour
                 if (shouldSpawn)
                 {
                     Projectile projRef = _projPool.Get();
-                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized;
+                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized*2;
                     UnityEngine.Debug.DrawLine(_t.position, projRef.transform.position, Color.red, 2);
                     projRef.InitEnemySource(_t);
                     projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position), -_t.up) * 4 + _t.up * 2, ForceMode.Impulse);
@@ -109,7 +111,7 @@ public class EnemyController : MonoBehaviour
                 if (shouldSpawn)
                 {
                     Projectile projRef = _projPool.Get();
-                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized;
+                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized*2;
                     UnityEngine.Debug.DrawLine(_t.position, projRef.transform.position, Color.red, 2);
                     projRef.InitEnemySource(_t);
                     projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position), -_t.up) * 4 + _t.up * 2, ForceMode.Impulse);
@@ -127,11 +129,11 @@ public class EnemyController : MonoBehaviour
 
     private State CheckBehaviourState(float sqrMagnitude)
     {
-        if (sqrMagnitude < 100)
+        if (sqrMagnitude < 900)
         {
             return State.AttackState;
         }
-        else if (sqrMagnitude >= 100 && sqrMagnitude < 400)
+        else if (sqrMagnitude >= 900 && sqrMagnitude < 1600)
         {
             return State.AttackMoveState;
         }
