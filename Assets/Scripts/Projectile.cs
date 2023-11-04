@@ -11,6 +11,8 @@ public class Projectile : MonoBehaviour
 
     private Transform _enemySourceTransform;
 
+    private Transform _SphereT;
+
     ObjectPool<Projectile> _projPool;
 
     private bool colliding;
@@ -30,11 +32,12 @@ public class Projectile : MonoBehaviour
         colliding = false;
     }
 
-    public void Init(Transform redirect, ObjectPool<Projectile> pool)
+    public void Init(Transform redirect, ObjectPool<Projectile> pool,Transform sphereTransform)
     {
         _rb = GetComponent<Rigidbody>();
         _redirectTransform = redirect;
         _projPool = pool;
+        _SphereT = sphereTransform;
 
     }
 

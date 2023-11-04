@@ -12,6 +12,8 @@ public class PlanetGenerator : MonoBehaviour
 
     public Planet planetPrefab;
 
+    private Planet _currentPlanet;
+
     [SerializeField]
     private PlayerController _player;
 
@@ -29,7 +31,8 @@ public class PlanetGenerator : MonoBehaviour
         //     _orbits[i] = Instantiate(planetPrefab, transform.position + -transform.forward*250 + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
         //    
         // }
-         _player._SphereT = _orbits[6].transform;
+        _currentPlanet = _orbits[6];
+         _player._SphereT = _currentPlanet.transform;
     }
     // Start is called before the first frame update
     void Start()
@@ -358,5 +361,9 @@ public class PlanetGenerator : MonoBehaviour
         }
         return readValues;
 
+    }
+
+    public Transform GetPlanetTransform(){
+        return _currentPlanet.transform;
     }
 }

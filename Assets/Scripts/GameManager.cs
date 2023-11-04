@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public Transform _playerT;
     public EnemyController _enemyPrefab;
 
-    Planet _currentPlanet;
+    PlanetGenerator _planetGen;
 
     ObjectPool<Projectile> _projectilePool;
 
@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     void Awake(){
          _projectilePool = new ObjectPool<Projectile>(() => {
             Projectile aux = Instantiate(_projPrefab);
-            aux.Init(_playerT, _projectilePool);
+            aux.Init(_playerT, _projectilePool,_planetGen.GetPlanetTransform());
             return aux ;
         }, proj => {
             proj.Reset(_playerT);
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
         _enemyPool = new ObjectPool<EnemyController>(() => {
 
             EnemyController aux = Instantiate(_enemyPrefab);
-            aux.Init(_projectilePool);
+            aux.Init(_projectilePool,_playerT,_planetGen.GetPlanetTransform());
             return aux ;
         }, enemy => {
             enemy.gameObject.SetActive(true);
@@ -47,10 +47,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
        a = _enemyPool.Get();
        a.transform.position = new Vector3(.4711895f,14.53f,6.3f); 
-
     }
 
     // Update is called once per frame

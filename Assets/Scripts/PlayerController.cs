@@ -29,7 +29,6 @@ public class PlayerController : MonoBehaviour
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tWeapon;
-    [SerializeField] private Transform _tWeaponReversed;
     private Transform _t;
 
     private Rigidbody _rb;
