@@ -2,10 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using TMPro;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class EnemyController : MonoBehaviour
 {
@@ -27,39 +31,20 @@ public class EnemyController : MonoBehaviour
         AttackMoveState
     }
     private State BehaviourState;
-    // Start is called before the first frame update
-    void Start()
-    {
-
-
-    }
 
     void Awake()
     {
-
         timer = 0;
-
         shouldSpawn = true;
-
-        //char_T = GameObject.Find("Char_position").transform;
         _rb = GetComponent<Rigidbody>();
-
         _t = transform;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-
     }
 
     void OnEnable()
     {
         timer = 0;
     }
-
-
+    
     public void Init(ObjectPool<Projectile> pool, Transform charTransform,Transform sphereTransform)
     {
         _projPool = pool;
@@ -67,15 +52,16 @@ public class EnemyController : MonoBehaviour
         _SphereT = sphereTransform;
 
         BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
-
-
     }
     private void FixedUpdate()
     {
-
+        Vector3 toCenter = _t.position - _SphereT.position;
+        Vector3 betweenThisAndChar = char_T.position - _t.position;
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
-        _rb.AddForce((_SphereT.position - _t.position).normalized*115);
-        float sqrDistance = (char_T.position - _t.position).sqrMagnitude;
+        _rb.AddForce(-toCenter.normalized*115);
+        float sqrDistance = betweenThisAndChar.sqrMagnitude;
+        Vector3 launchVector = betweenThisAndChar.normalized;
+        float launchVectorMag = betweenThisAndChar.magnitude*4;
 
         if (BehaviourState == State.AttackState)
         {
@@ -83,16 +69,12 @@ public class EnemyController : MonoBehaviour
             {
                 if (shouldSpawn)
                 {
-                    Projectile projRef = _projPool.Get();
-                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized*2;
-                    UnityEngine.Debug.DrawLine(_t.position, projRef.transform.position, Color.red, 2);
-                    projRef.InitEnemySource(_t);
-                    projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position), -_t.up) * 4 + _t.up * 2, ForceMode.Impulse);
+                    LaunchProjectile(launchVector,launchVectorMag);
                     timer = 0;
                 }
             }
 
-            BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
+            BehaviourState = CheckBehaviourState(sqrDistance);
             if (BehaviourState != State.AttackState){
                 timer = 0;
             }
@@ -100,25 +82,21 @@ public class EnemyController : MonoBehaviour
         else if (BehaviourState == State.MoveState)
         {   
             
-            BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
+            BehaviourState = CheckBehaviourState(sqrDistance);
             timer = 0;
         }
         else
         {   
-            _rb.AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position), -_t.up).normalized*200);
+            _rb.AddForce(Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized*200);
             if (timer > 2)
             {
                 if (shouldSpawn)
                 {
-                    Projectile projRef = _projPool.Get();
-                    projRef.transform.position = _t.position + (char_T.position - _t.position).normalized*2;
-                    UnityEngine.Debug.DrawLine(_t.position, projRef.transform.position, Color.red, 2);
-                    projRef.InitEnemySource(_t);
-                    projRef.GetComponent<Rigidbody>().AddForce(Vector3.ProjectOnPlane((char_T.position - _t.position), -_t.up) * 4 + _t.up * 2, ForceMode.Impulse);
+                    LaunchProjectile(launchVector,launchVectorMag);
                     timer = 0;
                 }
             }
-            BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
+            BehaviourState = CheckBehaviourState(sqrDistance);
             if (BehaviourState != State.AttackMoveState){
                 timer = 0;
             }
@@ -129,11 +107,11 @@ public class EnemyController : MonoBehaviour
 
     private State CheckBehaviourState(float sqrMagnitude)
     {
-        if (sqrMagnitude < 900)
+        if (sqrMagnitude < 225)
         {
             return State.AttackState;
         }
-        else if (sqrMagnitude >= 900 && sqrMagnitude < 1600)
+        else if (sqrMagnitude >= 225 && sqrMagnitude < 576)
         {
             return State.AttackMoveState;
         }
@@ -141,5 +119,13 @@ public class EnemyController : MonoBehaviour
         {
             return State.MoveState;
         }
+    }
+
+    private void LaunchProjectile(Vector3 launchVector, float launchVectorMag){
+        Projectile projRef = _projPool.Get();
+        projRef.transform.position = _t.position + _t.up*2;
+        projRef.InitEnemySource(_t);
+        projRef.GetComponent<Rigidbody>().AddForce((launchVector + _t.up*4).normalized*launchVectorMag, ForceMode.Impulse);
+        UnityEngine.Debug.DrawLine(_t.position, _t.position + (launchVector + _t.up*4).normalized*launchVectorMag, Color.red, 2);
     }
 }
