@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.Interactions;
 using System.Linq;
+using UnityEngine.Animations;
 
 public class WFCGraph
 {
@@ -315,7 +316,9 @@ public class WFCGraph
         public int entropy;
         // public bool collapsed;
         public Edge[] edges;
+        public Vector3 reference;
 
+        public List<Vector3> meshVertices;
         public List<int> tileVertices;
         public List<int> tileTriangles;
 
@@ -343,6 +346,8 @@ public class WFCGraph
 
             this.tileVertices = new List<int> {edges[0].edgeId.a,edges[1].edgeId.a,edges[2].edgeId.a};
             this.tileTriangles = new List<int>();
+            this.meshVertices = new List<Vector3>();
+            
         }
 
         public void Collapse(int option)
@@ -358,6 +363,13 @@ public class WFCGraph
                 edges[i].options.Add(savedOption);
             }
 
+        }
+
+        public Mesh GenerateDestructionMesh(){
+            Mesh aux = new Mesh();
+            aux.SetVertices(this.meshVertices);
+            aux.triangles = this.tileTriangles.ToArray();
+            return aux;
         }
 
     }

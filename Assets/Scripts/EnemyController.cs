@@ -128,4 +128,13 @@ public class EnemyController : MonoBehaviour
         projRef.GetComponent<Rigidbody>().AddForce((launchVector + _t.up*4).normalized*launchVectorMag, ForceMode.Impulse);
         UnityEngine.Debug.DrawLine(_t.position, _t.position + (launchVector + _t.up*4).normalized*launchVectorMag, Color.red, 2);
     }
+
+    // private IEnumerator CheckFrontObstacles(Vector3 launchVector, float launchVectorMag){
+    //     while(!Physics.Raycast(_t.position,_t.forward,5)){
+    //         yield return new WaitForFixedUpdate();
+    //     }
+    //     //hacer jump
+    //     yield return new WaitForFixedUpdate();
+        
+    // }
 }

@@ -84,6 +84,7 @@ public class Planet : MonoBehaviour
     {
 
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
+        Dictionary<int, int> meshVertexMatching = new Dictionary<int, int>();
         int newIndex = 0;
         int denom = 1;
         for (int r = 0; r < resolution; r++)
@@ -125,29 +126,51 @@ public class Planet : MonoBehaviour
                 newTriangles[i * 4 + 7] = newIndex1;
                 newTriangles[i * 4 + 8] = newIndex2;
 
-
+                if(meshVertexMatching.TryAdd(i0,tiles.elements[(i / 3) / denom].meshVertices.Count)){
+                    tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[i0]);
+                    tiles.elements[(i / 3) / denom].reference += newVertices[i0];
+                }
+                if(meshVertexMatching.TryAdd(i1,tiles.elements[(i / 3) / denom].meshVertices.Count)){
+                    tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[i1]);
+                    tiles.elements[(i / 3) / denom].reference += newVertices[i1];
+                }
+                if(meshVertexMatching.TryAdd(i2,tiles.elements[(i / 3) / denom].meshVertices.Count)){
+                    tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[i2]);
+                    tiles.elements[(i / 3) / denom].reference += newVertices[i2];
+                }
 
                 tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex0);
+                meshVertexMatching.Add(newIndex0,tiles.elements[(i / 3) / denom].meshVertices.Count);
+                tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[newIndex0]);
+                tiles.elements[(i / 3) / denom].reference += newVertices[newIndex0];
+                
                 tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex1);
+                meshVertexMatching.TryAdd(newIndex1,tiles.elements[(i / 3) / denom].meshVertices.Count);
+                tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[newIndex1]);
+                tiles.elements[(i / 3) / denom].reference += newVertices[newIndex1];
+                
                 tiles.elements[(i / 3) / denom].tileVertices.Add(newIndex2);
-
+                meshVertexMatching.TryAdd(newIndex2,tiles.elements[(i / 3) / denom].meshVertices.Count);
+                tiles.elements[(i / 3) / denom].meshVertices.Add(newVertices[newIndex2]);
+                tiles.elements[(i / 3) / denom].reference += newVertices[newIndex2];
+                
                 if (r == resolution - 1)
                 {
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i1);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex0]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[i1]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex1]);
 
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex2]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex1]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[i2]);
 
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex1);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex0]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex1]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex2]);
 
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(i0);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex0);
-                    tiles.elements[(i / 3) / denom].tileTriangles.Add(newIndex2);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[i0]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex0]);
+                    tiles.elements[(i / 3) / denom].tileTriangles.Add(meshVertexMatching[newIndex2]);
                 }
 
 
