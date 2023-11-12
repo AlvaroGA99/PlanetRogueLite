@@ -22,6 +22,7 @@ public class EnemyController : MonoBehaviour
     private Transform char_T;
     private Transform _SphereT;
     private Transform _t;
+    private bool jumping;
     private float timer;
 
     private enum State
@@ -34,6 +35,7 @@ public class EnemyController : MonoBehaviour
 
     void Awake()
     {
+        jumping = false;
         timer = 0;
         shouldSpawn = true;
         _rb = GetComponent<Rigidbody>();
@@ -81,7 +83,11 @@ public class EnemyController : MonoBehaviour
         }
         else if (BehaviourState == State.MoveState)
         {   
+            if(!jumping){
+                _rb.AddForce(Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized*200);
+            }
             
+
             BehaviourState = CheckBehaviourState(sqrDistance);
             timer = 0;
         }
@@ -102,7 +108,7 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        timer += Time.deltaTime;
+        timer += Time.fixedDeltaTime;
     }
 
     private State CheckBehaviourState(float sqrMagnitude)
@@ -129,12 +135,13 @@ public class EnemyController : MonoBehaviour
         UnityEngine.Debug.DrawLine(_t.position, _t.position + (launchVector + _t.up*4).normalized*launchVectorMag, Color.red, 2);
     }
 
-    // private IEnumerator CheckFrontObstacles(Vector3 launchVector, float launchVectorMag){
-    //     while(!Physics.Raycast(_t.position,_t.forward,5)){
-    //         yield return new WaitForFixedUpdate();
-    //     }
-    //     //hacer jump
-    //     yield return new WaitForFixedUpdate();
-        
-    // }
+    private IEnumerator Jumping(){
+        float time = 0;
+        while (time < 3){
+            time += Time.deltaTime;
+            yield return null;
+        }
+        jumping = false;
+        timer = 0;
+    }
 }
