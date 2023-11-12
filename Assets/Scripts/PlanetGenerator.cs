@@ -32,7 +32,7 @@ public class PlanetGenerator : MonoBehaviour
         //    
         // }
         _currentPlanet = _orbits[6];
-         _player._SphereT = _currentPlanet.transform;
+        _player._SphereT = _currentPlanet.transform;
     }
     // Start is called before the first frame update
     void Start()
@@ -131,14 +131,11 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
 
-            state = tiles.Step();
-            //print(state);
+            state = tiles.Step();            
             while (state != WFCGraph.StateInfo.SUCCESFUL)
             {
                 if (state == WFCGraph.StateInfo.ERROR)
                 {
-                    //state = tiles.Rollback();
-                    //sprint(state);
                     if (state == WFCGraph.StateInfo.ERROR)
                     {
                         tiles.Reset(-1);

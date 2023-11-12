@@ -65,7 +65,7 @@ public class EnemyController : MonoBehaviour
 
         if (BehaviourState == State.AttackState)
         {
-            if (timer > 2)
+            if (timer > 3)
             {
                 if (shouldSpawn)
                 {
@@ -88,7 +88,7 @@ public class EnemyController : MonoBehaviour
         else
         {   
             _rb.AddForce(Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized*200);
-            if (timer > 2)
+            if (timer > 3)
             {
                 if (shouldSpawn)
                 {

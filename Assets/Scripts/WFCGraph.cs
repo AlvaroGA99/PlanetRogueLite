@@ -353,25 +353,14 @@ public class WFCGraph
         public void Collapse(int option)
         {
             entropy = 1;
-
             string savedOption;
-
             for (int i = 0; i < 3; i++)
             {
                 savedOption = edges[i].options[option];
                 edges[i].options.Clear();
                 edges[i].options.Add(savedOption);
             }
-
         }
-
-        public Mesh GenerateDestructionMesh(){
-            Mesh aux = new Mesh();
-            aux.SetVertices(this.meshVertices);
-            aux.triangles = this.tileTriangles.ToArray();
-            return aux;
-        }
-
     }
 
     public class Edge

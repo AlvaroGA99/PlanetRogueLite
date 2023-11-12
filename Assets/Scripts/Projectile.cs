@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class Projectile : MonoBehaviour
 {
     // Start is called before the first frame update
+
+    public static event Action OnDestroyEnemy;
     private Rigidbody _rb;
     private Vector3 _savedVector;
 
@@ -62,7 +65,8 @@ public class Projectile : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         colliding = true;
-        _savedVector =  Vector3.ProjectOnPlane( _enemySourceTransform.position - _redirectTransform.position ,-other.transform.up)*4 + other.transform.up*2;
+        _redirectTransform = other.transform;
+        
     }
 
     private void OnTriggerExit(Collider other)
@@ -72,20 +76,26 @@ public class Projectile : MonoBehaviour
 
     private void TriggerForce(float force)
     {
-        print("ACTIVADO");
+        //print("ACTIVADO");
         if (colliding)
-        {
+        {   
+            _savedVector =  _enemySourceTransform.position - _redirectTransform.position;
+            _savedVector = (_savedVector.normalized + _redirectTransform.up*4).normalized*_savedVector.magnitude*4;
             _rb.velocity = new Vector3(0, 0, 0);
             _rb.angularVelocity = new Vector3(0, 0, 0);
-            _rb.AddForce((_savedVector) * force, ForceMode.Impulse);
+            _rb.AddForce((_savedVector) * 1, ForceMode.Impulse);
             _redirectTransform = _enemySourceTransform;
             colliding = false;
         }
 
     }
 
-    void OnCollisionEnter()
-    {
+    void OnCollisionEnter(Collision other)
+    {   //print(other.gameObject.tag);
+        if(other.gameObject.tag == "Enemy"){
+             OnDestroyEnemy?.Invoke();
+             
+        }
         _projPool.Release(this);
     }
 }
