@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 
     ObjectPool<EnemyController> _enemyPool;
 
+    private float timer;
+
     EnemyController a;
 
     void Awake(){
@@ -46,14 +48,22 @@ public class GameManager : MonoBehaviour
     }
     // Start is called before the first frame update
     void Start()
-    {
+    {  
+       timer = 0;
        a = _enemyPool.Get();
        a.transform.position = new Vector3(.4711895f,54.53f,6.3f); 
     }
 
     // Update is called once per frame
     void Update()
-    {
+    {   
+        if(timer > 8){
+            SpawnEnemy();
+        }
+        timer += Time.deltaTime;
+    }
+
+    private void SpawnEnemy(){
         
     }
 }
