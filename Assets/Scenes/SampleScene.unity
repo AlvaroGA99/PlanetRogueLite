@@ -896,8 +896,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.24
-  m_Center: {x: 0, y: 0, z: 2.09}
+  m_Radius: 1.64
+  m_Center: {x: 0, y: 0, z: 2.35}
 --- !u!1 &1283149244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1076,8 +1076,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1492539504}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 2.09}
-  m_LocalScale: {x: 2.06, y: 2.06, z: 2.06}
+  m_LocalPosition: {x: 0, y: 0, z: 2.39}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1024585299}
@@ -1103,7 +1103,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6b4f4a19f7bdc08498fa6b6e0f98f61d, type: 2}
+  - {fileID: 2100000, guid: a07a19f35c0a692419a2b95c0e60c4dd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

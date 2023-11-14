@@ -43,7 +43,7 @@ public class Weapon : MonoBehaviour
         //     }
         // }
         if (Mouse.current.leftButton.wasReleasedThisFrame){
-            OnReleaseShot?.Invoke(force);
+            OnReleaseShot?.Invoke(force/2);
             _energyPoints =  1.0f;
             UpdateEnergy();
             force = 0;

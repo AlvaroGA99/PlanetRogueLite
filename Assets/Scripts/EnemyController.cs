@@ -56,8 +56,8 @@ public class EnemyController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
         _rb.AddForce(-toCenter.normalized * 115);
         float sqrDistance = betweenThisAndChar.sqrMagnitude;
-        Vector3 launchVector = betweenThisAndChar.normalized;
-        float launchVectorMag = betweenThisAndChar.magnitude * 4;
+        Vector3 launchVector = betweenThisAndChar.normalized*1.5f;
+        float launchVectorMag = betweenThisAndChar.magnitude * 3;
 
         if (!jumping)
         {
@@ -66,7 +66,7 @@ public class EnemyController : MonoBehaviour
             if (Physics.Raycast(_t.position, _t.forward, out hit, 2.0f))
             {   
                 Vector3 vec = (hit.point - _SphereT.position).normalized;
-                vec = (vec*0.99f )*44 - _t.position;
+                vec = (vec*1.01f )*44 - _t.position;
                 float vecMag = vec.magnitude;
                 vec = vec.normalized*4;
                 //_rb.AddForce((vec + _t.up * 4).normalized * vecMag, ForceMode.Impulse);

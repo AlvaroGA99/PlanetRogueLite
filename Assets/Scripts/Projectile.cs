@@ -58,7 +58,8 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //_rb.AddForce((_redirectTransform.position - transform.position)*8, ForceMode.Acceleration);
+        Vector3 helpForce = _redirectTransform.position - transform.position;
+        _rb.AddForce(helpForce/helpForce.sqrMagnitude*40, ForceMode.Acceleration);
         _rb.AddForce(-transform.position.normalized * 50, ForceMode.Acceleration);
     }
 
@@ -80,7 +81,7 @@ public class Projectile : MonoBehaviour
         if (colliding)
         {   
             _savedVector =  _enemySourceTransform.position - _redirectTransform.position;
-            _savedVector = (_savedVector.normalized + _redirectTransform.up*4).normalized*_savedVector.magnitude*4;
+            _savedVector = (_savedVector.normalized*1.5f + _redirectTransform.up*4).normalized*_savedVector.magnitude*3;
             _rb.velocity = new Vector3(0, 0, 0);
             _rb.angularVelocity = new Vector3(0, 0, 0);
             _rb.AddForce((_savedVector) * 1, ForceMode.Impulse);
