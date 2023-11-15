@@ -4,7 +4,6 @@ using UnityEngine.Pool;
 public class GameManager : MonoBehaviour
 {   
     public Projectile _projPrefab;
-    
     public Transform _playerT;
     public EnemyController _enemyPrefab;
 
@@ -15,10 +14,14 @@ public class GameManager : MonoBehaviour
     ObjectPool<EnemyController> _enemyPool;
 
     private float timer;
+    private float spawnval;
+    private LayerMask _wallMask;
 
     EnemyController a;
 
     void Awake(){
+        _wallMask = LayerMask.GetMask("DestructionMesh");
+        spawnval = 8;
          _projectilePool = new ObjectPool<Projectile>(() => {
             Projectile aux = Instantiate(_projPrefab);
             aux.Init(_playerT, _projectilePool,_planetGen.GetPlanetTransform());
@@ -36,7 +39,7 @@ public class GameManager : MonoBehaviour
         _enemyPool = new ObjectPool<EnemyController>(() => {
 
             EnemyController aux = Instantiate(_enemyPrefab);
-            aux.Init(_projectilePool,_playerT,_planetGen.GetPlanetTransform());
+            aux.Init(_projectilePool,_playerT,_planetGen.GetPlanetTransform(),_wallMask);
             return aux ;
         }, enemy => {
             enemy.gameObject.SetActive(true);
@@ -57,13 +60,29 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        if(timer > 8){
+        if(timer > spawnval){
             SpawnEnemy();
+            spawnval = Random.Range(8,15);
         }
         timer += Time.deltaTime;
     }
 
     private void SpawnEnemy(){
+        float xRandomOffset = Random.Range(-8,8);
+        float zRandomOffset = Random.Range(-8,8);
+        Vector3 spawnPos = transform.localToWorldMatrix*new Vector3(xRandomOffset,0,zRandomOffset);
+        Vector3 dir = _planetGen.GetPlanetTransform().position - spawnPos;
+        RaycastHit hit;
+        while(Physics.Raycast(spawnPos,dir,out hit,_wallMask)){
+            xRandomOffset = Random.Range(-8,8);
+            zRandomOffset = Random.Range(-8,8);
+            spawnPos = transform.localToWorldMatrix*new Vector3(xRandomOffset,0,zRandomOffset);
+        }
+         a = _enemyPool.Get();
+         a.transform.position = hit.point - dir.normalized; 
+    
         
+        //samplear angulo random alrededor del personaje dentro de un radio
+        //spawnear el enemigo.
     }
 }

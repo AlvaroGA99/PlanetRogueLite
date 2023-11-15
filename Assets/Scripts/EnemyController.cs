@@ -19,6 +19,8 @@ public class EnemyController : MonoBehaviour
     private bool jumping;
     private float timer;
 
+    private LayerMask _wallMask;
+
     private enum State
     {
         AttackState,
@@ -41,12 +43,12 @@ public class EnemyController : MonoBehaviour
         timer = 0;
     }
 
-    public void Init(ObjectPool<Projectile> pool, Transform charTransform, Transform sphereTransform)
+    public void Init(ObjectPool<Projectile> pool, Transform charTransform, Transform sphereTransform, LayerMask wallMask)
     {
         _projPool = pool;
         char_T = charTransform;
         _SphereT = sphereTransform;
-
+        _wallMask = wallMask;
         BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
     }
     private void FixedUpdate()
@@ -63,7 +65,7 @@ public class EnemyController : MonoBehaviour
         {
 
             RaycastHit hit;
-            if (Physics.Raycast(_t.position, _t.forward, out hit, 2.0f))
+            if (Physics.Raycast(_t.position, _t.forward, out hit, 2.0f,_wallMask))
             {   
                 Vector3 vec = (hit.point - _SphereT.position).normalized;
                 vec = (vec*1.01f )*44 - _t.position;

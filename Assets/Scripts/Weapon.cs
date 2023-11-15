@@ -11,6 +11,8 @@ public class Weapon : MonoBehaviour
     public static event Action<float> OnReleaseShot;
     float force;
     private float _energyPoints;
+    [SerializeField]
+    private GameObject child;
 
     public Image Energy;
 
@@ -31,6 +33,7 @@ public class Weapon : MonoBehaviour
                 UpdateEnergy();
                 if (force < 2 )
                 {
+                    child.transform.localScale -= Vector3.one*1.125f*Time.deltaTime;
                     force += Time.deltaTime;
                 }
             }
@@ -44,6 +47,7 @@ public class Weapon : MonoBehaviour
         // }
         if (Mouse.current.leftButton.wasReleasedThisFrame){
             OnReleaseShot?.Invoke(force/2);
+            child.transform.localScale = Vector3.one*3;
             _energyPoints =  1.0f;
             UpdateEnergy();
             force = 0;
