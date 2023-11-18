@@ -16,11 +16,11 @@ public class PlanetGenerator : MonoBehaviour
 
     [SerializeField]
     private PlayerController _player;
-
     private WFCGraph tiles;
 
     void Awake()
-    {
+    {   
+        
         _orbits = new Planet[7];
         _orbits[6] = Instantiate(planetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         float angle = 0.0f;
@@ -125,7 +125,7 @@ public class PlanetGenerator : MonoBehaviour
         tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
         WFCGraph.StateInfo state;
 
-        for (int i = 6; i < _orbits.Length ; i++)
+        for (int i = 0; i < _orbits.Length ; i++)
         {
 
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
@@ -144,8 +144,8 @@ public class PlanetGenerator : MonoBehaviour
                 state = tiles.Step();
             }
             
-            _orbits[i].GenerateSphereResolution(3, tiles);
-            _orbits[i].UpdateVertexPositions(tiles,generationModuleWedgesValues,generationModuleCentresValues);
+            //_orbits[i].GenerateSphereResolution(3, tiles);
+            //_orbits[i].UpdateVertexPositions(tiles,generationModuleWedgesValues,generationModuleCentresValues);
             //_orbits[i].G(3);
             tiles.Reset(-1);
         }
@@ -362,5 +362,9 @@ public class PlanetGenerator : MonoBehaviour
 
     public Transform GetPlanetTransform(){
         return _currentPlanet.transform;
+    }
+
+    public bool IsInSpawnState(){
+        return _currentPlanet.isInSpawnState;
     }
 }

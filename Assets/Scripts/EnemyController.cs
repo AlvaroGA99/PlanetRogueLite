@@ -57,6 +57,8 @@ public class EnemyController : MonoBehaviour
         Vector3 betweenThisAndChar = char_T.position - _t.position;
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
         _rb.AddForce(-toCenter.normalized * 115);
+        Vector3 moveVector = Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized * 200;
+        _t.rotation = Quaternion.LookRotation(moveVector, _t.up);
         float sqrDistance = betweenThisAndChar.sqrMagnitude;
         Vector3 launchVector = betweenThisAndChar.normalized*1.5f;
         float launchVectorMag = betweenThisAndChar.magnitude * 3;
@@ -98,16 +100,13 @@ public class EnemyController : MonoBehaviour
                 }
                 else if (BehaviourState == State.MoveState)
                 {
-                    Vector3 moveVector = Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized * 200;
-                    _t.rotation = Quaternion.LookRotation(moveVector, _t.up);
+                    
                     _rb.AddForce(moveVector);
                     BehaviourState = CheckBehaviourState(sqrDistance);
                     timer = 0;
                 }
                 else
                 {
-                    Vector3 moveVector = Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized * 200;
-                    _t.rotation = Quaternion.LookRotation(moveVector, _t.up);
                     _rb.AddForce(moveVector);
                     if (timer > 3)
                     {

@@ -18,6 +18,8 @@ public class Planet : MonoBehaviour
     private List<DestructionMeshData> _destructionMeshes;
     public int res;
     public int seed;
+    public float mass;
+    public bool isInSpawnState;
     private float _planetIntegrity;
     public GameObject PlanetIntegrity;
 
@@ -34,9 +36,9 @@ public class Planet : MonoBehaviour
     }
 
     private void Awake()
-    {   
+    {   isInSpawnState = true;
         Projectile.OnDestroyEnemy += ReducePlanetIntegrity;
-        _planetIntegrity = 0.1f;
+        _planetIntegrity = 0.2f;
         PlanetIntegrity = GameObject.Find("PlanetIntegrity");
         //gameobjectReferences = new List<GameObject>();
         mF = gameObject.AddComponent<MeshFilter>();
@@ -82,13 +84,14 @@ public class Planet : MonoBehaviour
                  }
                  int originalLength = n.meshVertices.Count;
                  for(int i = 0; i < originalLength; i++){
-                    n.meshVertices.Add(n.meshVertices[i] - n.meshVertices[i].normalized*0.5f);
+                    n.meshVertices.Add(n.meshVertices[i] - n.meshVertices[i].normalized*5.5f/100);
+                    n.meshVertices[i + originalLength] -= n.reference;
                     n.meshVertices[i] -= n.reference;
                  }
             }
             meshVertexMatching.Clear();
 
-            List<int> trianglesForCompleteMesh = new List<int>{15,16,1,17,7,16,15,17,16,6,17,15,18,19,7,20,4,19,18,20,19,8,20,18,17,18,7,21,8,18,17,21,18,6,21,17,22,21,6,23,8,21,22,23,21,3,23,22,24,25,4,26,10,25,24,26,25,9,26,24,27,28,10,29,2,28,27,29,28,11,29,27,26,27,10,30,11,27,26,30,27,9,30,26,31,30,9,32,11,30,31,32,30,5,32,31,20,24,4,33,9,24,20,33,24,8,33,20,34,31,9,35,5,31,34,35,31,12,35,34,33,34,9,36,12,34,33,36,34,8,36,33,23,36,8,37,12,36,23,37,36,3,37,23,38,37,3,39,12,37,38,39,37,13,39,38,40,35,12,41,5,35,40,41,35,14,41,40,39,40,12,42,14,40,39,42,40,13,42,39,43,42,13,44,14,42,43,44,42,0,44,43,0,45,65,20,0,65,20,65,81,36,20,81,36,81,84,39,36,84,39,84,88,43,39,88,43,88,53,8,43,53,8,53,58,13,8,58,13,58,82,37,13,82,37,82,63,18,37,63,18,63,68,23,18,68,23,68,83,38,23,83,38,83,48,3,38,48,3,48,66,21,3,66,21,66,62,17,21,62,17,62,67,22,17,67,22,67,51,6,22,51,6,51,60,15,6,60,15,60,46,1,15,46,1,46,49,4,1,49,4,49,52,7,4,52,7,52,55,10,7,55,10,55,61,16,10,61,16,61,64,19,16,64,19,64,70,25,19,70,25,70,73,28,25,73,28,73,47,2,28,47,2,47,69,24,2,69,24,69,79,34,24,79,34,79,85,40,34,85,40,85,89,44,40,89,44,89,54,9,44,54,9,54,59,14,9,59,14,59,80,35,14,80,35,80,71,26,35,71,26,71,76,31,26,76,31,76,86,41,31,86,41,86,50,5,41,50,5,50,75,30,5,75,30,75,72,27,30,72,27,72,77,32,27,77,32,77,56,11,32,56,11,56,74,29,11,74,29,74,45,0,29,45};
+            List<int> trianglesForCompleteMesh = new List<int>{60,61,46,62,52,61,60,62,61,51,62,60,63,64,52,65,49,64,63,65,64,53,65,63,62,63,52,66,53,63,62,66,63,51,66,62,67,66,51,68,53,66,67,68,66,48,68,67,69,70,49,71,55,70,69,71,70,54,71,69,72,73,55,74,47,73,72,74,73,56,74,72,71,72,55,75,56,72,71,75,72,54,75,71,76,75,54,77,56,75,76,77,75,50,77,76,65,69,49,78,54,69,65,78,69,53,78,65,79,76,54,80,50,76,79,80,76,57,80,79,78,79,54,81,57,79,78,81,79,53,81,78,68,81,53,82,57,81,68,82,81,48,82,68,83,82,48,84,57,82,83,84,82,58,84,83,85,80,57,86,50,80,85,86,80,59,86,85,84,85,57,87,59,85,84,87,85,58,87,84,88,87,58,89,59,87,88,89,87,45,89,88,0,45,88,43,0,88,43,88,58,13,43,58,13,58,83,38,13,83,38,83,48,3,38,48,3,48,67,22,3,67,22,67,51,6,22,51,6,51,60,15,6,60,15,60,46,1,15,46,1,46,61,16,1,61,16,61,52,7,16,52,7,52,64,19,7,64,19,64,49,4,19,49,4,49,70,25,4,70,25,70,55,10,25,55,10,55,73,28,10,73,28,73,47,2,28,47,2,47,74,29,2,74,29,74,56,11,29,56,11,56,77,32,11,77,32,77,50,5,32,50,5,50,86,41,5,86,41,86,59,14,41,59,14,59,89,44,14,89,44,89,45,0,44,45};
             n.tileTriangles.AddRange(trianglesForCompleteMesh);
             Mesh aux = new Mesh();
             aux.vertices = n.meshVertices.ToArray();
@@ -222,6 +225,7 @@ public class Planet : MonoBehaviour
     }
 
     private void FracturePlanet(){
+        isInSpawnState = false;
         foreach(DestructionMeshData d in _destructionMeshes){
             DestructionMesh aux =  Instantiate(_destructionMeshPrefab, transform.position, Quaternion.identity);
             aux.Init(d.reference,d.mesh);

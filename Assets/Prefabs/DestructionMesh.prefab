@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7162196656236711152}
   m_Layer: 8
   m_Name: DestructionMesh
-  m_TagString: Untagged
+  m_TagString: Planet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
