@@ -40,20 +40,18 @@ public class PlayerController : MonoBehaviour
     public Vector3 _lastForward;
     
     private float _rotationSpeed;
-    
     private Quaternion _lastLocalRotation;
     private Quaternion _lastLocalWieldRotation;
-    
     private bool onFloor;
     private bool notGamepad;
-
     private Camera cam;
 
     //private float airTimer;
 
 
     void Start()
-    {   _healthPoints = 1.0f;
+    {   
+        _healthPoints = 1.0f;
         onFloor = false;
         _t = transform;
         _ingameControl = input.FindActionMap("Ingame");
