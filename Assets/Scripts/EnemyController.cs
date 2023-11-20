@@ -18,6 +18,7 @@ public class EnemyController : MonoBehaviour
     private Transform _t;
     private bool jumping;
     private float timer;
+    private GravityField _gF;
 
     private LayerMask _wallMask;
 

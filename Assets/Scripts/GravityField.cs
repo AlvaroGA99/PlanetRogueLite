@@ -15,7 +15,7 @@ public class GravityField
     public Vector3 GetTotalFieldForceForBody(Vector3 pos){
         Vector3 total = new Vector3();
         foreach(GravityBody p in gravityBodies){
-            Vector3 u = p.position - pos;
+            Vector3 u = p.position.position - pos;
             float r = u.sqrMagnitude;
             u = u.normalized;
             total += u*p.mass / r;

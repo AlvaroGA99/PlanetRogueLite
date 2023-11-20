@@ -7,14 +7,13 @@ public class Projectile : MonoBehaviour
     // Start is called before the first frame update
 
     public static event Action OnDestroyEnemy;
+
     private Rigidbody _rb;
     private Vector3 _savedVector;
-
     private Transform _redirectTransform;
-
     private Transform _enemySourceTransform;
-
     private Transform _SphereT;
+    private GravityField _gF;
 
     ObjectPool<Projectile> _projPool;
 

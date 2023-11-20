@@ -19,26 +19,28 @@ public class PlayerController : MonoBehaviour
 
     private float _healthPoints;
     [SerializeField] private InputActionAsset input;
-
     private InputAction movement;
     private InputAction jump;
     private InputAction wield;
+    private InputAction shipRotation;
+    private InputAction mainShipPropulsion;
+    private InputAction takeOffPropulsion;
+    private InputAction shipYRightRotation;
+    private InputAction shipYLeftRotation;
+    private InputAction brakePropulsion;
 
     public Image Health;
-    
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tWeapon;
+    [SerializeField] private ShipController _shipController;
     private Transform _t;
-
     private Rigidbody _rb;
-    
     private Vector3 _rotationVector ;
     private Vector3 _toCenter;
+    private GravityField _gF;
     private Vector3 _wieldVector;
-
     public Vector3 _lastForward;
-    
     private float _rotationSpeed;
     private Quaternion _lastLocalRotation;
     private Quaternion _lastLocalWieldRotation;
@@ -54,19 +56,35 @@ public class PlayerController : MonoBehaviour
         _healthPoints = 1.0f;
         onFloor = false;
         _t = transform;
+
         _ingameControl = input.FindActionMap("Ingame");
         movement = _ingameControl.FindAction("Movement");
         jump = _ingameControl.FindAction("Jump");
         wield = _ingameControl.FindAction("Wield");
+        shipRotation = _ingameControl.FindAction("ShipRotation");
+        mainShipPropulsion = _ingameControl.FindAction("MainShipPropulsion");
+        takeOffPropulsion = _ingameControl.FindAction("TakeOffPropulsion");
+        shipYRightRotation = _ingameControl.FindAction("ShipYRightRotation");
+        shipYLeftRotation = _ingameControl.FindAction("ShipYLeftRotation");
+        brakePropulsion = _ingameControl.FindAction("BrakePropulsion");
+
         movement.Enable();
         jump.Enable();
         wield.Enable();
+        shipRotation.Enable();
+        mainShipPropulsion.Enable();
+        takeOffPropulsion.Enable();
+        shipYRightRotation.Enable();
+        shipYLeftRotation.Enable();
+        brakePropulsion.Enable();
+
         movement.performed += OnMove;
         movement.canceled += OnStop;
         jump.performed += OnJump;
         jump.canceled  += OnStopJump;
         wield.performed += OnWield;
         wield.canceled  += OnStopWield;
+
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
         _lastLocalWieldRotation = _tWeapon.localRotation;

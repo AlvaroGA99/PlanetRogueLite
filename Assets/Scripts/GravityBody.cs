@@ -1,20 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[Serializable]
 public class GravityBody
 {
+    [SerializeField]
     private Vector3 _frameDragVector = Vector3.zero;
-
+    [SerializeField]
     public float mass;
-    public Vector3 position;
+    [SerializeField]
+    public Transform position;
 
-    public GravityBody(Vector3 pos,float bodyMass){
+    public GravityBody(Transform pos,float bodyMass){
         position = pos;
         mass = bodyMass;
     }
     
-    public GravityBody(Vector3 pos,Vector3 frameDrag){
+    public GravityBody(Transform pos,Vector3 frameDrag){
         position = pos;
         _frameDragVector = frameDrag;
     }

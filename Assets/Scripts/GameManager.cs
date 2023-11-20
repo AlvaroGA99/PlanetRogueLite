@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -18,12 +19,17 @@ public class GameManager : MonoBehaviour
     private float timer;
     private float spawnval;
     private LayerMask _wallMask;
+    private Transform[] _preloadedGravityBodies;
 
     EnemyController a;
 
     void Awake()
     {   
         _gravityField = new GravityField();
+        foreach(Transform t in _preloadedGravityBodies){
+            GravityBody g = new GravityBody(t,0.5f);
+            _gravityField.AddGravityBody(g);
+        }
         _wallMask = LayerMask.GetMask("DestructionMesh");
         spawnval = 8;
         _projectilePool = new ObjectPool<Projectile>(() =>

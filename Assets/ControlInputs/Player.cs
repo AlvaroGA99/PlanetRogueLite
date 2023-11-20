@@ -53,6 +53,60 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ShipRotation"",
+                    ""type"": ""Value"",
+                    ""id"": ""bb994fc3-b348-4c37-b23a-c7679b0481f2"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MainShipPropulsion"",
+                    ""type"": ""Value"",
+                    ""id"": ""74e3b357-7825-4ef4-923a-a269b779c996"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""TakeOffPropulsion"",
+                    ""type"": ""Button"",
+                    ""id"": ""34c8d049-a586-471a-ba1b-6cfa90d39652"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShipYRightRotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""49bb6075-0ce8-42b0-9abc-c2b4ea32df22"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShipYLeftRotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""78317723-9437-4a25-b03c-de2b5c953eb8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""BrakePropulsion"",
+                    ""type"": ""Value"",
+                    ""id"": ""130c0c6d-6b33-4e79-84d5-96b215c24f92"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -154,6 +208,210 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""Wield"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e99e1c78-5a1c-4a43-a88a-303d1d53fcc4"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TakeOffPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b863e9c8-bcfb-48aa-8ddf-80bf5b8517a8"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TakeOffPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eb85082a-b624-4987-bd69-32ad0387ae92"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipYRightRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""15864a15-94b6-4f8e-a685-540fbc5c5c28"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipYRightRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""560ba62f-b303-4c1a-9f3a-2ad2e75a8332"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipYLeftRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e8308e41-14fc-4486-abeb-6b26951dff61"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipYLeftRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""728b98c7-490f-4316-ad78-c3cb5877b1a0"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""2c49afdb-305c-445d-9e77-e35d8a08dac4"",
+                    ""path"": ""2DVector(mode=1)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""6392f7fb-8c42-4cda-8b78-ff2e4d21592d"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""104856b3-9bc6-496c-8fa7-c1d6c15c6670"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""853acdba-ed32-44bd-a686-8125960c3f1e"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""da52e4d4-c44d-4a23-9e77-a0ef5a1c9f13"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShipRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a58d76af-e164-4639-89a2-c071abd10250"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MainShipPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1706637e-9966-4491-a411-6a535805fbe7"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MainShipPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c2bf50d7-4a97-44e0-88a1-636418d8aa85"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BrakePropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""47a018bd-51d7-47fa-9bb2-a8e9466570fc"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BrakePropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Menu"",
+            ""id"": ""28e77ffd-d288-4e8d-b2fb-0db07a5ef127"",
+            ""actions"": [
+                {
+                    ""name"": ""New action"",
+                    ""type"": ""Button"",
+                    ""id"": ""3520ada9-445f-479a-a0c1-a9620e3add49"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""fb3858b2-fbc1-41e9-bea7-837928aad175"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""New action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -165,6 +423,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_Movement = m_Ingame.FindAction("Movement", throwIfNotFound: true);
         m_Ingame_Jump = m_Ingame.FindAction("Jump", throwIfNotFound: true);
         m_Ingame_Wield = m_Ingame.FindAction("Wield", throwIfNotFound: true);
+        m_Ingame_ShipRotation = m_Ingame.FindAction("ShipRotation", throwIfNotFound: true);
+        m_Ingame_MainShipPropulsion = m_Ingame.FindAction("MainShipPropulsion", throwIfNotFound: true);
+        m_Ingame_TakeOffPropulsion = m_Ingame.FindAction("TakeOffPropulsion", throwIfNotFound: true);
+        m_Ingame_ShipYRightRotation = m_Ingame.FindAction("ShipYRightRotation", throwIfNotFound: true);
+        m_Ingame_ShipYLeftRotation = m_Ingame.FindAction("ShipYLeftRotation", throwIfNotFound: true);
+        m_Ingame_BrakePropulsion = m_Ingame.FindAction("BrakePropulsion", throwIfNotFound: true);
+        // Menu
+        m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
+        m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +494,12 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_Ingame_Movement;
     private readonly InputAction m_Ingame_Jump;
     private readonly InputAction m_Ingame_Wield;
+    private readonly InputAction m_Ingame_ShipRotation;
+    private readonly InputAction m_Ingame_MainShipPropulsion;
+    private readonly InputAction m_Ingame_TakeOffPropulsion;
+    private readonly InputAction m_Ingame_ShipYRightRotation;
+    private readonly InputAction m_Ingame_ShipYLeftRotation;
+    private readonly InputAction m_Ingame_BrakePropulsion;
     public struct IngameActions
     {
         private @Player m_Wrapper;
@@ -234,6 +507,12 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Ingame_Movement;
         public InputAction @Jump => m_Wrapper.m_Ingame_Jump;
         public InputAction @Wield => m_Wrapper.m_Ingame_Wield;
+        public InputAction @ShipRotation => m_Wrapper.m_Ingame_ShipRotation;
+        public InputAction @MainShipPropulsion => m_Wrapper.m_Ingame_MainShipPropulsion;
+        public InputAction @TakeOffPropulsion => m_Wrapper.m_Ingame_TakeOffPropulsion;
+        public InputAction @ShipYRightRotation => m_Wrapper.m_Ingame_ShipYRightRotation;
+        public InputAction @ShipYLeftRotation => m_Wrapper.m_Ingame_ShipYLeftRotation;
+        public InputAction @BrakePropulsion => m_Wrapper.m_Ingame_BrakePropulsion;
         public InputActionMap Get() { return m_Wrapper.m_Ingame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -252,6 +531,24 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Wield.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnWield;
                 @Wield.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnWield;
                 @Wield.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnWield;
+                @ShipRotation.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipRotation;
+                @ShipRotation.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipRotation;
+                @ShipRotation.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipRotation;
+                @MainShipPropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnMainShipPropulsion;
+                @MainShipPropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnMainShipPropulsion;
+                @MainShipPropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnMainShipPropulsion;
+                @TakeOffPropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnTakeOffPropulsion;
+                @TakeOffPropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnTakeOffPropulsion;
+                @TakeOffPropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnTakeOffPropulsion;
+                @ShipYRightRotation.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYRightRotation;
+                @ShipYRightRotation.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYRightRotation;
+                @ShipYRightRotation.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYRightRotation;
+                @ShipYLeftRotation.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYLeftRotation;
+                @ShipYLeftRotation.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYLeftRotation;
+                @ShipYLeftRotation.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnShipYLeftRotation;
+                @BrakePropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
+                @BrakePropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
+                @BrakePropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
             }
             m_Wrapper.m_IngameActionsCallbackInterface = instance;
             if (instance != null)
@@ -265,14 +562,75 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Wield.started += instance.OnWield;
                 @Wield.performed += instance.OnWield;
                 @Wield.canceled += instance.OnWield;
+                @ShipRotation.started += instance.OnShipRotation;
+                @ShipRotation.performed += instance.OnShipRotation;
+                @ShipRotation.canceled += instance.OnShipRotation;
+                @MainShipPropulsion.started += instance.OnMainShipPropulsion;
+                @MainShipPropulsion.performed += instance.OnMainShipPropulsion;
+                @MainShipPropulsion.canceled += instance.OnMainShipPropulsion;
+                @TakeOffPropulsion.started += instance.OnTakeOffPropulsion;
+                @TakeOffPropulsion.performed += instance.OnTakeOffPropulsion;
+                @TakeOffPropulsion.canceled += instance.OnTakeOffPropulsion;
+                @ShipYRightRotation.started += instance.OnShipYRightRotation;
+                @ShipYRightRotation.performed += instance.OnShipYRightRotation;
+                @ShipYRightRotation.canceled += instance.OnShipYRightRotation;
+                @ShipYLeftRotation.started += instance.OnShipYLeftRotation;
+                @ShipYLeftRotation.performed += instance.OnShipYLeftRotation;
+                @ShipYLeftRotation.canceled += instance.OnShipYLeftRotation;
+                @BrakePropulsion.started += instance.OnBrakePropulsion;
+                @BrakePropulsion.performed += instance.OnBrakePropulsion;
+                @BrakePropulsion.canceled += instance.OnBrakePropulsion;
             }
         }
     }
     public IngameActions @Ingame => new IngameActions(this);
+
+    // Menu
+    private readonly InputActionMap m_Menu;
+    private IMenuActions m_MenuActionsCallbackInterface;
+    private readonly InputAction m_Menu_Newaction;
+    public struct MenuActions
+    {
+        private @Player m_Wrapper;
+        public MenuActions(@Player wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Newaction => m_Wrapper.m_Menu_Newaction;
+        public InputActionMap Get() { return m_Wrapper.m_Menu; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MenuActions set) { return set.Get(); }
+        public void SetCallbacks(IMenuActions instance)
+        {
+            if (m_Wrapper.m_MenuActionsCallbackInterface != null)
+            {
+                @Newaction.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
+                @Newaction.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
+                @Newaction.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
+            }
+            m_Wrapper.m_MenuActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Newaction.started += instance.OnNewaction;
+                @Newaction.performed += instance.OnNewaction;
+                @Newaction.canceled += instance.OnNewaction;
+            }
+        }
+    }
+    public MenuActions @Menu => new MenuActions(this);
     public interface IIngameActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnWield(InputAction.CallbackContext context);
+        void OnShipRotation(InputAction.CallbackContext context);
+        void OnMainShipPropulsion(InputAction.CallbackContext context);
+        void OnTakeOffPropulsion(InputAction.CallbackContext context);
+        void OnShipYRightRotation(InputAction.CallbackContext context);
+        void OnShipYLeftRotation(InputAction.CallbackContext context);
+        void OnBrakePropulsion(InputAction.CallbackContext context);
+    }
+    public interface IMenuActions
+    {
+        void OnNewaction(InputAction.CallbackContext context);
     }
 }
