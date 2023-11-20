@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
     private InputActionMap _ingameControl;
-
     private float _healthPoints;
     [SerializeField] private InputActionAsset input;
     private InputAction movement;
@@ -135,6 +134,56 @@ public class PlayerController : MonoBehaviour
     void OnStopWield(InputAction.CallbackContext stopWieldAction)
     {
         notGamepad = true;
+    }
+
+    void OnShipRotation(InputAction.CallbackContext action){
+        _shipController.zxRotationValue = action.ReadValue<Vector2>();
+    }
+
+    void OnStopShipRotation(InputAction.CallbackContext action){
+        _shipController.zxRotationValue = Vector2.zero;
+    }
+
+    void OnMainShipPropulsion(InputAction.CallbackContext action){
+        _shipController.mainEngineValue = action.ReadValue<float>();
+    }
+
+    void OnStopMainShipPropulsion(InputAction.CallbackContext action){
+        _shipController.mainEngineValue = 0;
+    }
+
+    void OnTakeOffPropulsion(InputAction.CallbackContext action){
+        _shipController.takeOffEngineValue = true;
+    }
+
+    void OnStopTakeOffPropulsion(InputAction.CallbackContext action){
+        _shipController.takeOffEngineValue = false;
+    }
+
+    void OnShipYRightRotation(InputAction.CallbackContext action){
+        _shipController.rightYRotationValue = action.ReadValue<float>();
+    
+    }
+
+    void OnStopShipYRightRotation(InputAction.CallbackContext action){
+        _shipController.rightYRotationValue = 0;
+    }
+
+    void OnShipYLeftRotation(InputAction.CallbackContext action){
+         _shipController.leftYRotationValue = action.ReadValue<float>();
+    
+    }
+
+    void OnStopShipYLeftRotation(InputAction.CallbackContext action){
+        _shipController.leftYRotationValue = 0;
+    }
+
+    void OnBrakePropulsion(InputAction.CallbackContext action){
+        _shipController.breakEngineValue = action.ReadValue<float>();
+    }
+
+    void OnStopBrakePropulsion(InputAction.CallbackContext action){
+        _shipController.breakEngineValue = 0;
     }
     public void FixedUpdate()
     {
