@@ -67,9 +67,9 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation = _ingameControl.FindAction("ShipYLeftRotation");
         brakePropulsion = _ingameControl.FindAction("BrakePropulsion");
 
-        movement.Enable();
-        jump.Enable();
-        wield.Enable();
+        // movement.Enable();
+        // jump.Enable();
+        // wield.Enable();
         shipRotation.Enable();
         mainShipPropulsion.Enable();
         takeOffPropulsion.Enable();
@@ -83,6 +83,18 @@ public class PlayerController : MonoBehaviour
         jump.canceled  += OnStopJump;
         wield.performed += OnWield;
         wield.canceled  += OnStopWield;
+        shipRotation.performed += OnShipRotation;
+        shipRotation.canceled += OnStopShipRotation;
+        mainShipPropulsion.performed += OnMainShipPropulsion;
+        mainShipPropulsion.canceled += OnStopMainShipPropulsion;
+        takeOffPropulsion.performed += OnTakeOffPropulsion;
+        takeOffPropulsion.canceled += OnStopTakeOffPropulsion;
+        shipYRightRotation.performed += OnShipYRightRotation;
+        shipYRightRotation.canceled += OnStopShipYRightRotation;
+        shipYLeftRotation.performed += OnShipYLeftRotation;
+        shipYLeftRotation.canceled += OnStopShipYLeftRotation;
+        brakePropulsion.performed += OnBrakePropulsion;
+        brakePropulsion.canceled += OnStopBrakePropulsion;
 
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
@@ -197,16 +209,16 @@ public class PlayerController : MonoBehaviour
           
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
-        _toCenter = (_SphereT.position - _t.position).normalized;
-        _rb.AddForce(_toCenter * 115);
-        _rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
+        //_toCenter = (_SphereT.position - _t.position).normalized;
+        //_rb.AddForce(_gF.GetTotalFieldForceForBody(_t.position) * 115);
+        //_rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
 
         if (_rb.velocity.magnitude > 10)
         {
             _rb.velocity = Vector3.ClampMagnitude(_rb.velocity, 10);
         }
         
-        _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
+        //_t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
 
         // _tChild.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_rotationVector, Vector3.up),_lastLocalRotation,0.8f);
 

@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour
     ObjectPool<Projectile> _projPool;
 
     private Transform char_T;
-    private Transform _SphereT;
+    //private Transform _SphereT;
     private Transform _t;
     private bool jumping;
     private float timer;
@@ -44,20 +44,20 @@ public class EnemyController : MonoBehaviour
         timer = 0;
     }
 
-    public void Init(ObjectPool<Projectile> pool, Transform charTransform, Transform sphereTransform, LayerMask wallMask)
+    public void Init(ObjectPool<Projectile> pool, Transform charTransform, LayerMask wallMask)
     {
         _projPool = pool;
         char_T = charTransform;
-        _SphereT = sphereTransform;
+        //_SphereT = sphereTransform;
         _wallMask = wallMask;
         BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
     }
     private void FixedUpdate()
     {
-        Vector3 toCenter = _t.position - _SphereT.position;
+        //Vector3 toCenter = _t.position - _SphereT.position;
         Vector3 betweenThisAndChar = char_T.position - _t.position;
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
-        _rb.AddForce(-toCenter.normalized * 115);
+        //_rb.AddForce(-toCenter.normalized * 115);
         Vector3 moveVector = Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized * 200;
         _t.rotation = Quaternion.LookRotation(moveVector, _t.up);
         float sqrDistance = betweenThisAndChar.sqrMagnitude;
@@ -70,13 +70,13 @@ public class EnemyController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(_t.position, _t.forward, out hit, 2.0f,_wallMask))
             {   
-                Vector3 vec = (hit.point - _SphereT.position).normalized;
-                vec = (vec*1.01f )*44 - _t.position;
-                float vecMag = vec.magnitude;
-                vec = vec.normalized*4;
+                // Vector3 vec = (hit.point - _SphereT.position).normalized;
+                // vec = (vec*1.01f )*44 - _t.position;
+                // float vecMag = vec.magnitude;
+                // vec = vec.normalized*4;
                 //_rb.AddForce((vec + _t.up * 4).normalized * vecMag, ForceMode.Impulse);
                 //_rb.AddForce(_t.up * 1000, ForceMode.Impulse);
-                _rb.AddForce(_t.up * 100 + _t.forward*2, ForceMode.Impulse);
+                //_rb.AddForce(_t.up * 100 + _t.forward*2, ForceMode.Impulse);
                 jumping = true;
                 StartCoroutine("Jumping");
             }

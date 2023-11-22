@@ -43,7 +43,7 @@ public class Planet : MonoBehaviour
         //gameobjectReferences = new List<GameObject>();
         mF = gameObject.AddComponent<MeshFilter>();
         m = mF.mesh;
-        mC = gameObject.GetComponent<MeshCollider>();
+        //mC = gameObject.GetComponent<MeshCollider>();
 
     }
 

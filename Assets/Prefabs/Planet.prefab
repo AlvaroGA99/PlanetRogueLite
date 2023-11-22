@@ -93,6 +93,8 @@ MonoBehaviour:
   _destructionMeshPrefab: {fileID: 7690870018776814912, guid: 97bb571d3b2b90c4a87f0ee8da6a68a3, type: 3}
   res: 2
   seed: 1829380132
+  mass: 0
+  isInSpawnState: 0
   PlanetIntegrity: {fileID: 0}
 --- !u!64 &6584837813910274162
 MeshCollider:
@@ -103,7 +105,7 @@ MeshCollider:
   m_GameObject: {fileID: 5699372761463504413}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 2

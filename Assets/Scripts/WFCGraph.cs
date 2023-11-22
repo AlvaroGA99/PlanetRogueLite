@@ -14,21 +14,19 @@ public class WFCGraph
     public Dictionary<EdgeId, int> edgeMatching;
     System.Random sampler;
     List<Node> toProcess;
+    RestoreNodeInfo[] restoringData;
+    List<int> lowestEntropyElementList;
+    //int minEntropy;
 
-    int minEntropy;
-    //List<int> nonExploredNodes;
-    //Stack<RollbackInfo> rollbackRegistry;
 
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
 
         //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
         elements = new Node[((triangleList.Length / 3))];
+        restoringData = new RestoreNodeInfo[triangleList.Length / 3];
         toProcess = new List<Node>();
-        minEntropy = 1000;
-        //rollbackRegistry = new Stack<RollbackInfo>();
-        //RollbackInfo firstInfo = new RollbackInfo();
-        //nonExploredNodes = new List<int>();
+        //minEntropy = 1000;
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
 
@@ -98,14 +96,12 @@ public class WFCGraph
         //rollbackRegistry.Push(firstInfo);
 
         currentNode = elements[sampler.Next(0, elements.Length - 1)];
+        ComputeLowestEntropyElementList();
 
     }
 
-
-    private int GetLowestEntropyElementId()
-    {
-        //Returns the id of a random Node with the non-one(collasped) lowest entropy
-        List<int> lowestEntropyElements = new List<int>();
+    public void ComputeLowestEntropyElementList(){
+        lowestEntropyElementList = new List<int>();
         int minEntropy = 1000;
         //foreach (int i in nonExploredNodes)
         for (int i = 0; i < elements.Length; i ++)
@@ -113,19 +109,25 @@ public class WFCGraph
             if (elements[i].entropy < minEntropy && elements[i].entropy > 1)
             {
                 minEntropy = elements[i].entropy;
-                lowestEntropyElements.Clear();
-                lowestEntropyElements.Add(i);
+                lowestEntropyElementList.Clear();
+                lowestEntropyElementList.Add(i);
             }
             else if (elements[i].entropy == minEntropy)
             {
-                lowestEntropyElements.Add(i);
+                lowestEntropyElementList.Add(i);
             }
 
 
         }
-        if (lowestEntropyElements.Count > 0)
+    }
+
+    private int GetLowestEntropyElementId()
+    {
+        //Returns the id of a random Node with the non-zero(collasped) lowest entropy
+        
+        if (lowestEntropyElementList.Count > 0)
         {
-            return lowestEntropyElements[sampler.Next(0, lowestEntropyElements.Count - 1)];
+            return lowestEntropyElementList[sampler.Next(0, lowestEntropyElementList.Count - 1)];
             //return sampler.Next(0, lowestEntropyElements.Count - 1);
         }
         else
@@ -307,8 +309,26 @@ public class WFCGraph
             //firstInfo.AddOptions(elements[n.id].edges[0].options.ToArray(), elements[n.id].edges[1].options.ToArray(), elements[n.id].edges[2].options.ToArray());
         }
 
-        minEntropy = 1000;
+        //minEntropy = 1000;
         //rollbackRegistry.Push(firstInfo);
+    }
+
+    public void SaveState(){
+        for (int i = 0; i < elements.Length; i++)
+        {
+            restoringData[i] = new RestoreNodeInfo(elements[i].id,elements[i].entropy,new List<string>(elements[i].edges[0].options),new List<string>(elements[i].edges[1].options),new List<string>(elements[i].edges[2].options));
+        }
+    }
+
+    public void RestoreState(){
+        for (int i = 0; i < elements.Length; i++)
+        {
+            elements[i].id = restoringData[i].id;
+            elements[i].entropy = restoringData[i].entropy;
+            elements[i].edges[0].options = restoringData[i].aEdgeOptionList;
+            elements[i].edges[1].options = restoringData[i].bEdgeOptionList;
+            elements[i].edges[2].options = restoringData[i].cEdgeOptionList;
+        }
     }
     public class Node
     {
@@ -542,5 +562,22 @@ public class WFCGraph
         IN_PROGRESS,
         ERROR
 
+    }
+
+    private struct RestoreNodeInfo{
+        public int id;
+        public int entropy;
+        public List<string> aEdgeOptionList;
+        public List<string> bEdgeOptionList;
+        public List<string> cEdgeOptionList;
+
+        public RestoreNodeInfo(int id, int entropy, List<string> aEdgeOptionList, List<string> bEdgeOptionList, List<string> cEdgeOptionList)
+        {
+            this.id = id;
+            this.entropy = entropy;
+            this.aEdgeOptionList = aEdgeOptionList;
+            this.bEdgeOptionList = bEdgeOptionList;
+            this.cEdgeOptionList = cEdgeOptionList;
+        }
     }
 }

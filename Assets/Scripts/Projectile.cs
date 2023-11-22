@@ -12,7 +12,6 @@ public class Projectile : MonoBehaviour
     private Vector3 _savedVector;
     private Transform _redirectTransform;
     private Transform _enemySourceTransform;
-    private Transform _SphereT;
     private GravityField _gF;
 
     ObjectPool<Projectile> _projPool;
@@ -34,12 +33,11 @@ public class Projectile : MonoBehaviour
         colliding = false;
     }
 
-    public void Init(Transform redirect, ObjectPool<Projectile> pool,Transform sphereTransform)
+    public void Init(Transform redirect, ObjectPool<Projectile> pool)
     {
         _rb = GetComponent<Rigidbody>();
         _redirectTransform = redirect;
         _projPool = pool;
-        _SphereT = sphereTransform;
 
     }
 
