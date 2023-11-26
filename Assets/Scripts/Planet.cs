@@ -43,7 +43,7 @@ public class Planet : MonoBehaviour
         //gameobjectReferences = new List<GameObject>();
         mF = gameObject.AddComponent<MeshFilter>();
         m = mF.mesh;
-        //mC = gameObject.GetComponent<MeshCollider>();
+        mC = gameObject.GetComponent<MeshCollider>();
 
     }
 
@@ -182,7 +182,7 @@ public class Planet : MonoBehaviour
         }
         
         m.RecalculateNormals();
-        mC.sharedMesh = m;
+        //mC.sharedMesh = m;
         //Debug.Log(tiles.elements[0].tileVertices.Count);
     }
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)

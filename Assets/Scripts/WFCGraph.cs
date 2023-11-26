@@ -6,16 +6,27 @@ using UnityEngine;
 using UnityEngine.InputSystem.Interactions;
 using System.Linq;
 using UnityEngine.Animations;
+using System.Collections;
 
 public class WFCGraph
 {
     public Node currentNode;
     public Node[] elements;
     public Dictionary<EdgeId, int> edgeMatching;
+    public readonly HashSet<string> compatibilityList  =  new HashSet<string>(){
+       "AAAAAA","AABBAA","AACCAA","ABAABA","ABBBBA","ABCCBA","ACAACA","ACBBCA","ACCCCA",
+       "BAAAAB","BABBAB","BACCAB","BBAABB","BBBBBB","BBCCBB","BCAACB","BCBBCB","BCCCCB",
+       "CAAAAC","CABBAC","CACCAC","CBAABC","CBBBBC","CBCCBC","CCAACC","CCBBCC","CCCCCC"
+    };
     System.Random sampler;
     List<Node> toProcess;
     RestoreNodeInfo[] restoringData;
-    List<int> lowestEntropyElementList;
+
+    StateInfo state;
+    public List<int> lowestEntropyElementList;
+    
+
+    //private bool[] propagated;
     //int minEntropy;
 
 
@@ -23,9 +34,11 @@ public class WFCGraph
     {
 
         //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
-        elements = new Node[((triangleList.Length / 3))];
-        restoringData = new RestoreNodeInfo[triangleList.Length / 3];
+        int dim = triangleList.Length / 3;
+        elements = new Node[((dim))];
+        restoringData = new RestoreNodeInfo[dim];
         toProcess = new List<Node>();
+        //propagated = new bool[triangleList.Length / 3];
         //minEntropy = 1000;
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
@@ -139,18 +152,28 @@ public class WFCGraph
 
     public StateInfo Step()
     {
-
+        //for(int i = 0; i < propagated.Length; i++){
+          //  propagated[i] = false;
+        //}
         toProcess.Clear();
         int collapsingId = GetLowestEntropyElementId();
-        //nonExploredNodes.Clear();
-        StateInfo state = StateInfo.SUCCESFUL;
+        state = StateInfo.SUCCESFUL;
         if (collapsingId != -1)
         {   
+            //lowestEntropyElementList.Remove(collapsingId);
             Node collapsingNode = elements[collapsingId];
             collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
-            //nonExploredNodes.Remove(collapsingId);
-            //Debug.Log(collapsingNode.edges[0].options[0] + collapsingNode.edges[1].options[0] + collapsingNode.edges[2].options[0]);
             toProcess.Add(collapsingNode);
+            //propagated[collapsingId] = true;
+            // for (int i = 0; i < 3; i++)
+            // {   collapsingId = GetLowestEntropyElementId();
+            //     if(!propagated[collapsingId]){
+            //         collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
+            //         toProcess.Add(collapsingNode);
+            //         propagated[collapsingId] = true;
+            //     }
+            // }
+
             int localLength;
             while (toProcess.Count > 0)
             {
@@ -159,86 +182,75 @@ public class WFCGraph
                 {
                     state = Propagate(toProcess[0]);
                     if (state == StateInfo.ERROR)
-                    {
+                    {   
+                        //toProcess.Clear();
+                        //break;
                         return StateInfo.ERROR;
                     }
+                    //yield return null;
                 }
             }
         }
-
-        //rollbackRegistry.Push(GenerateRollbackInfo());
-
         return state;
-
-    }
-
-    public void TestSubState()
-    {
-        int localLength;
-        if (toProcess.Count > 0)
-        {
-            localLength = toProcess.Count;
-            for (int i = 0; i < localLength; i++)
-            {
-                Propagate(toProcess[0]);
-            }
-        }
     }
 
     private StateInfo Propagate(Node elementToProcess)
     {
-
+        
         toProcess.RemoveAt(0);
 
-        StateInfo localState = StateInfo.IN_PROGRESS;
+        StateInfo state = StateInfo.IN_PROGRESS;
 
         for (int i = 0; i < 3; i++)
         {
-            // if (elementToProcess.edges[i].adjacentEdge.ownerNode.id != id)
-            // {
+            if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy  != 1 )
+            {
             if (UpdateNeighbour(elementToProcess.edges[i]))
             {
-                //Debug.Log("UPDATED");
                 elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
-                toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
-                //localState = StateInfo.IN_PROGRESS;
-
+                //if (!propagated[elementToProcess.edges[i].adjacentEdge.ownerNode.id]){
+                    toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
+                  //  propagated[elementToProcess.edges[i].adjacentEdge.ownerNode.id] = true;
+                //}
             }
-
-            if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy == 0)
+            }
+            Debug.Log(elementToProcess.edges[0].adjacentEdge.ownerNode.entropy);
+            if (elementToProcess.edges[0].adjacentEdge.ownerNode.entropy == 0)
             {
-
+                //state = StateInfo.ERROR;
+                //break;
                 return StateInfo.ERROR;
             }
-
             
-
         }
-
-        return localState;
+        return state;
 
     }
 
     private bool UpdateNeighbour(Edge edge)
     {
+        //if(propagatedFrom[edge.ownerNode.id] == edge.adjacentEdge.ownerNode.id){
+          //  return false;
+        //}
         int originalLength = edge.adjacentEdge.options.Count;
         int index = 0;
         bool optionCompatible;
-        int debugCount = 0;
+        //int debugCount = 0;
         while (index < edge.adjacentEdge.options.Count)
         {
             optionCompatible = false;
-            debugCount = 0;
+            //debugCount = 0;
             foreach (string option in edge.options)
             {
-                char[] edgeOption = edge.adjacentEdge.options[index].ToCharArray();
-                char[] adjacentReversedOption = option.ToCharArray();
-                Array.Reverse(adjacentReversedOption);
-                debugCount++;
+                //char[] edgeOption = edge.adjacentEdge.options[index].ToCharArray();
+                //char[] adjacentReversedOption = option.ToCharArray();
+                //Array.Reverse(adjacentReversedOption);
+                //debugCount++;
 
                 //Debug.Log();
                 //Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
-                if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1] && edgeOption[2] == adjacentReversedOption[2])
+                //if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1] && edgeOption[2] == adjacentReversedOption[2])
+                if(compatibilityList.Contains(edge.adjacentEdge.options[index] + option))
                 {
                     //Debug.Log("-------");
                     optionCompatible = true;
@@ -252,6 +264,7 @@ public class WFCGraph
                 edge.adjacentEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.nextInternalEdge.options.RemoveAt(index);
+                 //edge.adjacentEdge.options.Remove()
             }
             else
             {
@@ -308,9 +321,15 @@ public class WFCGraph
             //firstInfo.NodesToTest.Add(n.id);
             //firstInfo.AddOptions(elements[n.id].edges[0].options.ToArray(), elements[n.id].edges[1].options.ToArray(), elements[n.id].edges[2].options.ToArray());
         }
+        //SaveState();
+        ComputeLowestEntropyElementList();
 
         //minEntropy = 1000;
         //rollbackRegistry.Push(firstInfo);
+    }
+
+    public StateInfo CheckState(){
+        return state;
     }
 
     public void SaveState(){
