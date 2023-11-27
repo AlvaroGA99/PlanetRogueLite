@@ -214,7 +214,7 @@ public class WFCGraph
                 //}
             }
             }
-            Debug.Log(elementToProcess.edges[0].adjacentEdge.ownerNode.entropy);
+            //Debug.Log(elementToProcess.edges[0].adjacentEdge.ownerNode.entropy);
             if (elementToProcess.edges[0].adjacentEdge.ownerNode.entropy == 0)
             {
                 //state = StateInfo.ERROR;

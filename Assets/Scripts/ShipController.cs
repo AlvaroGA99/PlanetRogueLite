@@ -6,32 +6,13 @@ using UnityEngine;
 public class ShipController : MonoBehaviour
 {   
     private Rigidbody _rb;
-
-    [SerializeField]
-    private Transform _mainEngine;
-    [SerializeField]
-    private Transform _takeOffEngine;
-    [SerializeField]
-    private Transform _brakeEngine;
-    [SerializeField]
-    private Transform _upZRotationEngine;
-    [SerializeField]
-    private Transform _downZRotationEngine;
-    [SerializeField]
-    private Transform _leftXRotationEngine;
-    [SerializeField]
-    private Transform _rightXRotationEngine;
-    [SerializeField]
-    private Transform _leftYRotationEngine;
-    [SerializeField]
-    private Transform _rightYRotationEngine;
-
+    private GravityField _gF;
     public Vector2 zxRotationValue;
     public float rightYRotationValue;
     public float leftYRotationValue;
     public float mainEngineValue;
     public float breakEngineValue;
-    public bool takeOffEngineValue;
+    public float takeOffEngineValue;
     
     // Start is called before the first frame update
     void Start()
@@ -40,25 +21,22 @@ public class ShipController : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-
     void FixedUpdate(){
-        _rb.AddForce(_mainEngine.up*mainEngineValue*10000);
-        
-        // _rb.AddForceAtPosition(_takeOffEngine.up,_takeOffEngine.position);
-        // _rb.AddForceAtPosition(_brakeEngine.up,_brakeEngine.position);
-
-        //_rb.AddForceAtPosition(_upZRotationEngine.up*Math.Clamp(zxRotationValue.y,-1.0f,0f)*-1*10000,_upZRotationEngine.position);
-        //_rb.AddForceAtPosition(_downZRotationEngine.up*Math.Clamp(zxRotationValue.y,0.0f,1.0f)*10000,_downZRotationEngine.position);
-        //_rb.AddForceAtPosition(_leftXRotationEngine.up*Math.Clamp(zxRotationValue.x,0.0f,1.0f)*10000,_leftXRotationEngine.position);
-        //_rb.AddForceAtPosition(_rightXRotationEngine.up*Math.Clamp(zxRotationValue.x,-1.0f,0f)*-1*10000,_rightXRotationEngine.position);
-        
+        _rb.AddForce(-transform.forward*mainEngineValue*10000);
+        _rb.AddForce(transform.forward*breakEngineValue*10000);
+        _rb.AddForce(transform.up*takeOffEngineValue*10000);
         _rb.AddTorque(transform.right*Math.Clamp(zxRotationValue.y,-1.0f,0f)*-1*10000);
         _rb.AddTorque(-transform.right*Math.Clamp(zxRotationValue.y,0.0f,1.0f)*10000);
         _rb.AddTorque(transform.forward*Math.Clamp(zxRotationValue.x,0.0f,1.0f)*10000);
         _rb.AddTorque(-transform.forward*Math.Clamp(zxRotationValue.x,-1.0f,0f)*-1*10000);
+        _rb.AddTorque(-transform.up*leftYRotationValue*10000);
+        _rb.AddTorque(transform.up*rightYRotationValue*10000);
 
-        // _rb.AddForceAtPosition(_leftYRotationEngine.up,_leftYRotationEngine.position);
-        // _rb.AddForceAtPosition(_rightYRotationEngine.up,_rightYRotationEngine.position);
+        print(_gF.GetTotalFieldForceForBody(transform.position));
+        _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position),ForceMode.Acceleration);
+    }
+
+    public void SetupGravityField(GravityField gravity){
+        _gF = gravity;
     }
 }

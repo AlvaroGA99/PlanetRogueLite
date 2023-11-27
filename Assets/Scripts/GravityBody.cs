@@ -17,8 +17,9 @@ public class GravityBody
         mass = bodyMass;
     }
     
-    public GravityBody(Transform pos,Vector3 frameDrag){
+    public GravityBody(Transform pos,Vector3 frameDrag,float bodyMass){
         position = pos;
         _frameDragVector = frameDrag;
+        mass = bodyMass;
     }
 }

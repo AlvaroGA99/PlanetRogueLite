@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 public class PlanetGenerator : MonoBehaviour
 {
-    private Planet[] _orbits;
+    public Planet[] _orbits;
 
     public Planet planetPrefab;
 
@@ -138,12 +138,22 @@ public class PlanetGenerator : MonoBehaviour
 
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-
+           
+           
+            //_orbits[i] = 10000;      
+            }
+        for (int i = 0; i < _orbits.Length; i++)
+        {
             await LoadLevel();
 
             _orbits[i].GenerateSphereResolution(3, tiles);
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
+        }
+
+         for (int i = 0; i < _orbits.Length; i++)
+        {
+           
         }
         // WFCGraph.StateInfo state;
 

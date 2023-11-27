@@ -165,11 +165,11 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnTakeOffPropulsion(InputAction.CallbackContext action){
-        _shipController.takeOffEngineValue = true;
+        _shipController.takeOffEngineValue = 1.0f;
     }
 
     void OnStopTakeOffPropulsion(InputAction.CallbackContext action){
-        _shipController.takeOffEngineValue = false;
+        _shipController.takeOffEngineValue = 0.0f;
     }
 
     void OnShipYRightRotation(InputAction.CallbackContext action){
@@ -210,7 +210,7 @@ public class PlayerController : MonoBehaviour
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
         //_toCenter = (_SphereT.position - _t.position).normalized;
-        //_rb.AddForce(_gF.GetTotalFieldForceForBody(_t.position) * 115);
+        _rb.AddForce(_gF.GetTotalFieldForceForBody(_t.position),ForceMode.Acceleration);
         //_rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
 
         if (_rb.velocity.magnitude > 10)
@@ -251,6 +251,11 @@ public class PlayerController : MonoBehaviour
         }
         
         
+    }
+
+    public void SetupGravityField(GravityField gravity){
+        _gF = gravity;
+        _shipController.SetupGravityField(gravity);
     }
 
    

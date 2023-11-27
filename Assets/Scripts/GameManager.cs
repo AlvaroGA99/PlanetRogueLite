@@ -19,17 +19,11 @@ public class GameManager : MonoBehaviour
     private float timer;
     private float spawnval;
     private LayerMask _wallMask;
-    private Transform[] _preloadedGravityBodies;
-
     EnemyController a;
 
     void Awake()
     {   
         _gravityField = new GravityField();
-        // foreach(Transform t in _preloadedGravityBodies){
-        //     GravityBody g = new GravityBody(t,0.5f);
-        //     _gravityField.AddGravityBody(g);
-        // }
         _wallMask = LayerMask.GetMask("DestructionMesh");
         spawnval = 8;
         _projectilePool = new ObjectPool<Projectile>(() =>
@@ -72,10 +66,13 @@ public class GameManager : MonoBehaviour
     {
         timer = 0;
         a = _enemyPool.Get();
+        foreach(Planet p in _planetGen._orbits){
+            _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
+        }
+        _playerT.SetupGravityField(_gravityField);
         a.transform.position = new Vector3(.4711895f, 54.53f, 6.3f);
     }
 
-    // Update is called once per frame
     void Update()
     {
         // if (_planetGen.IsInSpawnState())
