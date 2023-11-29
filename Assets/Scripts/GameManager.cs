@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,10 +17,16 @@ public class GameManager : MonoBehaviour
 
     ObjectPool<EnemyController> _enemyPool;
 
+    [SerializeField] Animation _cameraAnimation;
+
     private float timer;
     private float spawnval;
     private LayerMask _wallMask;
     EnemyController a;
+
+    [SerializeField] Button _explore;
+    [SerializeField] Button _starCoords;
+    [SerializeField] Button _options;
 
     void Awake()
     {   
@@ -60,6 +67,10 @@ public class GameManager : MonoBehaviour
         {
             Destroy(enemy.gameObject);
         }, false, 5, 15);
+
+        _explore.onClick.AddListener(OnExplore);
+        _starCoords.onClick.AddListener(OnStarCoords);
+        _options.onClick.AddListener(OnOptions);
     }
     // Start is called before the first frame update
     void Start()
@@ -115,4 +126,23 @@ public class GameManager : MonoBehaviour
     //     //samplear angulo random alrededor del personaje dentro de un radio
     //     //spawnear el enemigo.
     // }
+
+    private void OnExplore(){
+        _cameraAnimation.Play();
+        HideStartMenu();
+    }
+
+    private void OnOptions(){
+        HideStartMenu();
+    }
+
+    private void OnStarCoords(){
+        HideStartMenu();
+    }
+
+    private void HideStartMenu(){
+        _explore.gameObject.SetActive(false);
+        _starCoords.gameObject.SetActive(false);
+        _options.gameObject.SetActive(false);
+    }
 }
