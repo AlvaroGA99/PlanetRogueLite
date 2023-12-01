@@ -107,6 +107,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LandingPropulsion"",
+                    ""type"": ""Button"",
+                    ""id"": ""62f7acc2-b1ae-491e-80b5-2c9c1d6706e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -384,6 +393,28 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""BrakePropulsion"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6eba6166-b05a-470b-a132-f1caf4a07a1a"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LandingPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fbc45444-348a-4002-bc77-449419c49693"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LandingPropulsion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -429,6 +460,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_ShipYRightRotation = m_Ingame.FindAction("ShipYRightRotation", throwIfNotFound: true);
         m_Ingame_ShipYLeftRotation = m_Ingame.FindAction("ShipYLeftRotation", throwIfNotFound: true);
         m_Ingame_BrakePropulsion = m_Ingame.FindAction("BrakePropulsion", throwIfNotFound: true);
+        m_Ingame_LandingPropulsion = m_Ingame.FindAction("LandingPropulsion", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
@@ -500,6 +532,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_Ingame_ShipYRightRotation;
     private readonly InputAction m_Ingame_ShipYLeftRotation;
     private readonly InputAction m_Ingame_BrakePropulsion;
+    private readonly InputAction m_Ingame_LandingPropulsion;
     public struct IngameActions
     {
         private @Player m_Wrapper;
@@ -513,6 +546,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @ShipYRightRotation => m_Wrapper.m_Ingame_ShipYRightRotation;
         public InputAction @ShipYLeftRotation => m_Wrapper.m_Ingame_ShipYLeftRotation;
         public InputAction @BrakePropulsion => m_Wrapper.m_Ingame_BrakePropulsion;
+        public InputAction @LandingPropulsion => m_Wrapper.m_Ingame_LandingPropulsion;
         public InputActionMap Get() { return m_Wrapper.m_Ingame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -549,6 +583,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @BrakePropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
                 @BrakePropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
                 @BrakePropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrakePropulsion;
+                @LandingPropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
+                @LandingPropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
+                @LandingPropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
             }
             m_Wrapper.m_IngameActionsCallbackInterface = instance;
             if (instance != null)
@@ -580,6 +617,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @BrakePropulsion.started += instance.OnBrakePropulsion;
                 @BrakePropulsion.performed += instance.OnBrakePropulsion;
                 @BrakePropulsion.canceled += instance.OnBrakePropulsion;
+                @LandingPropulsion.started += instance.OnLandingPropulsion;
+                @LandingPropulsion.performed += instance.OnLandingPropulsion;
+                @LandingPropulsion.canceled += instance.OnLandingPropulsion;
             }
         }
     }
@@ -628,6 +668,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         void OnShipYRightRotation(InputAction.CallbackContext context);
         void OnShipYLeftRotation(InputAction.CallbackContext context);
         void OnBrakePropulsion(InputAction.CallbackContext context);
+        void OnLandingPropulsion(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {

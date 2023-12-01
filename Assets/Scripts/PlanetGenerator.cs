@@ -19,21 +19,26 @@ public class PlanetGenerator : MonoBehaviour
     private PlayerController _player;
     private WFCGraph tiles;
 
+    public bool isFinishedLoading;
+
     Dictionary<String, List<float>> generationModuleWedgesValues;
     Dictionary<String, List<float>> generationModuleCentresValues;
 
+    System.Random sampler;
+    int seed;
     Mesh initialMesh;
 
 
     void Awake()
-    {
-
+    {   
+        seed = (int)UnityEngine.Random.value;
+        sampler = new System.Random(seed);
         _orbits = new Planet[7];
-        _orbits[6] = Instantiate(planetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        //_orbits[6] = Instantiate(planetPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         float angle = 0.0f;
-        for (int i = 0; i < _orbits.Length - 1; i++)
+        for (int i = 0; i < _orbits.Length; i++)
         {
-            angle = UnityEngine.Random.Range(0.66f * Mathf.PI, Mathf.PI / 3);
+            angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
             //            print(angle);
             _orbits[i] = Instantiate(planetPrefab, transform.position + -transform.forward * 250 + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
 
@@ -44,8 +49,7 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     async void Start()
     {
-        
-
+    
         generationModuleWedgesValues = new Dictionary<string, List<float>>();
         generationModuleCentresValues = new Dictionary<string, List<float>>();
 
@@ -131,30 +135,23 @@ public class PlanetGenerator : MonoBehaviour
         generationModuleCentresValues.Add("CCC", GenerateCentresValuesList("CCC"));
 
         initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
-        tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
+        tiles = new WFCGraph(initialMesh.triangles, 0, sampler);
 
         for (int i = 0; i < _orbits.Length; i++)
         {
-
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-           
-           
-            //_orbits[i] = 10000;      
+            _orbits[i].mass = 10000;  
             }
-        for (int i = 0; i < _orbits.Length; i++)
-        {
-            await LoadLevel();
+        // for (int i = 0; i < _orbits.Length; i++)
+        // {
+        //     await LoadLevel();
 
-            _orbits[i].GenerateSphereResolution(3, tiles);
-            _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
-            tiles.Reset(-1);
-        }
-
-         for (int i = 0; i < _orbits.Length; i++)
-        {
-           
-        }
+        //     _orbits[i].GenerateSphereResolution(3, tiles);
+        //     _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
+        //     tiles.Reset(-1);
+        // }
+        // isFinishedLoading = true;
         // WFCGraph.StateInfo state;
 
 
@@ -191,7 +188,7 @@ public class PlanetGenerator : MonoBehaviour
         //     tiles.Reset(-1);
         // }
         
-        await LoadLevel();
+        //await LoadLevel();
 
         //StartCoroutine(FramedLoad());
     }
@@ -566,7 +563,7 @@ public class PlanetGenerator : MonoBehaviour
             state = tiles.Step();
             while (state != WFCGraph.StateInfo.SUCCESFUL)
             {
-                print("dgfgdgdgf");
+                //print("dgfgdgdgf");
                 if (state == WFCGraph.StateInfo.ERROR)
                 {   //si tamaño de lista de entropias == 0
                     //if(tiles.lowestEntropyElementList.Count == 0){
@@ -593,7 +590,7 @@ public class PlanetGenerator : MonoBehaviour
 
     }
 
-    private async void ReloadLevel(){
+    public async void ReloadLevel(){
         
            for (int i = 0; i < _orbits.Length; i++)
         {
@@ -602,5 +599,6 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
         }
+        isFinishedLoading = true;
     }
 }

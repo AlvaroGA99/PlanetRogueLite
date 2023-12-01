@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private InputAction shipYRightRotation;
     private InputAction shipYLeftRotation;
     private InputAction brakePropulsion;
+    private InputAction landingPropulsion;
 
     public Image Health;
     public Transform _SphereT;
@@ -66,16 +67,17 @@ public class PlayerController : MonoBehaviour
         shipYRightRotation = _ingameControl.FindAction("ShipYRightRotation");
         shipYLeftRotation = _ingameControl.FindAction("ShipYLeftRotation");
         brakePropulsion = _ingameControl.FindAction("BrakePropulsion");
+        landingPropulsion = _ingameControl.FindAction("LandingPropulsion");
 
         // movement.Enable();
         // jump.Enable();
         // wield.Enable();
-        shipRotation.Enable();
-        mainShipPropulsion.Enable();
-        takeOffPropulsion.Enable();
-        shipYRightRotation.Enable();
-        shipYLeftRotation.Enable();
-        brakePropulsion.Enable();
+        //shipRotation.Enable();
+        //mainShipPropulsion.Enable();
+        //takeOffPropulsion.Enable();
+        //shipYRightRotation.Enable();
+        //shipYLeftRotation.Enable();
+        //brakePropulsion.Enable();
 
         movement.performed += OnMove;
         movement.canceled += OnStop;
@@ -95,6 +97,8 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation.canceled += OnStopShipYLeftRotation;
         brakePropulsion.performed += OnBrakePropulsion;
         brakePropulsion.canceled += OnStopBrakePropulsion;
+        landingPropulsion.performed += OnLandingPropulsion;
+        landingPropulsion.canceled += OnStopLandingPropulsion;
 
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
@@ -196,6 +200,47 @@ public class PlayerController : MonoBehaviour
 
     void OnStopBrakePropulsion(InputAction.CallbackContext action){
         _shipController.breakEngineValue = 0;
+    }
+
+    void OnLandingPropulsion(InputAction.CallbackContext action){
+        _shipController.landingEngineValue = 1.0f;
+        
+    }
+
+     void OnStopLandingPropulsion(InputAction.CallbackContext action){
+        _shipController.landingEngineValue = 0.0f;
+    }
+
+    public void DisablePlayerController(){
+        movement.Disable();
+        jump.Disable();
+        wield.Disable();
+    }
+
+    public void EnablePlayerController(){
+        movement.Enable();
+        jump.Enable();
+        wield.Enable();
+    }
+
+    public void DisableShipController(){
+        shipRotation.Disable();
+        mainShipPropulsion.Disable();
+        takeOffPropulsion.Disable();
+        shipYRightRotation.Disable();
+        shipYLeftRotation.Disable();
+        brakePropulsion.Disable();
+        landingPropulsion.Disable();
+    }
+
+    public void EnableShipController(){
+        shipRotation.Enable();
+        mainShipPropulsion.Enable();
+        takeOffPropulsion.Enable();
+        shipYRightRotation.Enable();
+        shipYLeftRotation.Enable();
+        brakePropulsion.Enable();
+        landingPropulsion.Enable();
     }
     public void FixedUpdate()
     {

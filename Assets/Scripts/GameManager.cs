@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -27,6 +28,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button _explore;
     [SerializeField] Button _starCoords;
     [SerializeField] Button _options;
+
+    [SerializeField] InputField _starCoordsInput;
+
+    [SerializeField] Button _travel;
+
+    [SerializeField] Button _cancel;
 
     void Awake()
     {   
@@ -71,15 +78,13 @@ public class GameManager : MonoBehaviour
         _explore.onClick.AddListener(OnExplore);
         _starCoords.onClick.AddListener(OnStarCoords);
         _options.onClick.AddListener(OnOptions);
+        _cancel.onClick.AddListener(OnCancel);
     }
     // Start is called before the first frame update
     void Start()
     {
         timer = 0;
         a = _enemyPool.Get();
-        foreach(Planet p in _planetGen._orbits){
-            _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
-        }
         _playerT.SetupGravityField(_gravityField);
         a.transform.position = new Vector3(.4711895f, 54.53f, 6.3f);
     }
@@ -129,6 +134,8 @@ public class GameManager : MonoBehaviour
 
     private void OnExplore(){
         _cameraAnimation.Play();
+        _planetGen.ReloadLevel();
+        StartCoroutine(WaitForLevelAndAnimationFinish());
         HideStartMenu();
     }
 
@@ -138,11 +145,58 @@ public class GameManager : MonoBehaviour
 
     private void OnStarCoords(){
         HideStartMenu();
+        ShowCoordMenu();
     }
+
+    private void OnTravel(){
+
+    }
+
+    private void OnCancel(){
+        HideCoordsMenu();
+        ShowStartMenu();
+    }
+
 
     private void HideStartMenu(){
         _explore.gameObject.SetActive(false);
         _starCoords.gameObject.SetActive(false);
         _options.gameObject.SetActive(false);
+    }
+
+    private void HideCoordsMenu(){
+        _starCoordsInput.gameObject.SetActive(false);
+        _cancel.gameObject.SetActive(false);
+        _travel.gameObject.SetActive(false);
+        
+    }
+
+    private void ShowStartMenu(){
+        _explore.gameObject.SetActive(true);
+        _starCoords.gameObject.SetActive(true);
+        _options.gameObject.SetActive(true);
+    }
+
+    private void ShowCoordMenu(){
+        _starCoordsInput.gameObject.SetActive(true);
+        _cancel.gameObject.SetActive(true);
+        _travel.gameObject.SetActive(true);
+    }
+
+    private void StartSimulation(){
+        foreach(Planet p in _planetGen._orbits){
+            _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
+        }
+        _playerT.EnableShipController();
+        print("SIMULATION STARTED");
+    }
+
+
+    private IEnumerator WaitForLevelAndAnimationFinish(){
+        while(!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying){
+            yield return null;
+        }
+        StartSimulation();
+        yield return null;
     }
 }
