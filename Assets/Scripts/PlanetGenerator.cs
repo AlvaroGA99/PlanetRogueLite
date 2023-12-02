@@ -41,8 +41,9 @@ public class PlanetGenerator : MonoBehaviour
             angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
             //            print(angle);
             _orbits[i] = Instantiate(planetPrefab, transform.position + -transform.forward * 250 + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
-
+            _orbits[i].transform.SetParent(transform);
         }
+        transform.localScale = Vector3.zero;
         //_currentPlanet = _orbits[6];
         //_player._SphereT = _currentPlanet.transform;
     }

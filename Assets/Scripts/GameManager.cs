@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     ObjectPool<EnemyController> _enemyPool;
 
     [SerializeField] Animation _cameraAnimation;
+    [SerializeField] Animation _systemAnimation;
 
     private float timer;
     private float spawnval;
@@ -186,6 +187,7 @@ public class GameManager : MonoBehaviour
     private void StartSimulation(){
         foreach(Planet p in _planetGen._orbits){
             _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
+            p.SetColliders();
         }
         _playerT.EnableShipController();
         print("SIMULATION STARTED");
@@ -194,6 +196,11 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForLevelAndAnimationFinish(){
         while(!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying){
+            yield return null;
+        }
+        _cameraAnimation.Play("SpeedDown");
+        _systemAnimation.Play();
+        while(_cameraAnimation.isPlaying){
             yield return null;
         }
         StartSimulation();

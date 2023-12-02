@@ -548,6 +548,7 @@ GameObject:
   - component: {fileID: 402258813}
   - component: {fileID: 402258812}
   - component: {fileID: 402258815}
+  - component: {fileID: 402258816}
   m_Layer: 0
   m_Name: SystemCentre
   m_TagString: Untagged
@@ -636,6 +637,22 @@ MonoBehaviour:
   planetPrefab: {fileID: 5699372761463504400, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
   _player: {fileID: 1591222658}
   isFinishedLoading: 0
+--- !u!111 &402258816
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402258811}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: c1dc2d8920c702a4d80d09241a9788bb, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: c1dc2d8920c702a4d80d09241a9788bb, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &551461413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,7 +1419,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 16000
-  field of view: 58.4
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: 1
@@ -1478,8 +1495,9 @@ Animation:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: ca887f5e31a812144b304e1693724d73, type: 2}
+  m_Animation: {fileID: 7400000, guid: ebb6ca0d4d0104244a3d546fdae11232, type: 2}
   m_Animations:
+  - {fileID: 7400000, guid: ebb6ca0d4d0104244a3d546fdae11232, type: 2}
   - {fileID: 7400000, guid: ca887f5e31a812144b304e1693724d73, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
@@ -1731,6 +1749,7 @@ MonoBehaviour:
   _camTransform: {fileID: 963194228}
   _starMaterial: {fileID: 2100000, guid: 2825d1ee37e1fa849a20cb54f6b13c18, type: 2}
   _starMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  speed: 20
 --- !u!1 &1024585298
 GameObject:
   m_ObjectHideFlags: 0
@@ -2607,6 +2626,7 @@ MonoBehaviour:
   _enemyPrefab: {fileID: 7743818068257472705, guid: 8cedec9a3eb66d44ca6a62e15bdb392d, type: 3}
   _planetGen: {fileID: 402258815}
   _cameraAnimation: {fileID: 963194230}
+  _systemAnimation: {fileID: 402258816}
   _explore: {fileID: 47554964}
   _starCoords: {fileID: 991707693}
   _options: {fileID: 1272790660}

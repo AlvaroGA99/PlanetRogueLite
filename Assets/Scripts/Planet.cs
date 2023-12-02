@@ -103,7 +103,6 @@ public class Planet : MonoBehaviour
         m.vertices = vertices;
         m.RecalculateNormals();
         
-        mC.sharedMesh = m;
     }
 
     public void GenerateSphereResolution(int resolution, WFCGraph tiles)
@@ -236,6 +235,10 @@ public class Planet : MonoBehaviour
 
     private void UpdatePlanetIntegrity(){
         PlanetIntegrity.transform.localScale = new Vector3(_planetIntegrity,1,1);
+    }
+
+    public void SetColliders(){
+        mC.sharedMesh = m;
     }
 
     private class DestructionMeshData{

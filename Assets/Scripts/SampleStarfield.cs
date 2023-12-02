@@ -12,6 +12,7 @@ public class SampleStarfield : MonoBehaviour
     [SerializeField] private Material _starMaterial;
     [SerializeField] private Mesh _starMesh;
     private RenderParams _rp;
+    public int speed;
     private int _samples;
     private Vector3[] _dirs;
     private float[] _scales;
@@ -46,13 +47,12 @@ public class SampleStarfield : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {   
-         for (int i = 0; i < _samples; i++)
+    { 
+            for (int i = 0; i < _samples; i++)
          {
-            //matrices[i] = Matrix4x4.Translate(transform.position + _dirs[i]*5);
-            matrices[i].SetTRS(transform.position + _dirs[i]*15000,Quaternion.identity,Vector3.one*100);
-            
+            matrices[i].SetTRS(transform.position - transform.forward*speed*100 + _dirs[i]*15000,Quaternion.identity,new Vector3(1,1,1+speed)*100);  
          }
         Graphics.RenderMeshInstanced(_rp,_starMesh,0,matrices);
+        
     }
 }
