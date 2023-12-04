@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Button _cancel;
 
+    [SerializeField] private SampleStarfield _sf;
+
     void Awake()
     {   
         _gravityField = new GravityField();
@@ -85,9 +87,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         timer = 0;
-        a = _enemyPool.Get();
+        //a = _enemyPool.Get();
         _playerT.SetupGravityField(_gravityField);
-        a.transform.position = new Vector3(.4711895f, 54.53f, 6.3f);
+        //a.transform.position = new Vector3(.4711895f, 54.53f, 6.3f);
     }
 
     void Update()
@@ -135,7 +137,7 @@ public class GameManager : MonoBehaviour
 
     private void OnExplore(){
         _cameraAnimation.Play();
-        _planetGen.ReloadLevel();
+        //_planetGen.ReloadLevel();
         StartCoroutine(WaitForLevelAndAnimationFinish());
         HideStartMenu();
     }
@@ -190,6 +192,7 @@ public class GameManager : MonoBehaviour
             p.SetColliders();
         }
         _playerT.EnableShipController();
+        _playerT.EnableCameraController();
         print("SIMULATION STARTED");
     }
 
@@ -198,6 +201,7 @@ public class GameManager : MonoBehaviour
         while(!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying){
             yield return null;
         }
+        //_sf.StopSwappingStars();
         _cameraAnimation.Play("SpeedDown");
         _systemAnimation.Play();
         while(_cameraAnimation.isPlaying){

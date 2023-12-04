@@ -144,15 +144,15 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].m = _orbits[i].mF.mesh;
             _orbits[i].mass = 10000;  
             }
-        // for (int i = 0; i < _orbits.Length; i++)
-        // {
-        //     await LoadLevel();
+        for (int i = 0; i < _orbits.Length; i++)
+        {
+            await LoadLevel();
 
-        //     _orbits[i].GenerateSphereResolution(3, tiles);
-        //     _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
-        //     tiles.Reset(-1);
-        // }
-        // isFinishedLoading = true;
+            _orbits[i].GenerateSphereResolution(3, tiles);
+            _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
+            tiles.Reset(-1);
+        }
+        isFinishedLoading = true;
         // WFCGraph.StateInfo state;
 
 

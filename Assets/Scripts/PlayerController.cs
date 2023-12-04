@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private InputAction shipYLeftRotation;
     private InputAction brakePropulsion;
     private InputAction landingPropulsion;
+    private InputAction cameraAction;
 
     public Image Health;
     public Transform _SphereT;
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour
     private bool onFloor;
     private bool notGamepad;
     private Camera cam;
+
+    private Vector2 rotateCamValue;
 
     //private float airTimer;
 
@@ -68,6 +72,7 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation = _ingameControl.FindAction("ShipYLeftRotation");
         brakePropulsion = _ingameControl.FindAction("BrakePropulsion");
         landingPropulsion = _ingameControl.FindAction("LandingPropulsion");
+        cameraAction = _ingameControl.FindAction("Camera");
 
         // movement.Enable();
         // jump.Enable();
@@ -99,6 +104,8 @@ public class PlayerController : MonoBehaviour
         brakePropulsion.canceled += OnStopBrakePropulsion;
         landingPropulsion.performed += OnLandingPropulsion;
         landingPropulsion.canceled += OnStopLandingPropulsion;
+        cameraAction.performed += OnCameraAction;
+        cameraAction.canceled += OnStopCameraAction;
 
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
@@ -108,7 +115,16 @@ public class PlayerController : MonoBehaviour
 
     }
  
-    
+    void Update(){
+        cam.transform.RotateAround(transform.position,transform.up,rotateCamValue.x);
+        Vector3 axis = Vector3.Cross(transform.up,transform.position - cam.transform.position); //new Vector2(cam.transform.localPosition.x,cam.transform.localPosition.y).sqrMagnitude > 1)
+        if(axis.sqrMagnitude > 0 && rotateCamValue.y > 0){
+            cam.transform.RotateAround(transform.position,Vector3.Cross(transform.up,transform.position - cam.transform.position),rotateCamValue.y);
+        }else if(axis.sqrMagnitude > 0 && rotateCamValue.y < 0)
+        {
+            cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
+        }
+    }
    
 
     void OnMove(InputAction.CallbackContext moveAction)
@@ -207,8 +223,17 @@ public class PlayerController : MonoBehaviour
         
     }
 
-     void OnStopLandingPropulsion(InputAction.CallbackContext action){
+    void OnStopLandingPropulsion(InputAction.CallbackContext action){
         _shipController.landingEngineValue = 0.0f;
+    }
+
+    void OnCameraAction(InputAction.CallbackContext action){
+        rotateCamValue = action.ReadValue<Vector2>();
+        //cam.transform.RotateAround(transform.position,transform.up,input.x);
+    }
+
+    void OnStopCameraAction(InputAction.CallbackContext action){
+        rotateCamValue = Vector2.zero;
     }
 
     public void DisablePlayerController(){
@@ -241,6 +266,15 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation.Enable();
         brakePropulsion.Enable();
         landingPropulsion.Enable();
+    }
+
+    public void EnableCameraController(){
+        cameraAction.Enable();
+        rotateCamValue = Vector2.zero;
+    }
+
+    public void DisableCameraController(){
+        cameraAction.Disable();
     }
     public void FixedUpdate()
     {

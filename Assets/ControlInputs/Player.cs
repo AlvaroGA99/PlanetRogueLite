@@ -116,6 +116,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Camera"",
+                    ""type"": ""Value"",
+                    ""id"": ""85edd53c-9bab-444d-9850-5517bd60136b"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -415,6 +424,28 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""LandingPropulsion"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""98c0fb4e-468f-4bc1-bd7e-b972738636d6"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Camera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""82fb3a4c-235c-4fb4-b69f-ba6ea8da6352"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Camera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -461,6 +492,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_ShipYLeftRotation = m_Ingame.FindAction("ShipYLeftRotation", throwIfNotFound: true);
         m_Ingame_BrakePropulsion = m_Ingame.FindAction("BrakePropulsion", throwIfNotFound: true);
         m_Ingame_LandingPropulsion = m_Ingame.FindAction("LandingPropulsion", throwIfNotFound: true);
+        m_Ingame_Camera = m_Ingame.FindAction("Camera", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
@@ -533,6 +565,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_Ingame_ShipYLeftRotation;
     private readonly InputAction m_Ingame_BrakePropulsion;
     private readonly InputAction m_Ingame_LandingPropulsion;
+    private readonly InputAction m_Ingame_Camera;
     public struct IngameActions
     {
         private @Player m_Wrapper;
@@ -547,6 +580,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @ShipYLeftRotation => m_Wrapper.m_Ingame_ShipYLeftRotation;
         public InputAction @BrakePropulsion => m_Wrapper.m_Ingame_BrakePropulsion;
         public InputAction @LandingPropulsion => m_Wrapper.m_Ingame_LandingPropulsion;
+        public InputAction @Camera => m_Wrapper.m_Ingame_Camera;
         public InputActionMap Get() { return m_Wrapper.m_Ingame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -586,6 +620,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @LandingPropulsion.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
                 @LandingPropulsion.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
                 @LandingPropulsion.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnLandingPropulsion;
+                @Camera.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnCamera;
+                @Camera.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnCamera;
+                @Camera.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnCamera;
             }
             m_Wrapper.m_IngameActionsCallbackInterface = instance;
             if (instance != null)
@@ -620,6 +657,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @LandingPropulsion.started += instance.OnLandingPropulsion;
                 @LandingPropulsion.performed += instance.OnLandingPropulsion;
                 @LandingPropulsion.canceled += instance.OnLandingPropulsion;
+                @Camera.started += instance.OnCamera;
+                @Camera.performed += instance.OnCamera;
+                @Camera.canceled += instance.OnCamera;
             }
         }
     }
@@ -669,6 +709,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         void OnShipYLeftRotation(InputAction.CallbackContext context);
         void OnBrakePropulsion(InputAction.CallbackContext context);
         void OnLandingPropulsion(InputAction.CallbackContext context);
+        void OnCamera(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {
