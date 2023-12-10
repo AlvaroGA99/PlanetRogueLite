@@ -10,8 +10,8 @@ namespace PlanetProperties{
 }
 public enum PlanetLayerElement{
     Magma,
-    Water,
-    Toxic,
+    EarthWater,
+    ToxicGrass
 }
 }
 

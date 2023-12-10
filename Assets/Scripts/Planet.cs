@@ -21,14 +21,17 @@ public class Planet : MonoBehaviour
     private List<DestructionMeshData> _destructionMeshes;
     private float _planetIntegrity;
     
-
     // Start is called before the first frame update
     void Start()
     {
-        //print (new Vector3());
-
     }
-
+    
+    public void Init(System.Random sampler){
+        Array vals = Enum.GetValues(typeof(PlanetLayerElement));
+        highLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+        mediumLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+        fluidLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+    }
     private void Awake()
     {   isInSpawnState = true;
         Projectile.OnDestroyEnemy += ReducePlanetIntegrity;

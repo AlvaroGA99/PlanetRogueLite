@@ -18,13 +18,13 @@ public class PlanetGenerator : MonoBehaviour
     [SerializeField]
     private PlayerController _player;
     private WFCGraph tiles;
-
     public bool isFinishedLoading;
-
     Dictionary<String, List<float>> generationModuleWedgesValues;
     Dictionary<String, List<float>> generationModuleCentresValues;
-
     System.Random sampler;
+    Texture2D magmaTexture;
+    Texture2D grassTexture;
+    Texture2D earthTexture;
     int seed;
     Mesh initialMesh;
 
@@ -39,8 +39,8 @@ public class PlanetGenerator : MonoBehaviour
         for (int i = 0; i < _orbits.Length; i++)
         {
             angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
-            //            print(angle);
             _orbits[i] = Instantiate(planetPrefab, transform.position + -transform.forward * 250 + new Vector3(250 * (i + 1) * Mathf.Cos(angle), 0, -250 * (i + 1) * Mathf.Sin(angle)), Quaternion.identity);
+            _orbits[i].Init(sampler);
             _orbits[i].transform.SetParent(transform);
         }
         transform.localScale = Vector3.zero;

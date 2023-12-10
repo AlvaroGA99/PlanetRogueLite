@@ -27,7 +27,8 @@ public class WFCGraph
         int dim = triangleList.Length / 3;
         elements = new Node[((dim))];
         toProcess = new List<Node>();
-        planetTopography = (PlanetTopography)1;
+        Array vals = Enum.GetValues(typeof(PlanetTopography));
+        planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
         Debug.Log(planetTopography);
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
@@ -279,9 +280,8 @@ public class WFCGraph
             sampler = new System.Random(sampler.Next());
         }
 
-        //nonExploredNodes.Clear();
-        //rollbackRegistry.Clear();
-        //RollbackInfo firstInfo = new RollbackInfo();
+        Array vals = Enum.GetValues(typeof(PlanetTopography));
+        planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
 
         foreach (Node n in elements)
         {
@@ -298,16 +298,8 @@ public class WFCGraph
 
             n.tileVertices = new List<int> {n.edges[0].edgeId.a,n.edges[1].edgeId.a,n.edges[2].edgeId.a};
             n.tileTriangles = new List<int>();
-
-            //nonExploredNodes.Add(n.id);
-            //firstInfo.NodesToTest.Add(n.id);
-            //firstInfo.AddOptions(elements[n.id].edges[0].options.ToArray(), elements[n.id].edges[1].options.ToArray(), elements[n.id].edges[2].options.ToArray());
         }
-        //SaveState();
         ComputeLowestEntropyElementList();
-
-        //minEntropy = 1000;
-        //rollbackRegistry.Push(firstInfo);
     }
 
     public StateInfo CheckState(){
