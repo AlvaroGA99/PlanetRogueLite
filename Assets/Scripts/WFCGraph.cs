@@ -1,15 +1,14 @@
 using System.Collections.Generic;
-using System;
-using UnityEngine.Profiling;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.Interactions;
+using PlanetProperties;
 using System.Linq;
-using UnityEngine.Animations;
-using System.Collections;
+using UnityEngine.InputSystem.Interactions;
+using System;
 
 public class WFCGraph
 {
+    
+    private PlanetTopography planetTopography;
     public Node currentNode;
     public Node[] elements;
     public Dictionary<EdgeId, int> edgeMatching;
@@ -20,26 +19,16 @@ public class WFCGraph
     };
     System.Random sampler;
     List<Node> toProcess;
-    RestoreNodeInfo[] restoringData;
-
     StateInfo state;
     public List<int> lowestEntropyElementList;
-    
-
-    //private bool[] propagated;
-    //int minEntropy;
-
 
     public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
     {
-
-        //elements = new Node[((triangleList.Length / 3) / (int)Math.Pow(4, resolution))];
         int dim = triangleList.Length / 3;
         elements = new Node[((dim))];
-        restoringData = new RestoreNodeInfo[dim];
         toProcess = new List<Node>();
-        //propagated = new bool[triangleList.Length / 3];
-        //minEntropy = 1000;
+        planetTopography = (PlanetTopography)1;
+        Debug.Log(planetTopography);
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
 
@@ -61,9 +50,9 @@ public class WFCGraph
             //edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
             //edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
 
-            edges[id0].ResetID0Option();
-            edges[id1].ResetID1Option();
-            edges[id2].ResetID2Option();
+            edges[id0].ResetID0Option(planetTopography);
+            edges[id1].ResetID1Option(planetTopography);
+            edges[id2].ResetID2Option(planetTopography);
             
             edges[id0].edgeId.a = triangleList[id0];
             edges[id0].edgeId.b = triangleList[id1];
@@ -99,15 +88,9 @@ public class WFCGraph
             }
 
             elements[i] = new Node(i, edges[id0], edges[id1], edges[id2], resolution);
-            //nonExploredNodes.Add(i);
-            //firstInfo.NodesToTest.Add(i);
-            //firstInfo.AddOptions(elements[i].edges[0].options.ToArray(), elements[i].edges[1].options.ToArray(), elements[i].edges[2].options.ToArray());
         }
 
         this.sampler = sampler;
-
-        //rollbackRegistry.Push(firstInfo);
-
         currentNode = elements[sampler.Next(0, elements.Length - 1)];
         ComputeLowestEntropyElementList();
 
@@ -116,7 +99,6 @@ public class WFCGraph
     public void ComputeLowestEntropyElementList(){
         lowestEntropyElementList = new List<int>();
         int minEntropy = 1000;
-        //foreach (int i in nonExploredNodes)
         for (int i = 0; i < elements.Length; i ++)
         {
             if (elements[i].entropy < minEntropy && elements[i].entropy > 1)
@@ -136,7 +118,7 @@ public class WFCGraph
 
     private int GetLowestEntropyElementId()
     {
-        //Returns the id of a random Node with the non-zero(collasped) lowest entropy
+        //Returns the id of a random Node with the non-one(collasped) lowest entropy
         
         if (lowestEntropyElementList.Count > 0)
         {
@@ -250,7 +232,7 @@ public class WFCGraph
                 //Debug.Log();
                 //Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
                 //if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1] && edgeOption[2] == adjacentReversedOption[2])
-                if(compatibilityList.Contains(edge.adjacentEdge.options[index] + option))
+                if(compatibilityList.Contains(edge.adjacentEdge.options[index] + option) )
                 {
                     //Debug.Log("-------");
                     optionCompatible = true;
@@ -308,9 +290,9 @@ public class WFCGraph
             //n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
             //n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
             
-             n.edges[0].ResetID0Option();
-             n.edges[1].ResetID1Option();
-             n.edges[2].ResetID2Option();
+             n.edges[0].ResetID0Option(planetTopography);
+             n.edges[1].ResetID1Option(planetTopography);
+             n.edges[2].ResetID2Option(planetTopography);
 
             n.entropy = n.edges[0].options.Count;
 
@@ -332,31 +314,33 @@ public class WFCGraph
         return state;
     }
 
-    public void SaveState(){
-        for (int i = 0; i < elements.Length; i++)
-        {
-            restoringData[i] = new RestoreNodeInfo(elements[i].id,elements[i].entropy,new List<string>(elements[i].edges[0].options),new List<string>(elements[i].edges[1].options),new List<string>(elements[i].edges[2].options));
+    public bool CheckTopography(Edge edge,int index){
+            if(planetTopography == PlanetTopography.Laky ){
+                //if(edge.options[index].Contains('C')){
+                    return edge.nextInternalEdge.options[index].Contains('C') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('C');
+                //}else{
+                  //  return true;
+                //}   
+            }else if(planetTopography == PlanetTopography.Rocky ){
+                //if(edge.options[index].Contains('A')){
+                    return edge.nextInternalEdge.options[index].Contains('A') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('A');
+                //}else{
+                  //  return true;
+                //}   
+            }else{
+                //if(edge.options[index].Contains('B')){
+                    return edge.nextInternalEdge.options[index].Contains('B') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('B');
+                //}else{
+                  //  return true;
+                //}   
+            }
         }
-    }
-
-    public void RestoreState(){
-        for (int i = 0; i < elements.Length; i++)
-        {
-            elements[i].id = restoringData[i].id;
-            elements[i].entropy = restoringData[i].entropy;
-            elements[i].edges[0].options = restoringData[i].aEdgeOptionList;
-            elements[i].edges[1].options = restoringData[i].bEdgeOptionList;
-            elements[i].edges[2].options = restoringData[i].cEdgeOptionList;
-        }
-    }
     public class Node
     {
         public int id;
         public int entropy;
-        // public bool collapsed;
         public Edge[] edges;
         public Vector3 reference;
-
         public List<Vector3> meshVertices;
         public List<int> tileVertices;
         public List<int> tileTriangles;
@@ -365,7 +349,6 @@ public class WFCGraph
 
         {
             this.id = id;
-            //this.collapsed = false;
             this.entropy = a_Edge.options.Count;
 
             this.edges = new Edge[3];
@@ -459,6 +442,48 @@ public class WFCGraph
             "CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC"};
         }
 
+        public void ResetID0Option(PlanetTopography pt){
+            switch(pt){
+                case PlanetTopography.Laky:
+                    options = new List<string>() {"AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA",
+                    "AAA","AAA","AAA","AAA","AAA","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB",
+                    "AAB","AAB","AAB","AAB","AAB","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC",
+                    "AAC","AAC","AAC","AAC","AAC","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA",
+                    "ABA","ABA","ABA","ABA","ABA","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB",
+                    "ABB","ABB","ABB","ABB","ABB","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC",
+                    "ABC","ABC","ABC","ABC","ABC","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA",
+                    "ACA","ACA","ACA","ACA","ACA","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB",
+                    "ACB","ACB","ACB","ACB","ACB","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC",
+                    "ACC","ACC","ACC","ACC","ACC","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA",
+                    "BAA","BAA","BAA","BAA","BAA","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB",
+                    "BAB","BAB","BAB","BAB","BAB","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC",
+                    "BAC","BAC","BAC","BAC","BAC","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA",
+                    "BBA","BBA","BBA","BBA","BBA","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB",
+                    "BBB","BBB","BBB","BBB","BBB","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC",
+                    "BBC","BBC","BBC","BBC","BBC","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA",
+                    "BCA","BCA","BCA","BCA","BCA","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB",
+                    "BCB","BCB","BCB","BCB","BCB","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC",
+                    "BCC","BCC","BCC","BCC","BCC","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA",
+                    "CAA","CAA","CAA","CAA","CAA","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB",
+                    "CAB","CAB","CAB","CAB","CAB","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC",
+                    "CAC","CAC","CAC","CAC","CAC","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA",
+                    "CBA","CBA","CBA","CBA","CBA","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB",
+                    "CBB","CBB","CBB","CBB","CBB","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC",
+                    "CBC","CBC","CBC","CBC","CBC","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA",
+                    "CCA","CCA","CCA","CCA","CCA","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB",
+                    "CCB","CCB","CCB","CCB","CCB","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC",
+                    "CCC","CCC","CCC","CCC","CCC"};
+                break;
+                case PlanetTopography.Rocky:
+                    options = new List<string>() {"AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC"};
+
+                break;
+                case PlanetTopography.Flat:
+                    options = new List<string>() {"AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAA","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAB","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","AAC","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABA","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABB","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ABC","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACA","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACB","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","ACC","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAA","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAB","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BAC","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBA","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBB","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BBC","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCA","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCB","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","BCC","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAA","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAB","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CAC","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBA","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBB","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CBC","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCA","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCB","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC","CCC"};
+                break;
+            }
+        }
+
         public void ResetID1Option(){
             options = new List<string>() {"AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABA",
             "ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACA","ACA","ACB","ACB","ACB","ACC","ACC","ACC",
@@ -508,6 +533,47 @@ public class WFCGraph
             "CBB","CBB","CBC","CBC","CBC","CCA","CCA","CCA","CCB","CCB","CCB","CCC","CCC","CCC"};
         }
 
+        public void ResetID1Option(PlanetTopography pt){
+            switch(pt){
+                case PlanetTopography.Laky:
+                    options = new List<string>() {"AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABB","ABC","ACA","ACA","ACA","ACB",
+                    "ACB","ACB","ACC","ACC","ACC","BAA","BAB","BAC","BBA","BBB","BBC","BCA","BCA","BCA","BCB",
+                    "BCB","BCB","BCC","BCC","BCC","CAA","CAB","CAC","CBA","CBB","CBC","CCA","CCA","CCA","CCB",
+                    "CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABB","ABC","ACA","ACA","ACA","ACB",
+                    "ACB","ACB","ACC","ACC","ACC","BAA","BAB","BAC","BBA","BBB","BBC","BCA","BCA","BCA","BCB",
+                    "BCB","BCB","BCC","BCC","BCC","CAA","CAB","CAC","CBA","CBB","CBC","CCA","CCA","CCA","CCB",
+                    "CCB","CCB","CCC","CCC","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABA","ABB","ABB",
+                    "ABC","ABC","ACA","ACB","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBA","BBB","BBB",
+                    "BBC","BBC","BCA","BCB","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBA","CBB","CBB",
+                    "CBC","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABB","ABC","ACA","ACA","ACA","ACB",
+                    "ACB","ACB","ACC","ACC","ACC","BAA","BAB","BAC","BBA","BBB","BBC","BCA","BCA","BCA","BCB",
+                    "BCB","BCB","BCC","BCC","BCC","CAA","CAB","CAC","CBA","CBB","CBC","CCA","CCA","CCA","CCB",
+                    "CCB","CCB","CCC","CCC","CCC"};
+                break;
+                case PlanetTopography.Rocky:
+                    options = new List<string>() {"AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABB","ABC","ACA","ACB","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBB","BBC","BCA","BCB","BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBB","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABB","ABC","ACA","ACB","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBB","BBC","BCA","BCB","BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBB","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAA","AAA","AAB","AAB","AAB","AAC","AAC","AAC","ABA","ABB","ABC","ACA","ACB","ACC","BAA","BAA","BAA","BAB","BAB","BAB","BAC","BAC","BAC","BBA","BBB","BBC","BCA","BCB","BCC","CAA","CAA","CAA","CAB","CAB","CAB","CAC","CAC","CAC","CBA","CBB","CBC","CCA","CCB","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABB","ABB","ABC","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAB","BAC","BBA","BBA","BBB","BBB","BBC","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAB","CAC","CBA","CBA","CBB","CBB","CBC","CBC","CCA","CCA","CCB","CCB","CCC","CCC"};
+
+                break;
+                case PlanetTopography.Flat:
+                    options = new List<string>() {"AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACB","ACC","BAA","BAB","BAC","BBA","BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCB","BCC","CAA","CAB","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACB","ACC","BAA","BAB","BAC","BBA","BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCB","BCC","CAA","CAB","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC","AAA","AAB","AAC","ABA","ABA","ABA","ABB","ABB","ABB","ABC","ABC","ABC","ACA","ACB","ACC","BAA","BAB","BAC","BBA","BBA","BBA","BBB","BBB","BBB","BBC","BBC","BBC","BCA","BCB","BCC","CAA","CAB","CAC","CBA","CBA","CBA","CBB","CBB","CBB","CBC","CBC","CBC","CCA","CCB","CCC","AAA","AAA","AAB","AAB","AAC","AAC","ABA","ABB","ABC","ACA","ACA","ACB","ACB","ACC","ACC","BAA","BAA","BAB","BAB","BAC","BAC","BBA","BBB","BBC","BCA","BCA","BCB","BCB","BCC","BCC","CAA","CAA","CAB","CAB","CAC","CAC","CBA","CBB","CBC","CCA","CCA","CCB","CCB","CCC","CCC"};
+                break;
+            }
+        }
         public void ResetID2Option(){
             options = new List<string>() {"AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA",
             "ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA",
@@ -556,6 +622,48 @@ public class WFCGraph
             "CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC",
             "BBC","BCC","CAC","CBC","CCC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC"};
         }
+        
+        public void ResetID2Option(PlanetTopography pt){
+            switch(pt){
+                case PlanetTopography.Laky:
+                    options = new List<string>() {"AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","AAA","ABA","BAA","BBA","CAA","CBA","AAA","ABA","BAA","BBA",
+                    "CAA","CBA","ACA","BCA","CCA","ACA","BCA","CCA","ACA","BCA","CCA","AAA","ABA","ACA","BAA",
+                    "BBA","BCA","CAA","CBA","CCA","ACA","BCA","CCA","ACA","BCA","CCA","AAA","ABA","ACA","BAA",
+                    "BBA","BCA","CAA","CBA","CCA","ACA","BCA","CCA","ACA","BCA","CCA","AAA","ABA","ACA","BAA",
+                    "BBA","BCA","CAA","CBA","CCA","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","AAB","ABB","BAB","BBB","CAB","CBB","AAB","ABB","BAB","BBB",
+                    "CAB","CBB","ACB","BCB","CCB","ACB","BCB","CCB","ACB","BCB","CCB","AAB","ABB","ACB","BAB",
+                    "BBB","BCB","CAB","CBB","CCB","ACB","BCB","CCB","ACB","BCB","CCB","AAB","ABB","ACB","BAB",
+                    "BBB","BCB","CAB","CBB","CCB","ACB","BCB","CCB","ACB","BCB","CCB","AAB","ABB","ACB","BAB",
+                    "BBB","BCB","CAB","CBB","CCB","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","AAC","ABC","BAC","BBC","CAC","CBC","AAC","ABC","BAC","BBC",
+                    "CAC","CBC","ACC","BCC","CCC","ACC","BCC","CCC","ACC","BCC","CCC","AAC","ABC","ACC","BAC",
+                    "BBC","BCC","CAC","CBC","CCC","ACC","BCC","CCC","ACC","BCC","CCC","AAC","ABC","ACC","BAC",
+                    "BBC","BCC","CAC","CBC","CCC","ACC","BCC","CCC","ACC","BCC","CCC","AAC","ABC","ACC","BAC",
+                    "BBC","BCC","CAC","CBC","CCC"};
+                break;
+                case PlanetTopography.Rocky:
+                    options = new List<string>() {"AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","BAA","CAA","AAA","BAA","CAA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","BAA","CAA","AAA","BAA","CAA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","AAA","BAA","CAA","AAA","BAA","CAA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAA","BAA","CAA","ABA","ACA","BBA","BCA","CBA","CCA","ABA","ACA","BBA","BCA","CBA","CCA","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","BAB","CAB","AAB","BAB","CAB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","BAB","CAB","AAB","BAB","CAB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","AAB","BAB","CAB","AAB","BAB","CAB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAB","BAB","CAB","ABB","ACB","BBB","BCB","CBB","CCB","ABB","ACB","BBB","BCB","CBB","CCB","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","BAC","CAC","AAC","BAC","CAC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","BAC","CAC","AAC","BAC","CAC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","AAC","BAC","CAC","AAC","BAC","CAC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC","AAC","BAC","CAC","ABC","ACC","BBC","BCC","CBC","CCC","ABC","ACC","BBC","BCC","CBC","CCC"};
+
+                break;
+                case PlanetTopography.Flat:
+                    options = new List<string>() {"AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","ABA","BBA","CBA","ABA","BBA","CBA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","ABA","BBA","CBA","ABA","BBA","CBA","AAA","ABA","ACA","BAA","BBA","BCA","CAA","CBA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","AAA","ACA","BAA","BCA","CAA","CCA","ABA","BBA","CBA","AAA","ACA","BAA","BCA","CAA","CCA","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","ABB","BBB","CBB","ABB","BBB","CBB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","ABB","BBB","CBB","ABB","BBB","CBB","AAB","ABB","ACB","BAB","BBB","BCB","CAB","CBB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","AAB","ACB","BAB","BCB","CAB","CCB","ABB","BBB","CBB","AAB","ACB","BAB","BCB","CAB","CCB","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","ABC","BBC","CBC","ABC","BBC","CBC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","ABC","BBC","CBC","ABC","BBC","CBC","AAC","ABC","ACC","BAC","BBC","BCC","CAC","CBC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC","AAC","ACC","BAC","BCC","CAC","CCC","ABC","BBC","CBC","AAC","ACC","BAC","BCC","CAC","CCC"};
+                break;
+            }
+        }
         public EdgeId GetReversedEdgeId()
         {
             return new EdgeId(edgeId.b, edgeId.a);
@@ -580,23 +688,5 @@ public class WFCGraph
         SUCCESFUL,
         IN_PROGRESS,
         ERROR
-
-    }
-
-    private struct RestoreNodeInfo{
-        public int id;
-        public int entropy;
-        public List<string> aEdgeOptionList;
-        public List<string> bEdgeOptionList;
-        public List<string> cEdgeOptionList;
-
-        public RestoreNodeInfo(int id, int entropy, List<string> aEdgeOptionList, List<string> bEdgeOptionList, List<string> cEdgeOptionList)
-        {
-            this.id = id;
-            this.entropy = entropy;
-            this.aEdgeOptionList = aEdgeOptionList;
-            this.bEdgeOptionList = bEdgeOptionList;
-            this.cEdgeOptionList = cEdgeOptionList;
-        }
     }
 }

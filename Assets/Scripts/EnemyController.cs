@@ -126,12 +126,7 @@ public class EnemyController : MonoBehaviour
 
                 timer += Time.fixedDeltaTime;
             }
-
-
         }
-
-
-
     }
 
     private State CheckBehaviourState(float sqrMagnitude)

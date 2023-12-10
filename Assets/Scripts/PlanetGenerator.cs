@@ -570,6 +570,7 @@ public class PlanetGenerator : MonoBehaviour
                     //if(tiles.lowestEntropyElementList.Count == 0){
                     //print("RESET");
                     tiles.Reset(-1);
+                    print("ERROR");
                     //}else{
                     //tiles.RestoreState();
                     //}

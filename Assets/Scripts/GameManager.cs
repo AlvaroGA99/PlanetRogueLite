@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button _cancel;
 
     [SerializeField] private SampleStarfield _sf;
+    [SerializeField] private SampleStarfield _sfTraveling;
 
     void Awake()
     {   
@@ -201,7 +202,8 @@ public class GameManager : MonoBehaviour
         while(!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying){
             yield return null;
         }
-        //_sf.StopSwappingStars();
+        _sf.gameObject.SetActive(true);
+        _sfTraveling.gameObject.SetActive(false);
         _cameraAnimation.Play("SpeedDown");
         _systemAnimation.Play();
         while(_cameraAnimation.isPlaying){

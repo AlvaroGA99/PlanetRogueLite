@@ -1,32 +1,26 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
-
+using PlanetProperties;
 
 public class Planet : MonoBehaviour
 {
     public Mesh m;
     public MeshFilter mF;
-    private MeshCollider mC;
-    public DestructionMesh _destructionMeshPrefab;
-    private List<DestructionMeshData> _destructionMeshes;
+    public GameObject PlanetIntegrity;
     public int res;
     public int seed;
     public float mass;
     public bool isInSpawnState;
+    public DestructionMesh _destructionMeshPrefab;
+    private PlanetLayerElement highLayerElement;
+    private PlanetLayerElement mediumLayerElement;
+    private PlanetLayerElement fluidLayerElement;
+    private MeshCollider mC;
+    private List<DestructionMeshData> _destructionMeshes;
     private float _planetIntegrity;
-    public GameObject PlanetIntegrity;
-
-    //private WFCGraph tiles;
-
-    //private List<GameObject> gameobjectReferences;
-
+    
 
     // Start is called before the first frame update
     void Start()

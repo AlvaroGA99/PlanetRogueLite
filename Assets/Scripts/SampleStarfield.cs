@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -21,11 +22,13 @@ public class SampleStarfield : MonoBehaviour
     private Vector3[] _originalDirs;
     private Vector3[] _moveDirs;
     private float[] _scales;
+    private Vector3 _sampleAdjustment;
     private int _currentDirsIndex;
 
     IEnumerator cor;
     Matrix4x4[] matrices;
-   [SerializeField] public float[] offset;
+    private float[] offset;
+    [SerializeField] private SampleType sampleType;
 
     void Start()
     {
@@ -40,11 +43,22 @@ public class SampleStarfield : MonoBehaviour
         float x;
         float y;
         float theta;
-        //float phi;
-         for (int j = 0; j < offset.Length; j++)
-        {
-            offset[j] = offset[j] + j*10/offset.Length + j*10/offset.Length*offset.Length-1;
-        }
+        float phi;
+        if (sampleType == SampleType.Conical)
+            {   
+               offset = new float[10];
+               for (int j = 0; j < offset.Length; j++)
+                {
+                offset[j] = offset[j] + j * 10 / offset.Length + j * 10 / offset.Length * offset.Length - 1;
+                }
+            }
+            else
+            {   
+                offset = new float[1];
+                offset[0] = 0;
+            }
+        
+
         for (int i = 0; i < _samples; i++)
         {
             //     for (int i = j*_samples/_chunks; i < (j+1)*_samples/_chunks; i++)
@@ -58,40 +72,26 @@ public class SampleStarfield : MonoBehaviour
 
 
             theta = x * math.PI * 2;
-            //phi = y*math.PI;
-
-            _dirs[i] = new Vector3(math.cos(theta) * (1 - y + 0.0001f), math.sin(theta) * (1 - y + 0.0001f), y*10);
-            //_dirs[i] = new Vector3(math.sin(phi)*math.cos(theta),math.sin(phi)*math.sin(theta), math.cos(phi)  );
-            _moveDirs[i] = (_dirs[i] - new Vector3(math.cos(theta) * (0.0001f), math.sin(theta) * (0.0001f), 10)).normalized;
-
-            //matrices[i].SetTRS(transform.position + _dirs[i]*5,Quaternion.identity,Vector3.one/10f*_scales[i]);
-            //}   
-        }
+            phi = y * math.PI;
+            if (sampleType == SampleType.Conical)
+            {   
+                _sampleAdjustment = transform.forward * 20000 + transform.up * 2500;
+                _dirs[i] = new Vector3(math.cos(theta) * (1 - y + 0.0001f), math.sin(theta) * (1 - y + 0.0001f), y * 10);
+                _moveDirs[i] = (_dirs[i] - new Vector3(math.cos(theta) * (0.0001f), math.sin(theta) * (0.0001f), 10)).normalized;  
+                _dirs[i]*=1000;
+            }
+            else
+            {
+                _dirs[i] = new Vector3(math.sin(phi)*math.cos(theta),math.sin(phi)*math.sin(theta), math.cos(phi)  )*16000;
+                _moveDirs[i] = Vector3.zero;
+            }
+            
+            }
         _currentDirsIndex = 0;
         _rp = new RenderParams(_starMaterial);
 
         // cor = SwappingStars();
         // StartCoroutine(cor);
-
-    }
-
-    private void NextDirs()
-    {
-        if (_currentDirsIndex < offset.Length - 1)
-        {
-            _currentDirsIndex++;
-        }
-        else
-        {
-            _currentDirsIndex = 0;
-        }
-
-        for (int i = _currentDirsIndex * _samples / offset.Length; i < (_currentDirsIndex + 1) * _samples / _chunks; i++)
-        {
-            //_dirs[i] -= _moveDirs[i] ;
-
-            //matrices[i].SetTRS(transform.position + _dirs[i]*5,Quaternion.identity,Vector3.one/10f*_scales[i]);
-        }
 
     }
     // Update is called once per frame
@@ -100,17 +100,24 @@ public class SampleStarfield : MonoBehaviour
         for (int j = 0; j < offset.Length; j++)
         {
             offset[j] += Time.deltaTime;
-            while(offset[j] > 10f){
+            while (offset[j] > 10f)
+            {
                 offset[j] = offset[j] - 10f;
             }
             for (int i = j * _samples / offset.Length; i < (j + 1) * _samples / offset.Length; i++)
             {
-                matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] * 1000 + _moveDirs[i] * offset[j] * 10000 + transform.forward*20000 + transform.up*2500, Quaternion.identity, new Vector3(1, 1, 1 + speed)*100);
+                matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 100);
             }
         }
         print(_currentDirsIndex);
         Graphics.RenderMeshInstanced(_rp, _starMesh, 0, matrices);
 
+    }
+
+    public enum SampleType
+    {
+        Spherical,
+        Conical
     }
 
 }
