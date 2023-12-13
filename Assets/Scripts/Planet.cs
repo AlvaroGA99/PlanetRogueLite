@@ -14,12 +14,11 @@ public class Planet : MonoBehaviour
     public float mass;
     public bool isInSpawnState;
     public DestructionMesh _destructionMeshPrefab;
-    private PlanetLayerElement highLayerElement;
-    private PlanetLayerElement mediumLayerElement;
-    private PlanetLayerElement fluidLayerElement;
     private MeshCollider mC;
     private List<DestructionMeshData> _destructionMeshes;
     private float _planetIntegrity;
+    private Material _material;
+    private Material _fluidMaterial;
     
     // Start is called before the first frame update
     void Start()
@@ -27,13 +26,12 @@ public class Planet : MonoBehaviour
     }
     
     public void Init(System.Random sampler){
-        Array vals = Enum.GetValues(typeof(PlanetLayerElement));
-        highLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
-        mediumLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
-        fluidLayerElement = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
     }
     private void Awake()
-    {   isInSpawnState = true;
+    {   
+        _material = GetComponent<MeshRenderer>().material;
+        _fluidMaterial = transform.GetChild(0).gameObject.GetComponentInChildren<MeshRenderer>().material;
+        isInSpawnState = true;
         Projectile.OnDestroyEnemy += ReducePlanetIntegrity;
         _planetIntegrity = 0.2f;
         PlanetIntegrity = GameObject.Find("PlanetIntegrity");
@@ -60,7 +58,7 @@ public class Planet : MonoBehaviour
         List<float> CentreValues;
         foreach (WFCGraph.Node n in nodeGraph.elements)
         {   
-//            print(n.edges[0].options[0].Substring(0, 1) + n.edges[0].options[0].Substring(1, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(1, 1) + n.edges[2].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(1, 1));
+            print(n.edges.Length);
             String wedges = n.edges[0].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(0, 1);
             String centres = n.edges[0].options[0].Substring(1, 1) + n.edges[1].options[0].Substring(1, 1) + n.edges[2].options[0].Substring(1, 1);
 
@@ -238,6 +236,19 @@ public class Planet : MonoBehaviour
         mC.sharedMesh = m;
     }
 
+    public void SetHighLayerTexture(Color32 color){
+        _material.SetColor("_HighLayerColor",color);
+    }
+
+    public void SetMediumLayerTexture(Color32 color){
+        _material.SetColor("_LowLayerColor",color);
+    }
+
+    public void SetFluidLayerTexture(Color32 color){
+        _fluidMaterial.SetColor("_BaseColor",color);
+        _fluidMaterial.SetColor("_EmissionColor",color);
+
+    }
     private class DestructionMeshData{
         public Mesh mesh;
         public Vector3 reference;

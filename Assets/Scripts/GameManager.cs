@@ -190,6 +190,7 @@ public class GameManager : MonoBehaviour
     private void StartSimulation(){
         foreach(Planet p in _planetGen._orbits){
             _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
+            print(p.mass);
             p.SetColliders();
         }
         _playerT.EnableShipController();

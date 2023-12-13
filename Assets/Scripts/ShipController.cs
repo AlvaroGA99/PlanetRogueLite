@@ -43,7 +43,7 @@ public class ShipController : MonoBehaviour
         }
         
 
-        //print(_gF.GetTotalFieldForceForBody(transform.position));
+        print(_gF.GetTotalFieldForceForBody(transform.position));
         _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position),ForceMode.Acceleration);
     }
 

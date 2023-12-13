@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     private InputAction landingPropulsion;
     private InputAction cameraAction;
 
+    private InputAction eject_enterShip;
+
     public Image Health;
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour
     private Quaternion _lastLocalRotation;
     private Quaternion _lastLocalWieldRotation;
     private bool onFloor;
+
+    private bool onShip = true;
     private bool notGamepad;
     private Camera cam;
 
@@ -73,6 +77,7 @@ public class PlayerController : MonoBehaviour
         brakePropulsion = _ingameControl.FindAction("BrakePropulsion");
         landingPropulsion = _ingameControl.FindAction("LandingPropulsion");
         cameraAction = _ingameControl.FindAction("Camera");
+        eject_enterShip = _ingameControl.FindAction("Eject_EnterShip");
 
         // movement.Enable();
         // jump.Enable();
@@ -83,6 +88,8 @@ public class PlayerController : MonoBehaviour
         //shipYRightRotation.Enable();
         //shipYLeftRotation.Enable();
         //brakePropulsion.Enable();
+
+        eject_enterShip.Enable();
 
         movement.performed += OnMove;
         movement.canceled += OnStop;
@@ -106,6 +113,8 @@ public class PlayerController : MonoBehaviour
         landingPropulsion.canceled += OnStopLandingPropulsion;
         cameraAction.performed += OnCameraAction;
         cameraAction.canceled += OnStopCameraAction;
+        eject_enterShip.performed += Eject;
+
 
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
@@ -117,13 +126,13 @@ public class PlayerController : MonoBehaviour
  
     void Update(){
         cam.transform.RotateAround(transform.position,transform.up,rotateCamValue.x);
-        Vector3 axis = Vector3.Cross(transform.up,transform.position - cam.transform.position); //new Vector2(cam.transform.localPosition.x,cam.transform.localPosition.y).sqrMagnitude > 1)
-        if(axis.sqrMagnitude > 0 && rotateCamValue.y > 0){
-            cam.transform.RotateAround(transform.position,Vector3.Cross(transform.up,transform.position - cam.transform.position),rotateCamValue.y);
-        }else if(axis.sqrMagnitude > 0 && rotateCamValue.y < 0)
-        {
-            cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
-        }
+        // Vector3 axis = Vector3.Cross(transform.up,transform.position - cam.transform.position); //new Vector2(cam.transform.localPosition.x,cam.transform.localPosition.y).sqrMagnitude > 1)
+        // if(axis.sqrMagnitude > 0 && rotateCamValue.y > 0){
+        //     cam.transform.RotateAround(transform.position,Vector3.Cross(transform.up,transform.position - cam.transform.position),rotateCamValue.y);
+        // }else if(axis.sqrMagnitude > 0 && rotateCamValue.y < 0)
+        // {
+        //     cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
+        // }
     }
    
 
@@ -141,7 +150,7 @@ public class PlayerController : MonoBehaviour
 
     void OnJump(InputAction.CallbackContext jumpAction)
     {
-        
+    
         if (onFloor)
         {
             _rb.AddForce( -_toCenter*100 ,ForceMode.Impulse);  
@@ -288,28 +297,27 @@ public class PlayerController : MonoBehaviour
           
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
-        //_toCenter = (_SphereT.position - _t.position).normalized;
-        _rb.AddForce(_gF.GetTotalFieldForceForBody(_t.position),ForceMode.Acceleration);
-        //_rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
+        _toCenter = _gF.GetTotalFieldForceForBody(_tChild.position);
+        print(_toCenter);
+        _rb.AddForce(_toCenter,ForceMode.Acceleration);
+        _rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
 
         if (_rb.velocity.magnitude > 10)
         {
             _rb.velocity = Vector3.ClampMagnitude(_rb.velocity, 10);
         }
         
-        //_t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
+        if(!onShip){
+            _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
+        }
+        
 
         // _tChild.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_rotationVector, Vector3.up),_lastLocalRotation,0.8f);
 
         _lastLocalRotation = _tChild.localRotation;
         
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
-        //_tWeaponReversed.localRotation = _tWeapon.localRotation;
-        //_tWeaponReversed.transform.Rotate(new Vector3(0,0,-180));
-
         _lastLocalWieldRotation = _tWeapon.localRotation;
-
-        
  
     }
 
@@ -335,6 +343,18 @@ public class PlayerController : MonoBehaviour
     public void SetupGravityField(GravityField gravity){
         _gF = gravity;
         _shipController.SetupGravityField(gravity);
+    }
+
+    private void Eject(InputAction.CallbackContext action){
+        
+        _rb.isKinematic = false;
+       _t.position -= new Vector3(5f,0,0);
+       _t.parent = null;
+       onShip = false;
+       GetComponent<BoxCollider>().enabled = true;
+       EnablePlayerController();
+       DisableShipController();
+       print("EJECT");
     }
 
    
