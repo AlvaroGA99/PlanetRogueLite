@@ -143,20 +143,9 @@ public class WFCGraph
         state = StateInfo.SUCCESFUL;
         if (collapsingId != -1)
         {   
-            //lowestEntropyElementList.Remove(collapsingId);
             Node collapsingNode = elements[collapsingId];
             collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
             toProcess.Add(collapsingNode);
-            //propagated[collapsingId] = true;
-            // for (int i = 0; i < 3; i++)
-            // {   collapsingId = GetLowestEntropyElementId();
-            //     if(!propagated[collapsingId]){
-            //         collapsingNode.Collapse(sampler.Next(0, collapsingNode.entropy - 1));
-            //         toProcess.Add(collapsingNode);
-            //         propagated[collapsingId] = true;
-            //     }
-            // }
-
             int localLength;
             while (toProcess.Count > 0)
             {
@@ -166,11 +155,8 @@ public class WFCGraph
                     state = Propagate(toProcess[0]);
                     if (state == StateInfo.ERROR)
                     {   
-                        //toProcess.Clear();
-                        //break;
                         return StateInfo.ERROR;
                     }
-                    //yield return null;
                 }
             }
         }
@@ -186,22 +172,13 @@ public class WFCGraph
 
         for (int i = 0; i < 3; i++)
         {
-            if (elementToProcess.edges[i].adjacentEdge.ownerNode.entropy  != 1 )
-            {
             if (UpdateNeighbour(elementToProcess.edges[i]))
             {
                 elementToProcess.edges[i].adjacentEdge.ownerNode.entropy = elementToProcess.edges[i].adjacentEdge.options.Count;
-                //if (!propagated[elementToProcess.edges[i].adjacentEdge.ownerNode.id]){
-                    toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
-                  //  propagated[elementToProcess.edges[i].adjacentEdge.ownerNode.id] = true;
-                //}
+                toProcess.Add(elementToProcess.edges[i].adjacentEdge.ownerNode);
             }
-            }
-            //Debug.Log(elementToProcess.edges[0].adjacentEdge.ownerNode.entropy);
             if (elementToProcess.edges[0].adjacentEdge.ownerNode.entropy == 0)
             {
-                //state = StateInfo.ERROR;
-                //break;
                 return StateInfo.ERROR;
             }
             
@@ -212,51 +189,31 @@ public class WFCGraph
 
     private bool UpdateNeighbour(Edge edge)
     {
-        //if(propagatedFrom[edge.ownerNode.id] == edge.adjacentEdge.ownerNode.id){
-          //  return false;
-        //}
         int originalLength = edge.adjacentEdge.options.Count;
         int index = 0;
         bool optionCompatible;
-        //int debugCount = 0;
         while (index < edge.adjacentEdge.options.Count)
         {
             optionCompatible = false;
-            //debugCount = 0;
             foreach (string option in edge.options)
             {
-                //char[] edgeOption = edge.adjacentEdge.options[index].ToCharArray();
-                //char[] adjacentReversedOption = option.ToCharArray();
-                //Array.Reverse(adjacentReversedOption);
-                //debugCount++;
-
-                //Debug.Log();
-                //Debug.Log(edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1]);
-                //if (edgeOption[0] == adjacentReversedOption[0] && edgeOption[1] == adjacentReversedOption[1] && edgeOption[2] == adjacentReversedOption[2])
                 if(compatibilityList.Contains(edge.adjacentEdge.options[index] + option) )
                 {
-                    //Debug.Log("-------");
                     optionCompatible = true;
                     break;
                 }
-
             }
             if (!optionCompatible)
             {
-
                 edge.adjacentEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.options.RemoveAt(index);
                 edge.adjacentEdge.nextInternalEdge.nextInternalEdge.options.RemoveAt(index);
-                 //edge.adjacentEdge.options.Remove()
             }
             else
             {
                 index++;
             }
         }
-
-        // edge.adjacentEdge.options.Clear();
-        // edge.adjacentEdge.options.Add("AB");
 
         if (originalLength != edge.adjacentEdge.options.Count)
         {

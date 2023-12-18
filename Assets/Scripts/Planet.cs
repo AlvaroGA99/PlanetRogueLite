@@ -58,7 +58,7 @@ public class Planet : MonoBehaviour
         List<float> CentreValues;
         foreach (WFCGraph.Node n in nodeGraph.elements)
         {   
-            print(n.edges.Length);
+            print(n.edges[0].options.Count);
             String wedges = n.edges[0].options[0].Substring(0, 1) + n.edges[1].options[0].Substring(0, 1) + n.edges[2].options[0].Substring(0, 1);
             String centres = n.edges[0].options[0].Substring(1, 1) + n.edges[1].options[0].Substring(1, 1) + n.edges[2].options[0].Substring(1, 1);
 

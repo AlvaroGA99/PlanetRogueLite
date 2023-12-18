@@ -153,7 +153,7 @@ public class PlayerController : MonoBehaviour
     
         if (onFloor)
         {
-            _rb.AddForce( -_toCenter*100 ,ForceMode.Impulse);  
+            _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
             onFloor = false;
         }
         
@@ -298,9 +298,9 @@ public class PlayerController : MonoBehaviour
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
         _toCenter = _gF.GetTotalFieldForceForBody(_tChild.position);
-        print(_toCenter);
         _rb.AddForce(_toCenter,ForceMode.Acceleration);
-        _rb.AddForce( _t.localToWorldMatrix.MultiplyVector(_rotationVector)*_rotationSpeed*2);
+        _rb.AddForce( Vector3.ProjectOnPlane(cam.transform.localToWorldMatrix.MultiplyVector(_rotationVector),-_toCenter).normalized*_rotationSpeed);
+       
 
         if (_rb.velocity.magnitude > 10)
         {
