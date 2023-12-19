@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -49,9 +50,9 @@ public class PlayerController : MonoBehaviour
     private Quaternion _lastLocalRotation;
     private Quaternion _lastLocalWieldRotation;
     private bool onFloor;
-
     private bool onShip = true;
-    private bool notGamepad;
+    public Energy _energyObject;
+    private float _jetpackProp;
     private Camera cam;
 
     private Vector2 rotateCamValue;
@@ -133,6 +134,7 @@ public class PlayerController : MonoBehaviour
         // {
         //     cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
         // }
+        _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp);
     }
    
 
@@ -155,13 +157,15 @@ public class PlayerController : MonoBehaviour
         {
             _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
             onFloor = false;
+        }else{
+            _jetpackProp = 1.5f;
         }
         
     }
 
     void OnStopJump(InputAction.CallbackContext stopJumpAction)
     {
-        
+        _jetpackProp = 0;
     }
     
     void OnWield(InputAction.CallbackContext wieldAction)
@@ -169,12 +173,12 @@ public class PlayerController : MonoBehaviour
         
         Vector2 inp = wieldAction.ReadValue<Vector2>();
         _wieldVector = new Vector3(inp.x, 0, inp.y);
-        notGamepad = false;
+        //notGamepad = false;
     }
 
     void OnStopWield(InputAction.CallbackContext stopWieldAction)
     {
-        notGamepad = true;
+        //notGamepad = true;
     }
 
     void OnShipRotation(InputAction.CallbackContext action){
@@ -310,14 +314,17 @@ public class PlayerController : MonoBehaviour
         if(!onShip){
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
         }
-        
-
         // _tChild.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_rotationVector, Vector3.up),_lastLocalRotation,0.8f);
 
         _lastLocalRotation = _tChild.localRotation;
         
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
         _lastLocalWieldRotation = _tWeapon.localRotation;
+
+        if(_energyObject.energy > 0){
+            _rb.AddForce(_tChild.up*_jetpackProp);
+        }
+        
  
     }
 
@@ -336,8 +343,6 @@ public class PlayerController : MonoBehaviour
             }
             
         }
-        
-        
     }
 
     public void SetupGravityField(GravityField gravity){
@@ -347,7 +352,7 @@ public class PlayerController : MonoBehaviour
 
     private void Eject(InputAction.CallbackContext action){
         
-        _rb.isKinematic = false;
+       _rb.isKinematic = false;
        _t.position -= new Vector3(5f,0,0);
        _t.parent = null;
        onShip = false;
