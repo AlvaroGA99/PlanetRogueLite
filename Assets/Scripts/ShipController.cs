@@ -15,6 +15,7 @@ public class ShipController : MonoBehaviour
     public float breakEngineValue;
     public float takeOffEngineValue;
     public float landingEngineValue;
+    public bool breakActivated;
     public Energy energyObject;
     //public float _energy;
 
@@ -37,6 +38,10 @@ public class ShipController : MonoBehaviour
         _rb.AddTorque(-transform.forward*Math.Clamp(zxRotationValue.x,-1.0f,0f)*-1*10000);
         _rb.AddTorque(-transform.up*leftYRotationValue*10000);
         _rb.AddTorque(transform.up*rightYRotationValue*10000);
+        }
+
+        if(breakActivated){
+            _rb.velocity /= 1.5f;
         }
     
         print(_gF.GetTotalFieldForceForBody(transform.position));

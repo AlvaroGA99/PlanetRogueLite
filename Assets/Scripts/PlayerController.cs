@@ -1,11 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -31,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private InputAction brakePropulsion;
     private InputAction landingPropulsion;
     private InputAction cameraAction;
+    private InputAction brakeAction;
 
     private InputAction eject_enterShip;
 
@@ -45,6 +38,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 _toCenter;
     private GravityField _gF;
     private Vector3 _wieldVector;
+    private Vector3 _moveVector;
     public Vector3 _lastForward;
     private float _rotationSpeed;
     private Quaternion _lastLocalRotation;
@@ -79,6 +73,7 @@ public class PlayerController : MonoBehaviour
         landingPropulsion = _ingameControl.FindAction("LandingPropulsion");
         cameraAction = _ingameControl.FindAction("Camera");
         eject_enterShip = _ingameControl.FindAction("Eject_EnterShip");
+        brakeAction = _ingameControl.FindAction("Brake");
 
         // movement.Enable();
         // jump.Enable();
@@ -115,6 +110,8 @@ public class PlayerController : MonoBehaviour
         cameraAction.performed += OnCameraAction;
         cameraAction.canceled += OnStopCameraAction;
         eject_enterShip.performed += Eject;
+        brakeAction.performed += OnBrake;
+        brakeAction.canceled += OnStopBrake;
 
 
         _rb = GetComponent<Rigidbody>();
@@ -134,7 +131,7 @@ public class PlayerController : MonoBehaviour
         // {
         //     cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
         // }
-        _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp);
+        _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp/30);
     }
    
 
@@ -143,6 +140,7 @@ public class PlayerController : MonoBehaviour
         Vector2 inp = moveAction.ReadValue<Vector2>();
         _rotationVector = new Vector3(inp.x, 0, inp.y);
         _rotationVector.Normalize();
+        _moveVector = Vector3.ProjectOnPlane(cam.transform.localToWorldMatrix.MultiplyVector(_rotationVector),-_toCenter);
         _rotationSpeed = 100;
     }
     void OnStop(InputAction.CallbackContext moveAction)
@@ -158,7 +156,7 @@ public class PlayerController : MonoBehaviour
             _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
             onFloor = false;
         }else{
-            _jetpackProp = 1.5f;
+            _jetpackProp = 10f;
         }
         
     }
@@ -249,6 +247,26 @@ public class PlayerController : MonoBehaviour
         rotateCamValue = Vector2.zero;
     }
 
+    private void Eject(InputAction.CallbackContext action){
+       _rb.isKinematic = false;
+       _t.position -= new Vector3(5f,0,0);
+       _t.parent = null;
+       onShip = false;
+       GetComponent<BoxCollider>().enabled = true;
+       EnablePlayerController();
+       DisableShipController();
+       print("EJECT");
+    }
+
+    private void OnBrake(InputAction.CallbackContext action){
+        _shipController.breakActivated = true;
+    }
+
+    private void OnStopBrake(InputAction.CallbackContext action){
+        _shipController.breakActivated = false;
+    }
+
+
     public void DisablePlayerController(){
         movement.Disable();
         jump.Disable();
@@ -269,6 +287,7 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation.Disable();
         brakePropulsion.Disable();
         landingPropulsion.Disable();
+        brakeAction.Disable();
     }
 
     public void EnableShipController(){
@@ -279,6 +298,7 @@ public class PlayerController : MonoBehaviour
         shipYLeftRotation.Enable();
         brakePropulsion.Enable();
         landingPropulsion.Enable();
+        brakeAction.Enable();
     }
 
     public void EnableCameraController(){
@@ -303,7 +323,10 @@ public class PlayerController : MonoBehaviour
         //print(_rotationVector);
         _toCenter = _gF.GetTotalFieldForceForBody(_tChild.position);
         _rb.AddForce(_toCenter,ForceMode.Acceleration);
-        _rb.AddForce( Vector3.ProjectOnPlane(cam.transform.localToWorldMatrix.MultiplyVector(_rotationVector),-_toCenter).normalized*_rotationSpeed);
+           
+        
+        
+        _rb.AddForce( _moveVector.normalized*_rotationSpeed);
        
 
         if (_rb.velocity.magnitude > 10)
@@ -314,15 +337,15 @@ public class PlayerController : MonoBehaviour
         if(!onShip){
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
         }
-        // _tChild.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_rotationVector, Vector3.up),_lastLocalRotation,0.8f);
+        _tChild.rotation = Quaternion.Slerp(Quaternion.LookRotation(Vector3.ProjectOnPlane(_moveVector,-_toCenter).normalized, _tChild.up),_lastLocalRotation,0.8f);
 
-        _lastLocalRotation = _tChild.localRotation;
+        _lastLocalRotation = _tChild.rotation;
         
         _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
         _lastLocalWieldRotation = _tWeapon.localRotation;
 
         if(_energyObject.energy > 0){
-            _rb.AddForce(_tChild.up*_jetpackProp);
+            _rb.AddForce(_tChild.up*_jetpackProp*4);
         }
         
  
@@ -350,17 +373,4 @@ public class PlayerController : MonoBehaviour
         _shipController.SetupGravityField(gravity);
     }
 
-    private void Eject(InputAction.CallbackContext action){
-        
-       _rb.isKinematic = false;
-       _t.position -= new Vector3(5f,0,0);
-       _t.parent = null;
-       onShip = false;
-       GetComponent<BoxCollider>().enabled = true;
-       EnablePlayerController();
-       DisableShipController();
-       print("EJECT");
-    }
-
-   
 }

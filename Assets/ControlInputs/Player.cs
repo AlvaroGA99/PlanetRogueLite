@@ -134,6 +134,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Brake"",
+                    ""type"": ""Button"",
+                    ""id"": ""8751e3df-eabe-4867-943b-3f43eb525567"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -477,6 +486,17 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""Eject_EnterShip"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e26d4038-0dbf-4040-bb51-08124712510e"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Brake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -525,6 +545,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_LandingPropulsion = m_Ingame.FindAction("LandingPropulsion", throwIfNotFound: true);
         m_Ingame_Camera = m_Ingame.FindAction("Camera", throwIfNotFound: true);
         m_Ingame_Eject_EnterShip = m_Ingame.FindAction("Eject_EnterShip", throwIfNotFound: true);
+        m_Ingame_Brake = m_Ingame.FindAction("Brake", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
@@ -599,6 +620,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_Ingame_LandingPropulsion;
     private readonly InputAction m_Ingame_Camera;
     private readonly InputAction m_Ingame_Eject_EnterShip;
+    private readonly InputAction m_Ingame_Brake;
     public struct IngameActions
     {
         private @Player m_Wrapper;
@@ -615,6 +637,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @LandingPropulsion => m_Wrapper.m_Ingame_LandingPropulsion;
         public InputAction @Camera => m_Wrapper.m_Ingame_Camera;
         public InputAction @Eject_EnterShip => m_Wrapper.m_Ingame_Eject_EnterShip;
+        public InputAction @Brake => m_Wrapper.m_Ingame_Brake;
         public InputActionMap Get() { return m_Wrapper.m_Ingame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -660,6 +683,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Eject_EnterShip.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnEject_EnterShip;
                 @Eject_EnterShip.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnEject_EnterShip;
                 @Eject_EnterShip.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnEject_EnterShip;
+                @Brake.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
+                @Brake.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
+                @Brake.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
             }
             m_Wrapper.m_IngameActionsCallbackInterface = instance;
             if (instance != null)
@@ -700,6 +726,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Eject_EnterShip.started += instance.OnEject_EnterShip;
                 @Eject_EnterShip.performed += instance.OnEject_EnterShip;
                 @Eject_EnterShip.canceled += instance.OnEject_EnterShip;
+                @Brake.started += instance.OnBrake;
+                @Brake.performed += instance.OnBrake;
+                @Brake.canceled += instance.OnBrake;
             }
         }
     }
@@ -751,6 +780,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         void OnLandingPropulsion(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
         void OnEject_EnterShip(InputAction.CallbackContext context);
+        void OnBrake(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {

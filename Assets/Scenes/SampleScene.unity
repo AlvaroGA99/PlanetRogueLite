@@ -551,6 +551,7 @@ GameObject:
   - component: {fileID: 402258816}
   - component: {fileID: 402258818}
   - component: {fileID: 402258817}
+  - component: {fileID: 402258819}
   m_Layer: 0
   m_Name: SystemCentre
   m_TagString: Untagged
@@ -737,6 +738,19 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!135 &402258819
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402258811}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &519859357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1678,7 +1692,7 @@ MonoBehaviour:
   m_IsGlobal: 1
   priority: 0
   blendDistance: 0
-  weight: 1
+  weight: 0.1
   sharedProfile: {fileID: 11400000, guid: 6f92ab4d0a2d98f4b9e2ec81dda05887, type: 2}
 --- !u!1 &964450252
 GameObject:
@@ -2335,6 +2349,7 @@ GameObject:
   - component: {fileID: 1309977588}
   - component: {fileID: 1309977590}
   - component: {fileID: 1309977589}
+  - component: {fileID: 1309977591}
   m_Layer: 5
   m_Name: Energy
   m_TagString: Untagged
@@ -2400,6 +2415,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1309977587}
   m_CullTransparentMesh: 1
+--- !u!114 &1309977591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309977587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 059ef40e005a75147a868e338eaa8f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  energy: 0
 --- !u!1 &1362046727
 GameObject:
   m_ObjectHideFlags: 0
@@ -2723,6 +2751,7 @@ MonoBehaviour:
   _tWeapon: {fileID: 1024585299}
   _shipController: {fileID: 5558665754467538143}
   _lastForward: {x: 0, y: 0, z: 0}
+  _energyObject: {fileID: 1309977591}
 --- !u!4 &1591222659
 Transform:
   m_ObjectHideFlags: 0
@@ -3693,8 +3722,8 @@ MonoBehaviour:
   breakEngineValue: 0
   takeOffEngineValue: 0
   landingEngineValue: 0
-  _energyImage: {fileID: 1309977589}
-  _energy: 0
+  breakActivated: 0
+  energyObject: {fileID: 1309977591}
 --- !u!1 &5875348006664480389
 GameObject:
   m_ObjectHideFlags: 0
