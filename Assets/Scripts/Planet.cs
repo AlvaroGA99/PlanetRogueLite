@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using PlanetProperties;
+using Unity.VisualScripting;
 
 public class Planet : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class Planet : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
     }
     
     public void Init(System.Random sampler){
@@ -175,7 +177,7 @@ public class Planet : MonoBehaviour
             m.triangles = newTriangles;
         }
         
-        m.RecalculateNormals();
+        //m.RecalculateNormals();
         //mC.sharedMesh = m;
         //Debug.Log(tiles.elements[0].tileVertices.Count);
     }
@@ -248,6 +250,11 @@ public class Planet : MonoBehaviour
         _fluidMaterial.SetColor("_BaseColor",color);
         _fluidMaterial.SetColor("_EmissionColor",color);
 
+    }
+
+      public void SetFluidMat(Material mat){
+        MeshRenderer mr = transform.GetChild(0).gameObject.GetComponentInChildren<MeshRenderer>();
+        mr.material = mat;
     }
     private class DestructionMeshData{
         public Mesh mesh;

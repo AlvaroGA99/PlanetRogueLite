@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -88,9 +89,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         timer = 0;
-        //a = _enemyPool.Get();
         _playerT.SetupGravityField(_gravityField);
-        //a.transform.position = new Vector3(.4711895f, 54.53f, 6.3f);
     }
 
     void Update()
@@ -109,9 +108,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+
     // private void SpawnEnemy()
     // {   
-       
+
     //     float xRandomOffset = Random.Range(-8, 8);
     //     float zRandomOffset = Random.Range(-8, 8);
     //     Vector3 spawnPos = _playerT.transform.position + _playerT.transform.forward*zRandomOffset + _playerT.transform.right*xRandomOffset;
@@ -192,6 +193,7 @@ public class GameManager : MonoBehaviour
             _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
             print(p.mass);
             p.SetColliders();
+            p.transform.parent = null;
         }
         _playerT.EnableShipController();
         _playerT.EnableCameraController();

@@ -336,8 +336,9 @@ public class PlayerController : MonoBehaviour
         
         if(!onShip){
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
+            _tChild.rotation = Quaternion.Slerp(Quaternion.LookRotation(Vector3.ProjectOnPlane(_moveVector,_toCenter).normalized, -_toCenter),_lastLocalRotation,0.8f);
         }
-        _tChild.rotation = Quaternion.Slerp(Quaternion.LookRotation(Vector3.ProjectOnPlane(_moveVector,-_toCenter).normalized, _tChild.up),_lastLocalRotation,0.8f);
+       
 
         _lastLocalRotation = _tChild.rotation;
         

@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 651102bc2c72018469f25426d8f9ec4d, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: d0e5b726340a08e49b41112aed1e543a, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -566,10 +566,10 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402258811}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -579,7 +579,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2bf306ed20992224db8e4172d21443b7, type: 2}
+  - {fileID: 2100000, guid: 6a2a0faa285c68b4cbf8cf2220482202, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -640,6 +640,9 @@ MonoBehaviour:
   planetPrefab: {fileID: 5699372761463504400, guid: 65adbd112d936e445a3a9375b87d43e0, type: 3}
   _player: {fileID: 1591222658}
   isFinishedLoading: 0
+  magmaMat: {fileID: 2100000, guid: 2bf306ed20992224db8e4172d21443b7, type: 2}
+  waterMat: {fileID: 2100000, guid: 710c0eb43282d234c95b2a6599c7ccb3, type: 2}
+  toxicMat: {fileID: 2100000, guid: dc3a4d879d48ecf47ac096625ad72e0f, type: 2}
 --- !u!111 &402258816
 Animation:
   m_ObjectHideFlags: 0
@@ -683,18 +686,18 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402258811}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 0.4796733, b: 0.3537736, a: 1}
-  m_Intensity: 475626
+  m_Intensity: 650626
   m_Range: 10000
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1650,7 +1653,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -2356,7 +2359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1309977588
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2374,7 +2377,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -5, y: -81}
+  m_AnchoredPosition: {x: -5, y: -33}
   m_SizeDelta: {x: -44.043823, y: 25.264893}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1309977589

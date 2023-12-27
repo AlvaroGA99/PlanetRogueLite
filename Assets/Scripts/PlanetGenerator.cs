@@ -24,6 +24,10 @@ public class PlanetGenerator : MonoBehaviour
     Texture2D magmaTexture;
     Texture2D grassTexture;
     Texture2D earthTexture;
+
+    public Material magmaMat;
+    public Material waterMat;
+    public Material toxicMat;
     int seed;
     Mesh initialMesh;
 
@@ -38,7 +42,7 @@ public class PlanetGenerator : MonoBehaviour
         {
             angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
             Vector3 dir = new Vector3(Mathf.Cos(angle), 0, -Mathf.Sin(angle));
-            _orbits[i] = Instantiate(planetPrefab, transform.position + dir*600 + dir*400*(i + 1), Quaternion.identity);
+            _orbits[i] = Instantiate(planetPrefab, transform.position + dir*800 + dir*700*(i + 1), Quaternion.identity);
             _orbits[i].Init(sampler);
             _orbits[i].transform.SetParent(transform);
         }
@@ -143,7 +147,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].mass = 10000;
             _orbits[i].SetHighLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));  
             _orbits[i].SetMediumLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
-            _orbits[i].SetFluidLayerTexture(GetColorByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
+            _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
         }
         for (int i = 0; i < _orbits.Length; i++)
         {
@@ -630,6 +634,21 @@ public class PlanetGenerator : MonoBehaviour
                 return new Color32(130,171,4,255);
             default:
             return new Color();
+        }
+
+    }
+
+
+        private Material GetMatByFluid(PlanetLayerElement layer){
+        switch(layer){
+            case PlanetLayerElement.Magma:
+                return magmaMat;
+            case PlanetLayerElement.EarthWater:
+                return waterMat;
+            case PlanetLayerElement.ToxicGrass:
+                return toxicMat;
+            default:
+            return waterMat;
         }
 
     }
