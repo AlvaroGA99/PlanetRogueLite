@@ -16,6 +16,7 @@ public class PlanetGenerator : MonoBehaviour
 
     [SerializeField]
     private PlayerController _player;
+    [SerializeField] private LightManager _lM;
     private WFCGraph tiles;
     public bool isFinishedLoading;
     Dictionary<String, List<float>> generationModuleWedgesValues;
@@ -45,6 +46,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i] = Instantiate(planetPrefab, transform.position + dir*800 + dir*700*(i + 1), Quaternion.identity);
             _orbits[i].Init(sampler);
             _orbits[i].transform.SetParent(transform);
+            
         }
         transform.localScale = Vector3.zero;
     }
@@ -148,6 +150,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].SetHighLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));  
             _orbits[i].SetMediumLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
             _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
+            _lM.AddLight(_orbits[i].transform);
         }
         for (int i = 0; i < _orbits.Length; i++)
         {

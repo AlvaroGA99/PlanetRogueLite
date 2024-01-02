@@ -227,6 +227,7 @@ public class PlayerController : MonoBehaviour
 
     void OnStopBrakePropulsion(InputAction.CallbackContext action){
         _shipController.breakEngineValue = 0;
+
     }
 
     void OnLandingPropulsion(InputAction.CallbackContext action){

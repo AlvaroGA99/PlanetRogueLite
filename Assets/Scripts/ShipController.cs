@@ -24,7 +24,6 @@ public class ShipController : MonoBehaviour
     private float overridebreakEngineValue;
     private float overridetakeOffEngineValue;
     private float overridelandingEngineValue;
-    private bool overridebreakActivated;
     public Energy energyObject;
     //public float _energy;
 
@@ -46,13 +45,16 @@ public class ShipController : MonoBehaviour
             overridebreakEngineValue = breakEngineValue;
             overridetakeOffEngineValue = takeOffEngineValue;
             overridelandingEngineValue = landingEngineValue;
-            overridebreakActivated = breakActivated;
 
             Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
             print(localAngularVelocity);
             if (breakActivated)
-            {
-                bool stopFlag = false;
+            {   
+                _rb.angularDrag = 0;
+
+                bool xflag = false;
+                bool yflag = false;
+                bool zflag = false;
                 
                 localAngularVelocity = new Vector3(-localAngularVelocity.x,localAngularVelocity.z,localAngularVelocity.y);
                 
@@ -64,11 +66,9 @@ public class ShipController : MonoBehaviour
                 {
                     overridezxRotationValue.y = 1;
                 }
-                // else if( localAngularVelocity.x != 0){
-                //     overridezxRotationValue.y = 0;
-                //     localAngularVelocity.x = 0;
-                //     stopFlag = true;
-                // }   
+                else if( localAngularVelocity.x != 0){
+                    xflag = true;
+                }   
                 
                 if (localAngularVelocity.z > 0.05)
                 {
@@ -78,12 +78,9 @@ public class ShipController : MonoBehaviour
                 {
                     overriderightYRotationValue = 1;
                 }
-                // else if( localAngularVelocity.z != 0){
-                //     overrideleftYRotationValue = 0;
-                //     overriderightYRotationValue = 0;
-                //     localAngularVelocity.z = 0;
-                //     stopFlag = true;
-                // } 
+                else if( localAngularVelocity.z != 0){
+                    yflag = true;
+                } 
 
                 if (localAngularVelocity.y > 0.05)
                 {
@@ -93,15 +90,13 @@ public class ShipController : MonoBehaviour
                 {
                     overridezxRotationValue.x = 1;
                 }
-                //  else if( localAngularVelocity.y != 0){
-                //     overridezxRotationValue.x = 0;
-                //     localAngularVelocity.y = 0;
-                //     stopFlag = true;
-                // } 
+                else if( localAngularVelocity.y != 0){
+                     zflag = true;
+                } 
         
-                // if(stopFlag){
-                //     _rb.angularVelocity = transform.localToWorldMatrix.MultiplyVector(localAngularVelocity);
-                // }
+                if(xflag & yflag & zflag){
+                     _rb.angularDrag = 1000;
+                }
             }
             
             
@@ -138,6 +133,10 @@ public class ShipController : MonoBehaviour
     {
         _gF = gravity;
     }
+
+    // public void ResetAngularDrag(){
+    //     _rb.angularDrag = 0;
+    // }
 
     // private void UpdateEnergy(){
     //     _energyImage.transform.localScale = new Vector3(_energy/10,1,1);
