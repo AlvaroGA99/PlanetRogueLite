@@ -143,6 +143,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedAlign"",
+                    ""type"": ""Button"",
+                    ""id"": ""21a8510a-80ac-4497-bba3-7516bb4a1f05"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -497,6 +506,17 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a361ed7e-c29e-46b2-a6bd-8f911db920de"",
+                    ""path"": ""<Keyboard>/b"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedAlign"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -546,6 +566,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_Camera = m_Ingame.FindAction("Camera", throwIfNotFound: true);
         m_Ingame_Eject_EnterShip = m_Ingame.FindAction("Eject_EnterShip", throwIfNotFound: true);
         m_Ingame_Brake = m_Ingame.FindAction("Brake", throwIfNotFound: true);
+        m_Ingame_SpeedAlign = m_Ingame.FindAction("SpeedAlign", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
@@ -621,6 +642,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_Ingame_Camera;
     private readonly InputAction m_Ingame_Eject_EnterShip;
     private readonly InputAction m_Ingame_Brake;
+    private readonly InputAction m_Ingame_SpeedAlign;
     public struct IngameActions
     {
         private @Player m_Wrapper;
@@ -638,6 +660,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @Camera => m_Wrapper.m_Ingame_Camera;
         public InputAction @Eject_EnterShip => m_Wrapper.m_Ingame_Eject_EnterShip;
         public InputAction @Brake => m_Wrapper.m_Ingame_Brake;
+        public InputAction @SpeedAlign => m_Wrapper.m_Ingame_SpeedAlign;
         public InputActionMap Get() { return m_Wrapper.m_Ingame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -686,6 +709,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Brake.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
                 @Brake.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
                 @Brake.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnBrake;
+                @SpeedAlign.started -= m_Wrapper.m_IngameActionsCallbackInterface.OnSpeedAlign;
+                @SpeedAlign.performed -= m_Wrapper.m_IngameActionsCallbackInterface.OnSpeedAlign;
+                @SpeedAlign.canceled -= m_Wrapper.m_IngameActionsCallbackInterface.OnSpeedAlign;
             }
             m_Wrapper.m_IngameActionsCallbackInterface = instance;
             if (instance != null)
@@ -729,6 +755,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Brake.started += instance.OnBrake;
                 @Brake.performed += instance.OnBrake;
                 @Brake.canceled += instance.OnBrake;
+                @SpeedAlign.started += instance.OnSpeedAlign;
+                @SpeedAlign.performed += instance.OnSpeedAlign;
+                @SpeedAlign.canceled += instance.OnSpeedAlign;
             }
         }
     }
@@ -781,6 +810,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         void OnCamera(InputAction.CallbackContext context);
         void OnEject_EnterShip(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
+        void OnSpeedAlign(InputAction.CallbackContext context);
     }
     public interface IMenuActions
     {

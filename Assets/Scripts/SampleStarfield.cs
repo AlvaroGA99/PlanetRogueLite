@@ -120,7 +120,7 @@ public class SampleStarfield : MonoBehaviour
             }
             for (int i = j * _matrices.Length / offset.Length; i < (j + 1) * _matrices.Length / offset.Length; i++)
             {
-                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*_scales[i]);
+                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*math.clamp(_scales[i],0.2f,0.8f));
             }
         }
         print(_currentDirsIndex);

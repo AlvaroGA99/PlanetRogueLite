@@ -18,16 +18,16 @@ TagManager:
   - ProjectileLimit
   - Projectile
   - DestructionMesh
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - PlanetLayer1
+  - PlanetLayer2
+  - PlanetLayer3
+  - PlanetLayer4
+  - PlanetLayer5
+  - PlanetLayer6
+  - PlanetLayer7
+  - PlanetLayer8
+  - PlanetLayer9
+  - PlanetLayer10
   - 
   - 
   - 

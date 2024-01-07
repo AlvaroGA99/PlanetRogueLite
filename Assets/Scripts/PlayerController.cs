@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private InputAction landingPropulsion;
     private InputAction cameraAction;
     private InputAction brakeAction;
+    private InputAction speedAlignAction;
 
     private InputAction eject_enterShip;
 
@@ -74,6 +75,7 @@ public class PlayerController : MonoBehaviour
         cameraAction = _ingameControl.FindAction("Camera");
         eject_enterShip = _ingameControl.FindAction("Eject_EnterShip");
         brakeAction = _ingameControl.FindAction("Brake");
+        speedAlignAction = _ingameControl.FindAction("SpeedAlign");
 
         // movement.Enable();
         // jump.Enable();
@@ -112,6 +114,8 @@ public class PlayerController : MonoBehaviour
         eject_enterShip.performed += Eject;
         brakeAction.performed += OnBrake;
         brakeAction.canceled += OnStopBrake;
+        speedAlignAction.performed += OnSpeedAlign;
+        speedAlignAction.canceled += OnStopSpeedAlign;
 
 
         _rb = GetComponent<Rigidbody>();
@@ -267,6 +271,15 @@ public class PlayerController : MonoBehaviour
         _shipController.breakActivated = false;
     }
 
+    private void OnSpeedAlign(InputAction.CallbackContext action){
+        _shipController.speedAligner = true;
+    }
+
+    private void OnStopSpeedAlign(InputAction.CallbackContext action){
+        _shipController.speedAligner = false;
+        _shipController.speedAlignerValue = 0;
+    }
+
 
     public void DisablePlayerController(){
         movement.Disable();
@@ -289,6 +302,7 @@ public class PlayerController : MonoBehaviour
         brakePropulsion.Disable();
         landingPropulsion.Disable();
         brakeAction.Disable();
+        speedAlignAction.Disable();
     }
 
     public void EnableShipController(){
@@ -300,6 +314,7 @@ public class PlayerController : MonoBehaviour
         brakePropulsion.Enable();
         landingPropulsion.Enable();
         brakeAction.Enable();
+        speedAlignAction.Enable();
     }
 
     public void EnableCameraController(){

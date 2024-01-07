@@ -150,7 +150,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].SetHighLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));  
             _orbits[i].SetMediumLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
             _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
-            _lM.AddLight(_orbits[i].transform);
+            //_lM.AddLight(_orbits[i].transform);
         }
         for (int i = 0; i < _orbits.Length; i++)
         {

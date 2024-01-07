@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 5699372761463504403}
   - component: {fileID: 5699372761463504400}
   - component: {fileID: 6584837813910274162}
-  m_Layer: 8
+  - component: {fileID: 7103285686154263668}
+  m_Layer: 10
   m_Name: Planet
   m_TagString: Planet
   m_Icon: {fileID: 0}
@@ -52,10 +53,10 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5dd946ae1c2b4e544ae5a550432dcc6e, type: 2}
+  - {fileID: 2100000, guid: a76d3bed491e58140922d7b8625731f9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,6 +112,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 2
   m_Mesh: {fileID: 0}
+--- !u!135 &7103285686154263668
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5699372761463504413}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.26
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6979555655318198322
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +139,7 @@ GameObject:
   - component: {fileID: 3419238912766618888}
   - component: {fileID: 5935243250911137166}
   - component: {fileID: 2169928735640638733}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PlanetFluid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +177,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6979555655318198322}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0

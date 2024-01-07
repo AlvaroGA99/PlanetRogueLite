@@ -16,6 +16,8 @@ public class ShipController : MonoBehaviour
     public float takeOffEngineValue;
     public float landingEngineValue;
     public bool breakActivated;
+    public bool speedAligner;
+    public float speedAlignerValue;
 
     private Vector2 overridezxRotationValue;
     private float overriderightYRotationValue;
@@ -47,10 +49,12 @@ public class ShipController : MonoBehaviour
             overridelandingEngineValue = landingEngineValue;
 
             Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
-            print(localAngularVelocity);
+            Vector3 localVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
+
             if (breakActivated)
             {   
                 _rb.angularDrag = 0;
+                
 
                 bool xflag = false;
                 bool yflag = false;
@@ -92,14 +96,31 @@ public class ShipController : MonoBehaviour
                 }
                 else if( localAngularVelocity.y != 0){
                      zflag = true;
-                } 
-        
+                }  
+
                 if(xflag & yflag & zflag){
                      _rb.angularDrag = 1000;
                 }
             }
+
+            if (speedAligner){
+                 if (localVelocity.x > 0.05)
+                {
+                    speedAlignerValue = -1;
+                }
+                else if (localVelocity.x < -0.05)
+                {
+                    speedAlignerValue = 1;
+                }
+                else if( localVelocity.x != 0){
+                    speedAlignerValue = 0;
+                    // localVelocity.x = 0;
+                    // _rb.velocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
+                    
+                }
+            }
             
-            
+            _rb.AddForce(transform.right*speedAlignerValue*5000);
             _rb.AddForce(-transform.forward * overridemainEngineValue * 10000);
             _rb.AddForce(transform.forward * overridebreakEngineValue * 10000);
             _rb.AddForce(transform.up * overridetakeOffEngineValue * 10000);

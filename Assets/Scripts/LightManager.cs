@@ -34,6 +34,7 @@ public class LightManager : MonoBehaviour
 
     public void AddLight(Transform planetTarget){
         Light a = Instantiate(_mainLight,transform);
+        a.cullingMask = LayerMask.GetMask(LayerMask.LayerToName(_layer));
         a.gameObject.layer = _layer;
         planetTarget.gameObject.layer = _layer;
         _layer ++;

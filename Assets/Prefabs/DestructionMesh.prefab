@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7690870018776814912}
   - component: {fileID: 5907872468501438056}
   - component: {fileID: 7162196656236711152}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: DestructionMesh
   m_TagString: Planet
   m_Icon: {fileID: 0}
