@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +17,8 @@ public class GameManager : MonoBehaviour
 
     private GravityField _gravityField;
 
+    [SerializeField] UniversalRendererData rendererData;
+    Blit blitFeature;
     ObjectPool<Projectile> _projectilePool;
 
     ObjectPool<EnemyController> _enemyPool;
@@ -42,6 +46,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {   
+        blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         _wallMask = LayerMask.GetMask("DestructionMesh");
         spawnval = 8;
@@ -193,8 +198,10 @@ public class GameManager : MonoBehaviour
             _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
             print(p.mass);
             p.SetColliders();
+            //blitFeature.settings.blitMaterial.SetVector("_WorldSpherePos",p.transform.position);
             p.transform.parent = null;
         }
+        //rendererData.SetDirty();
         _playerT.EnableShipController();
         _playerT.EnableCameraController();
         print("SIMULATION STARTED");

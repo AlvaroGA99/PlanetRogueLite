@@ -5,9 +5,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using PlanetProperties;
+using UnityEngine.Rendering.Universal;
 
 public class PlanetGenerator : MonoBehaviour
-{
+{   
     public Planet[] _orbits;
 
     public Planet planetPrefab;
@@ -34,7 +35,8 @@ public class PlanetGenerator : MonoBehaviour
 
 
     void Awake()
-    {   sampler = new System.Random();
+    {   
+        sampler = new System.Random();
         seed = sampler.Next();
         sampler = new System.Random(seed);
         _orbits = new Planet[7];
@@ -48,6 +50,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].transform.SetParent(transform);
             
         }
+        
         transform.localScale = Vector3.zero;
     }
     // Start is called before the first frame update
