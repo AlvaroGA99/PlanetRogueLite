@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tWeapon;
     [SerializeField] private ShipController _shipController;
+
+    [SerializeField] private LightManager _lM;
     private Transform _t;
     private Rigidbody _rb;
     private Vector3 _rotationVector ;
@@ -383,6 +385,27 @@ public class PlayerController : MonoBehaviour
             }
             
         }
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {   
+        if(col.gameObject.tag == "Planet"){
+            _lM.Target(col.transform);
+            col.gameObject.layer = 0;
+        }
+            
+    }
+
+    private void OnTriggerExit(Collider col)
+    {   
+        if(col.gameObject.tag == "Planet"){
+            _lM.ResetTarget();
+            col.gameObject.layer = 9;
+        }else if(col.gameObject.tag == "Projectile"){
+
+        }else if(col.gameObject.tag == "Energy"){
+        }
+            
     }
 
     public void SetupGravityField(GravityField gravity){

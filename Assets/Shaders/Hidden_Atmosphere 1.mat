@@ -28,5 +28,5 @@ Material:
     m_Floats:
     - _Radius: 2
     m_Colors:
-    - _WorldSpherePos: {r: -3971.8936, g: -76, b: -2365.3665, a: 0}
+    - _WorldSpherePos: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5699372761463504400}
   - component: {fileID: 6584837813910274162}
   - component: {fileID: 7103285686154263668}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Planet
   m_TagString: Planet
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 44, y: 44, z: 44}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2521017928597540559}
   m_Father: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 3419238912766618888}
   - component: {fileID: 5935243250911137166}
   - component: {fileID: 2169928735640638733}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: PlanetFluid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
