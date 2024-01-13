@@ -8,6 +8,7 @@ TagManager:
   - Projectile
   - Planet
   - Enemy
+  - Energy
   layers:
   - Default
   - TransparentFX
