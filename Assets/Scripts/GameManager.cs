@@ -198,10 +198,11 @@ public class GameManager : MonoBehaviour
             _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
             print(p.mass);
             p.SetColliders();
-            //blitFeature.settings.blitMaterial.SetVector("_WorldSpherePos",p.transform.position);
+            blitFeature.settings.blitMaterial.SetVector("_dirToSun",(_planetGen.transform.position-p.transform.position ).normalized);
+            blitFeature.settings.blitMaterial.SetVector("_planetCentre",p.transform.position);
             p.transform.parent = null;
         }
-        //rendererData.SetDirty();
+        rendererData.SetDirty();
         _playerT.EnableShipController();
         _playerT.EnableCameraController();
         print("SIMULATION STARTED");

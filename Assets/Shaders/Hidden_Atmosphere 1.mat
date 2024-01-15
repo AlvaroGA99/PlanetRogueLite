@@ -20,6 +20,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BakedOpticalDepth:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -27,6 +31,19 @@ Material:
     m_Ints: []
     m_Floats:
     - _Radius: 2
+    - _atmosphereRadius: 97.3
+    - _densityFalloff: 18.2
+    - _ditherStrength: 8.2
+    - _intensity: 47.9
+    - _numInScatteringPoints: 10
+    - _numOpticalDepthPoints: 10
+    - _oceanRadius: 42.5
+    - _planetCentre: 1
+    - _planetRadius: 42.9
     m_Colors:
     - _WorldSpherePos: {r: 0, g: 0, b: 0, a: 0}
+    - _dirToSun: {r: -0.6151763, g: 0, b: -0.7883896, a: 0}
+    - _planetCentre: {r: 3509.5046, g: -76, b: 6213.8203, a: 0}
+    - _scatteringCoefficients: {r: 0.2, g: 0.32, b: 0.68, a: 1}
+    - dirToSun: {r: 1, g: 1, b: 0, a: 1}
   m_BuildTextureStacks: []

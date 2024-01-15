@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -120,12 +119,20 @@ public class SampleStarfield : MonoBehaviour
             }
             for (int i = j * _matrices.Length / offset.Length; i < (j + 1) * _matrices.Length / offset.Length; i++)
             {
-                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*math.clamp(_scales[i],0.2f,0.8f));
+                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*math.clamp(_scales[i],0.4f,0.75f));
             }
         }
         print(_currentDirsIndex);
-        Graphics.RenderMeshInstanced(_rp, _starMesh, 0, _matrices);
-
+        
+        int first = 0;
+        int batches = _matrices.Length/1023;
+        
+        for(int i = 0; i< batches;i++){
+            Graphics.RenderMeshInstanced(_rp, _starMesh, 0, _matrices,1023 ,first);
+            first += 1023;
+        }
+        Graphics.RenderMeshInstanced(_rp, _starMesh, 0, _matrices,_matrices.Length-first, first);
+        
     }
 
     public enum SampleType
