@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Hidden_Atmosphere 1
-  m_Shader: {fileID: 4800000, guid: 151d226455a27f3479c9171112ba103f, type: 3}
+  m_Name: Trail
+  m_Shader: {fileID: -6465566751694194690, guid: e4d76fda3e0a747498e09bb65ee16f23, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -20,30 +20,34 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BakedOpticalDepth:
+    - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainTex:
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Radius: 2
-    - _atmosphereRadius: 97.3
-    - _densityFalloff: 18.2
-    - _ditherStrength: 8.2
-    - _intensity: 47.9
-    - _numInScatteringPoints: 10
-    - _numOpticalDepthPoints: 10
-    - _oceanRadius: 42.5
-    - _planetCentre: 1
-    - _planetRadius: 42.9
-    m_Colors:
-    - _WorldSpherePos: {r: 0, g: 0, b: 0, a: 0}
-    - _dirToSun: {r: -0.9997287, g: 0, b: 0.023292238, a: 0}
-    - _planetCentre: {r: 5701.453, g: -76, b: 1587.2343, a: 0}
-    - _scatteringCoefficients: {r: 0.2, g: 0.32, b: 0.68, a: 1}
-    - dirToSun: {r: 1, g: 1, b: 0, a: 1}
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    m_Colors: []
   m_BuildTextureStacks: []
+--- !u!114 &4988668109841588806
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5

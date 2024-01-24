@@ -8,6 +8,10 @@ public class ShipController : MonoBehaviour
 {
     private Rigidbody _rb;
     private GravityField _gF;
+
+    [SerializeField]private TrailRenderer _tr1;
+    [SerializeField]private TrailRenderer _tr2;
+    [SerializeField] private Transform childShip;
     public Vector2 zxRotationValue;
     public float rightYRotationValue;
     public float leftYRotationValue;
@@ -18,6 +22,7 @@ public class ShipController : MonoBehaviour
     public bool breakActivated;
     public bool speedAligner;
     public float speedAlignerValue;
+    public float speedAlignerValue2;
 
     private Vector2 overridezxRotationValue;
     private float overriderightYRotationValue;
@@ -27,13 +32,14 @@ public class ShipController : MonoBehaviour
     private float overridetakeOffEngineValue;
     private float overridelandingEngineValue;
     public Energy energyObject;
+    //[SerializeField] private Collider enterAreaCollider;
     //public float _energy;
 
     // Start is called before the first frame update
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
-
+        //enterAreaCollider.enabled = true;
     }
 
     void FixedUpdate()
@@ -103,7 +109,22 @@ public class ShipController : MonoBehaviour
                 }
             }
 
-            if (speedAligner){
+            if (mainEngineValue > 0){
+                 if (localVelocity.y > 0.05)
+                {
+                    speedAlignerValue2 = -1;
+                }
+                else if (localVelocity.y < -0.05)
+                {
+                    speedAlignerValue2 = 1;
+                }
+                else if( localVelocity.y != 0){
+                    speedAlignerValue2 = 0;
+                    // localVelocity.x = 0;
+                    // _rb.velocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
+                    
+                }
+
                  if (localVelocity.x > 0.05)
                 {
                     speedAlignerValue = -1;
@@ -120,7 +141,8 @@ public class ShipController : MonoBehaviour
                 }
             }
             
-            _rb.AddForce(transform.right*speedAlignerValue*5000);
+            _rb.AddForce(transform.right*speedAlignerValue*10000);
+            _rb.AddForce(transform.up*speedAlignerValue2*10000);
             _rb.AddForce(-transform.forward * overridemainEngineValue * 10000);
             _rb.AddForce(transform.forward * overridebreakEngineValue * 10000);
             _rb.AddForce(transform.up * overridetakeOffEngineValue * 10000);
@@ -129,14 +151,14 @@ public class ShipController : MonoBehaviour
             _rb.AddTorque(-transform.right * Math.Clamp(overridezxRotationValue.y, 0.0f, 1.0f) * 5000);
             _rb.AddTorque(transform.forward * Math.Clamp(overridezxRotationValue.x, 0.0f, 1.0f) * 5000);
             _rb.AddTorque(-transform.forward * Math.Clamp(overridezxRotationValue.x, -1.0f, 0f) * -1 * 5000);
-            _rb.AddTorque(-transform.up * overrideleftYRotationValue * 5000);
-            _rb.AddTorque(transform.up * overriderightYRotationValue * 5000);
+            _rb.AddTorque(-childShip.forward * overrideleftYRotationValue * 5000);
+            _rb.AddTorque(childShip.forward * overriderightYRotationValue * 5000);
         }
 
 
 
         //print(_gF.GetTotalFieldForceForBody(transform.position));
-        _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
+        //_rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
     } 
 
     void Update()
@@ -155,6 +177,9 @@ public class ShipController : MonoBehaviour
         _gF = gravity;
     }
 
+    public void SetupEnterShipArea(){
+        
+    }
     // public void ResetAngularDrag(){
     //     _rb.angularDrag = 0;
     // }

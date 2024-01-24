@@ -9,6 +9,7 @@ TagManager:
   - Planet
   - Enemy
   - Energy
+  - Ship
   layers:
   - Default
   - TransparentFX

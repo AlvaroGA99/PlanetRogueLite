@@ -164,14 +164,14 @@ Shader "Hidden/Atmosphere"
 
 				// Attenuate brightness of original col (i.e light reflected from planet surfaces)
 				// This is a hacky mess, TODO: figure out a proper way to do this
-				const float brightnessAdaptionStrength = 0.15;
-				const float reflectedLightOutScatterStrength = 3;
-				float brightnessAdaption = dot (inScatteredLight,1) * brightnessAdaptionStrength;
-				float brightnessSum = viewRayOpticalDepth * _intensity * reflectedLightOutScatterStrength + brightnessAdaption;
-				float reflectedLightStrength = exp(-brightnessSum);
-				float hdrStrength = saturate(dot(originalCol,1)/3-1);
-				reflectedLightStrength = lerp(reflectedLightStrength, 1, hdrStrength);
-				float3 reflectedLight = originalCol * reflectedLightStrength;
+				// const float brightnessAdaptionStrength = 0.15;
+				// const float reflectedLightOutScatterStrength = 3;
+				// float brightnessAdaption = dot (inScatteredLight,1) * brightnessAdaptionStrength;
+				// float brightnessSum = viewRayOpticalDepth * _intensity * reflectedLightOutScatterStrength + brightnessAdaption;
+				// float reflectedLightStrength = exp(-brightnessSum);
+				// float hdrStrength = saturate(dot(originalCol,1)/3-1);
+				// reflectedLightStrength = lerp(reflectedLightStrength, 1, hdrStrength);
+				// float3 reflectedLight = originalCol * reflectedLightStrength;
 
 				float3 finalCol = originalCol + inScatteredLight;
 

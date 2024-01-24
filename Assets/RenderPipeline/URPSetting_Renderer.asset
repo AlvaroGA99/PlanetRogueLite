@@ -15,8 +15,8 @@ MonoBehaviour:
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
-  - {fileID: 2688523320949466351}
-  m_RendererFeatureMap: efe48b4bb78d4f25
+  - {fileID: 7670308670438355153}
+  m_RendererFeatureMap: d1b013c31869726a
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -53,7 +53,7 @@ MonoBehaviour:
   m_ClusteredRendering: 0
   m_TileSize: 32
   m_IntermediateTextureMode: 1
---- !u!114 &2688523320949466351
+--- !u!114 &7670308670438355153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -67,8 +67,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    Event: 500
+    Event: 450
     blitMaterial: {fileID: 2100000, guid: 9ba77180777c282428f9f8eee118852e, type: 2}
     blitMaterialPassIndex: -1
     destination: 0
     textureId: _BlitPassTexture
+    materialList: []

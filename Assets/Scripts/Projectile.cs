@@ -90,10 +90,8 @@ public class Projectile : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {   //print(other.gameObject.tag);
-        if(other.gameObject.tag == "Enemy"){
-             OnDestroyEnemy?.Invoke();
-             
-        }
+        //OnDestroyEnemy?.Invoke();
+        
         _projPool.Release(this);
     }
 }

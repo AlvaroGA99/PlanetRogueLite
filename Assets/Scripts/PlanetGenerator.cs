@@ -6,6 +6,12 @@ using System.IO;
 using System.Threading.Tasks;
 using PlanetProperties;
 using UnityEngine.Rendering.Universal;
+using UnityEditor.Rendering;
+using UnityEngine.UIElements;
+using UnityEngine.UI;
+using TMPro;
+using Image = UnityEngine.UI.Image;
+using System.Linq;
 
 public class PlanetGenerator : MonoBehaviour
 {   
@@ -18,14 +24,20 @@ public class PlanetGenerator : MonoBehaviour
     [SerializeField]
     private PlayerController _player;
     
+    [SerializeField] RectTransform loadingBar;
+    [SerializeField] RectTransform loadingBg;
+    [SerializeField] TextMeshProUGUI text;
     private WFCGraph tiles;
     public bool isFinishedLoading;
     Dictionary<String, List<float>> generationModuleWedgesValues;
     Dictionary<String, List<float>> generationModuleCentresValues;
     System.Random sampler;
-    Texture2D magmaTexture;
-    Texture2D grassTexture;
-    Texture2D earthTexture;
+    [SerializeField]Texture2D magmaTexture;
+    [SerializeField]Texture2D magmaNormal;
+    [SerializeField] Texture2D grassTexture;
+    [SerializeField] Texture2D grassNormal;
+    [SerializeField] Texture2D earthTexture;
+    [SerializeField] Texture2D earthNormal;
 
     public Material magmaMat;
     public Material waterMat;
@@ -150,19 +162,29 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
             _orbits[i].mass = 10000;
-            _orbits[i].SetHighLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));  
-            _orbits[i].SetMediumLayerTexture(GetColorByLayer((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
+            PlanetLayerElement samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+            _orbits[i].SetHighLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp)); 
+            samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length)); 
+            _orbits[i].SetMediumLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp));
             _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
         }
+        var widthToAdd = loadingBar.rect.width/_orbits.Length;
+        print(widthToAdd + "WIDTH");
         for (int i = 0; i < _orbits.Length; i++)
         {
             await LoadLevel();
-
-            _orbits[i].GenerateSphereResolution(3, tiles);
+            //text.text = "Cargando Planetas      " + (i+1) + "// " + _orbits.Length;
+            //loadingBg.anchoredPosition = new Vector2(loadingBg.anchoredPosition.x + widthToAdd/2,loadingBg.anchoredPosition.y);
+            loadingBg.sizeDelta = new Vector2(loadingBg.sizeDelta.x + widthToAdd,loadingBg.sizeDelta.y);
+            (int[] triRes,Vector3[] vertRes) = await _orbits[i].GenerateSphereResolution(3, tiles);
+            _orbits[i].SetMesh(triRes,vertRes);
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
         }
         isFinishedLoading = true;
+        loadingBar.gameObject.SetActive(false);
+        loadingBg.gameObject.SetActive(false);
+
         // WFCGraph.StateInfo state;
 
 
@@ -559,9 +581,9 @@ public class PlanetGenerator : MonoBehaviour
         }
     }
 
-    private async Task LoadLevel(){
-        await Task.Run(() => {
-
+    private Task LoadLevel(){
+        return Task.Run(() => {
+         //_orbits[index].GenerateSphereResolution(resolution,tiles);
         WFCGraph.StateInfo state;
 
 
@@ -607,26 +629,48 @@ public class PlanetGenerator : MonoBehaviour
            for (int i = 0; i < _orbits.Length; i++)
         {
             await LoadLevel();
-            _orbits[i].GenerateSphereResolution(3, tiles);
+            //_orbits[i].GenerateSphereResolution(3, tiles);
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
         }
         isFinishedLoading = true;
     }
 
-    private Color32 GetColorByLayer(PlanetLayerElement layer){
+    private Texture2D GetTexureByLayer(PlanetLayerElement layer){
         switch(layer){
             case PlanetLayerElement.Magma:
-                return new Color32(188,56,19,255);
+                //return new Color32(188,56,19,255);
                 //return Color.red;
+                return magmaTexture;
             case PlanetLayerElement.EarthWater:
-                 return new Color32(255,216,102,255);
+                 //return new Color32(255,216,102,255);
                 //return Color.blue;
+                return earthTexture;
             case PlanetLayerElement.ToxicGrass:
-                return new Color32(89,214,54,255);
+                //return new Color32(89,214,54,255);
                 //return Color.green;
+                return grassTexture;
             default:
-            return new Color();
+            return magmaTexture;
+        }
+    }
+
+    private Texture2D GetNormalByLayer(PlanetLayerElement layer){
+        switch(layer){
+            case PlanetLayerElement.Magma:
+                //return new Color32(188,56,19,255);
+                //return Color.red;
+                return magmaNormal;
+            case PlanetLayerElement.EarthWater:
+                 //return new Color32(255,216,102,255);
+                //return Color.blue;
+                return earthNormal;
+            case PlanetLayerElement.ToxicGrass:
+                //return new Color32(89,214,54,255);
+                //return Color.green;
+                return grassNormal;
+            default:
+            return magmaNormal;
         }
     }
     private Color32 GetColorByFluid(PlanetLayerElement layer){

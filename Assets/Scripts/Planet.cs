@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using PlanetProperties;
 using Unity.VisualScripting;
+using System.Threading.Tasks;
+using UnityEngine.UIElements;
 
 public class Planet : MonoBehaviour
 {
@@ -53,6 +55,7 @@ public class Planet : MonoBehaviour
     public void UpdateVertexPositions(WFCGraph nodeGraph, Dictionary<String, List<float>> generationModuleWedgesValues, Dictionary<String, List<float>> generationModuleCentresValues)
     {   _destructionMeshes = new List<DestructionMeshData>();
         Vector3[] vertices = new Vector3[m.vertexCount];
+        //print(m.vertices.Length + "DEBUG");
         Dictionary<int, int> meshVertexMatching = new Dictionary<int, int>();
         Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
         //print(nodeGraph.elements.Length);
@@ -102,31 +105,37 @@ public class Planet : MonoBehaviour
         
     }
 
-    public void GenerateSphereResolution(int resolution, WFCGraph tiles)
+    public Task<(int[] t, Vector3[] v)> GenerateSphereResolution(int resolution, WFCGraph tiles)
     {
-
+        Vector3[] originalVertices = m.vertices;
+        int[] originalTriangles = m.triangles;
+        return Task<(int[] tr,Vector3[] vr)>.Run(() => {
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
-        
+        //print(originalVertices.Length);
+        // auxm.vertices = originalVertices;
+        // auxm.triangles = originalTriangles;
+
         int newIndex = 0;
         int denom = 1;
+
         for (int r = 0; r < resolution; r++)
         {
 
-            int originalLength = m.triangles.Length;
+            int originalLength = originalTriangles.Length;
 
-            int[] newTriangles = new int[m.triangles.Length * 4];
-            Vector3[] newVertices = new Vector3[2 * m.vertexCount + (m.triangles.Length / 3) - 2];
+            int[] newTriangles = new int[originalTriangles.Length * 4];
+            Vector3[] newVertices = new Vector3[2 * originalVertices.Length + (originalTriangles.Length / 3) - 2];
 
-            newIndex = m.vertexCount;
+            newIndex = originalVertices.Length;
 
-            Array.Copy(m.vertices, 0, newVertices, 0, m.vertexCount);
+            Array.Copy(originalVertices, 0, newVertices, 0,originalVertices.Length);
 
             for (int i = 0; i < originalLength; i += 3)
             {
 
-                int i0 = m.triangles[i];
-                int i1 = m.triangles[i + 1];
-                int i2 = m.triangles[i + 2];
+                int i0 = originalTriangles[i];
+                int i1 =originalTriangles[i + 1];
+                int i2 = originalTriangles[i + 2];
 
                 int newIndex0 = GetNewVertexIndex(i0, i1, ref newVertexIndices, ref newVertices, ref newIndex);
                 int newIndex1 = GetNewVertexIndex(i1, i2, ref newVertexIndices, ref newVertices, ref newIndex);
@@ -173,13 +182,25 @@ public class Planet : MonoBehaviour
 
             }
             denom *= 4;
-            m.vertices = newVertices;
-            m.triangles = newTriangles;
+            originalVertices = newVertices;
+            originalTriangles = newTriangles;
         }
+        return (originalTriangles,originalVertices);
+        });
+        // print(m.vertices.Length);
+        // print(v.Length);
+        // m.vertices = v;
+        // m.triangles = t;
         
+        // mF.mesh = m;
         //m.RecalculateNormals();
         //mC.sharedMesh = m;
         //Debug.Log(tiles.elements[0].tileVertices.Count);
+    }
+
+    public void SetMesh(int[] triangles,Vector3[] vertices){
+        m.vertices = vertices;
+        m.triangles = triangles;
     }
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
     {
@@ -238,12 +259,14 @@ public class Planet : MonoBehaviour
         mC.sharedMesh = m;
     }
 
-    public void SetHighLayerTexture(Color32 color){
-        _material.SetColor("_HighLayerColor",color);
+    public void SetHighLayerTexture(Texture2D color,Texture2D normal){
+         _material.SetTexture("_HighLayer",color);
+        _material.SetTexture("_HighLayerNormal",normal);
     }
 
-    public void SetMediumLayerTexture(Color32 color){
-        _material.SetColor("_LowLayerColor",color);
+    public void SetMediumLayerTexture(Texture2D color,Texture2D normal){
+        _material.SetTexture("_LowLayer",color);
+        _material.SetTexture("_LowLayerNormal",normal);
     }
 
     public void SetFluidLayerTexture(Color32 color){

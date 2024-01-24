@@ -6,16 +6,23 @@ using UnityEngine.Pool;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
+using Random = UnityEngine.Random;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
-{
+{   
+    public Material atmosphereMaterial;
     public Projectile _projPrefab;
     public PlayerController _playerT;
     public EnemyController _enemyPrefab;
 
+    public Image energy;
+
     public PlanetGenerator _planetGen;
 
     private GravityField _gravityField;
+
+    private Coroutine _spawner;
 
     [SerializeField] UniversalRendererData rendererData;
     Blit blitFeature;
@@ -45,7 +52,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SampleStarfield _sfTraveling;
 
     void Awake()
-    {   
+    {
+        _playerT.OnEnterAtmosphere += StartSpawning;
+        _playerT.OnExitAtmosphere += StopSpawning;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         _wallMask = LayerMask.GetMask("DestructionMesh");
@@ -101,126 +110,160 @@ public class GameManager : MonoBehaviour
     {
         // if (_planetGen.IsInSpawnState())
         // {
-        //     if (timer > spawnval)
-        //     {
-        //         SpawnEnemy();
-
-        //         spawnval = Random.Range(8, 15);
-        //         timer = 0;
-        //     }
-        //     timer += Time.deltaTime;
+        //     
         // }
 
     }
 
 
 
-    // private void SpawnEnemy()
-    // {   
+    private IEnumerator SpawnEnemy(GameObject planet)
+    {
+        while (true)
+        {
+            if (timer > spawnval)
+            {
+                float xRandomOffset = Random.Range(-8, 8);
+                float zRandomOffset = Random.Range(-8, 8);
+                Vector3 spawnPos = _playerT.transform.position + _playerT.transform.up*6 + _playerT.transform.forward * zRandomOffset + _playerT.transform.right * xRandomOffset;
+                Vector3 dir = planet.transform.position - spawnPos;
+                RaycastHit hit;
 
-    //     float xRandomOffset = Random.Range(-8, 8);
-    //     float zRandomOffset = Random.Range(-8, 8);
-    //     Vector3 spawnPos = _playerT.transform.position + _playerT.transform.forward*zRandomOffset + _playerT.transform.right*xRandomOffset;
-    //     Vector3 dir = _planetGen.GetPlanetTransform().position - spawnPos;
-    //     RaycastHit hit;
+                // while(!Physics.Raycast(spawnPos,dir,out hit,_wallMask)){
+                //     xRandomOffset = Random.Range(-8,8);
+                //     zRandomOffset = Random.Range(-8,8);
+                //     spawnPos = transform.localToWorldMatrix*new Vector3(xRandomOffset,0,zRandomOffset);
+                // }
+                if (Physics.Raycast(spawnPos, dir, out hit, _wallMask))
+                {
+                    a = _enemyPool.Get();
+                    print("SPAWN ENEMY");
+                    a.transform.position = hit.point - dir.normalized;
+                }
+                spawnval = Random.Range(8, 15);
+                timer = 0;
+            }
+            timer += Time.deltaTime;
+            yield return null;
+        }
+    }
 
-    //     // while(!Physics.Raycast(spawnPos,dir,out hit,_wallMask)){
-    //     //     xRandomOffset = Random.Range(-8,8);
-    //     //     zRandomOffset = Random.Range(-8,8);
-    //     //     spawnPos = transform.localToWorldMatrix*new Vector3(xRandomOffset,0,zRandomOffset);
-    //     // }
-    //     if (Physics.Raycast(spawnPos, dir, out hit,_wallMask))
-    //     {   
-    //         a = _enemyPool.Get();
-    //          print("SPAWN ENEMY");
-    //         a.transform.position = hit.point - dir.normalized;
-    //     }
-
-
-
-    //     //samplear angulo random alrededor del personaje dentro de un radio
-    //     //spawnear el enemigo.
-    // }
-
-    private void OnExplore(){
+    private void OnExplore()
+    {
         _cameraAnimation.Play();
         //_planetGen.ReloadLevel();
         StartCoroutine(WaitForLevelAndAnimationFinish());
         HideStartMenu();
     }
 
-    private void OnOptions(){
+    private void OnOptions()
+    {
         HideStartMenu();
     }
 
-    private void OnStarCoords(){
+    private void OnStarCoords()
+    {
         HideStartMenu();
         ShowCoordMenu();
     }
 
-    private void OnTravel(){
+    private void OnTravel()
+    {
 
     }
 
-    private void OnCancel(){
+    private void OnCancel()
+    {
         HideCoordsMenu();
         ShowStartMenu();
     }
 
 
-    private void HideStartMenu(){
+    private void HideStartMenu()
+    {
         _explore.gameObject.SetActive(false);
         _starCoords.gameObject.SetActive(false);
         _options.gameObject.SetActive(false);
     }
 
-    private void HideCoordsMenu(){
+    private void HideCoordsMenu()
+    {
         _starCoordsInput.gameObject.SetActive(false);
         _cancel.gameObject.SetActive(false);
         _travel.gameObject.SetActive(false);
-        
+
     }
 
-    private void ShowStartMenu(){
+    private void ShowStartMenu()
+    {
         _explore.gameObject.SetActive(true);
         _starCoords.gameObject.SetActive(true);
         _options.gameObject.SetActive(true);
     }
 
-    private void ShowCoordMenu(){
+    private void ShowCoordMenu()
+    {
         _starCoordsInput.gameObject.SetActive(true);
         _cancel.gameObject.SetActive(true);
         _travel.gameObject.SetActive(true);
     }
 
-    private void StartSimulation(){
-        foreach(Planet p in _planetGen._orbits){
-            _gravityField.AddGravityBody(new GravityBody(p.transform,p.mass));
+    private void StartSimulation()
+    {   
+        energy.enabled = true;
+        //rendererData.rendererFeatures.Clear();
+        foreach (Planet p in _planetGen._orbits)
+        {
+            _gravityField.AddGravityBody(new GravityBody(p.transform, p.mass));
             print(p.mass);
             p.SetColliders();
-            blitFeature.settings.blitMaterial.SetVector("_dirToSun",(_planetGen.transform.position-p.transform.position ).normalized);
-            blitFeature.settings.blitMaterial.SetVector("_planetCentre",p.transform.position);
+            //blitFeature.ClearMaterials();
+            //blitFeature.settings.textureId = "_texture"+p.GetInstanceID();
+            //blitFeature.settings.blitMaterial = Material.Instantiate(atmosphereMaterial);
+            blitFeature.settings.blitMaterial.SetVector("_dirToSun", (_planetGen.transform.position - p.transform.position).normalized);
+            blitFeature.settings.blitMaterial.SetVector("_planetCentre", p.transform.position);
+            // Blit a = Instantiate(blitFeature);
+            // rendererData.rendererFeatures.Add(a);
+            // a.SetActive(true);
+            // blitFeature.ClearMaterials();
+            // blitFeature.AddMaterial((_planetGen.transform.position - p.transform.position).normalized,p.transform.position);
             p.transform.parent = null;
         }
+        //rendererData.rendererFeatures[0].SetActive(false);
         rendererData.SetDirty();
+        _playerT.SetupHeadLook();
         _playerT.EnableShipController();
         _playerT.EnableCameraController();
         print("SIMULATION STARTED");
     }
 
 
-    private IEnumerator WaitForLevelAndAnimationFinish(){
-        while(!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying){
+    private IEnumerator WaitForLevelAndAnimationFinish()
+    {
+        while (!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying)
+        {
             yield return null;
         }
         _sf.gameObject.SetActive(true);
         _sfTraveling.gameObject.SetActive(false);
         _cameraAnimation.Play("SpeedDown");
         _systemAnimation.Play();
-        while(_cameraAnimation.isPlaying){
+        while (_cameraAnimation.isPlaying)
+        {
             yield return null;
         }
         StartSimulation();
         yield return null;
+    }
+
+    private void StartSpawning(GameObject planet)
+    {   
+        timer = 0;
+        _spawner = StartCoroutine(SpawnEnemy(planet));
+    }
+
+    private void StopSpawning()
+    {
+        StopCoroutine(_spawner);
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using Unity.Mathematics;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -9,6 +12,8 @@ using Vector4 = UnityEngine.Vector4;
 public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
+    public event Action<GameObject> OnEnterAtmosphere;
+    public event Action OnExitAtmosphere;
     private InputActionMap _ingameControl;
     private float _healthPoints;
     [SerializeField] private InputActionAsset input;
@@ -31,6 +36,7 @@ public class PlayerController : MonoBehaviour
     public Image Health;
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
+    [SerializeField] private Transform _tHead;
     [SerializeField] private Transform _tWeapon;
     [SerializeField] private ShipController _shipController;
 
@@ -47,6 +53,7 @@ public class PlayerController : MonoBehaviour
     private Quaternion _lastLocalRotation;
     private Quaternion _lastLocalWieldRotation;
     private bool onFloor;
+    private bool nearShip;
     private bool onShip = true;
     public Energy _energyObject;
     private float _jetpackProp;
@@ -61,6 +68,7 @@ public class PlayerController : MonoBehaviour
     {   
         _healthPoints = 1.0f;
         onFloor = false;
+        nearShip = true;
         _t = transform;
 
         _ingameControl = input.FindActionMap("Ingame");
@@ -255,14 +263,28 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Eject(InputAction.CallbackContext action){
-       _rb.isKinematic = false;
-       _t.position -= new Vector3(5f,0,0);
-       _t.parent = null;
-       onShip = false;
-       GetComponent<BoxCollider>().enabled = true;
-       EnablePlayerController();
-       DisableShipController();
-       print("EJECT");
+        if(onShip){
+            _rb.isKinematic = false;
+            _t.position -= new Vector3(5f,0,0);
+            _t.parent = null;
+            onShip = false;
+            GetComponent<BoxCollider>().enabled = true;
+            EnablePlayerController();
+            DisableShipController();
+            print("EJECT");
+        }else if(nearShip){
+            onShip = true;
+            _rb.isKinematic = true;
+            _t.parent = _shipController.transform;
+            _t.localPosition = new Vector3(-0.09f,0.316f,-1.659f);
+            _t.localRotation = Quaternion.identity;//Quaternion.LookRotation(Vector3.forward,Vector3.up);
+            
+            onShip = true;
+            GetComponent<BoxCollider>().enabled = false;
+            DisablePlayerController();
+            EnableShipController();
+        }
+       
     }
 
     private void OnBrake(InputAction.CallbackContext action){
@@ -392,6 +414,9 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             _lM.Target(col.transform);
             col.gameObject.layer = 0;
+            OnEnterAtmosphere?.Invoke(col.gameObject);
+        }else if(col.gameObject.tag == "Ship"){
+            nearShip = true;
         }
             
     }
@@ -401,9 +426,12 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             _lM.ResetTarget();
             col.gameObject.layer = 9;
+            OnExitAtmosphere?.Invoke();
         }else if(col.gameObject.tag == "Projectile"){
 
         }else if(col.gameObject.tag == "Energy"){
+        }else if(col.gameObject.tag == "Ship"){
+            nearShip = false;
         }
             
     }
@@ -411,6 +439,10 @@ public class PlayerController : MonoBehaviour
     public void SetupGravityField(GravityField gravity){
         _gF = gravity;
         _shipController.SetupGravityField(gravity);
+    }
+
+    public void SetupHeadLook(){
+        _tHead.parent = Camera.main.transform;
     }
 
 }

@@ -8,9 +8,9 @@ Shader "Unlit/Stars"
 
     SubShader
     {
-        Tags { "Queue"="Overlay" "RenderType"="Transparent" }
+        Tags {"RenderType"="Opaque" }
         LOD 100
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend SrcAlpha SrcAlpha
         Pass
         {
             CGPROGRAM
@@ -35,6 +35,7 @@ Shader "Unlit/Stars"
 
 
             float4 _Color;
+            float4 _dirToSun;
             v2f vert(appdata v)
             {
                 v2f o;
@@ -44,16 +45,9 @@ Shader "Unlit/Stars"
 
                 o.vertex = UnityObjectToClipPos(v.vertex);
 
-                float4 screenPos = ComputeScreenPos(o.vertex);
-					float2 screenSpaceUV = screenPos.xy / screenPos.w;
-					
-                    float4 backgroundCol = 0;
-
-					float backgroundBrightness = saturate(dot(backgroundCol.rgb, 1) / 3 * 0.2);
-					float starBrightness = (1 - backgroundBrightness);
-					
-					//o.col = lerp(backgroundCol, starCol, starBrightness);
-					o.col = float4(_Color.rgb,starBrightness);
+                // float3 viewDir = WorldSpaceViewDir(v.vertex);
+                // float starBrightness = dot(_dirToSun.xyz-_WorldSpaceCameraPos,viewDir);
+                o.col = float4(_Color.rgb,1);
 					
                 return o;
             }
@@ -63,7 +57,7 @@ Shader "Unlit/Stars"
                 UNITY_SETUP_INSTANCE_ID(i);
                 //_Color.a = 1;
 				
-				return float4(i.col.rgb, i.col.a);
+				return float4(i.col.rgb,i.col.a );
             }
             ENDCG
         }

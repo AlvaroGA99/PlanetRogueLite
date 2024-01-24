@@ -1,4 +1,5 @@
-﻿using UnityEngine.Rendering;
+﻿using System.Collections.Generic;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Experimental.Rendering.Universal
@@ -21,11 +22,10 @@ namespace UnityEngine.Experimental.Rendering.Universal
         public Material blitMaterial = null;
         public int blitShaderPassIndex = 0;
         public FilterMode filterMode { get; set; }
-
         private RenderTargetIdentifier source { get; set; }
         private RenderTargetHandle destination { get; set; }
 
-        RenderTargetHandle m_TemporaryColorTexture;
+        public RenderTargetHandle m_TemporaryColorTexture;
         string m_ProfilerTag;
 
         /// <summary>
@@ -38,6 +38,7 @@ namespace UnityEngine.Experimental.Rendering.Universal
             this.blitShaderPassIndex = blitShaderPassIndex;
             m_ProfilerTag = tag;
             m_TemporaryColorTexture.Init("_TemporaryColorTexture");
+           
         }
 
         /// <summary>
@@ -60,16 +61,25 @@ namespace UnityEngine.Experimental.Rendering.Universal
             opaqueDesc.depthBufferBits = 0;
 
             // Can't read and write to same color target, create a temp render target to blit. 
-            if (destination == RenderTargetHandle.CameraTarget)
-            {
+            //if (destination == RenderTargetHandle.CameraTarget)
+            //{   
                 cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, filterMode);
-                Blit(cmd, source, m_TemporaryColorTexture.Identifier(), blitMaterial, blitShaderPassIndex);
-                Blit(cmd, m_TemporaryColorTexture.Identifier(), source);
-            }
-            else
-            {
-                Blit(cmd, source, destination.Identifier(), blitMaterial, blitShaderPassIndex);
-            }
+               
+                    Blit(cmd, source, m_TemporaryColorTexture.Identifier(), blitMaterial, blitShaderPassIndex);
+                    Blit(cmd, m_TemporaryColorTexture.Identifier(), source);
+                
+                    
+                    
+                
+                
+            //}
+            // else
+            // {   
+                //foreach(Material m in materialList){
+                    Blit(cmd, source, destination.Identifier());//, materialList[materialList.Count-1], blitShaderPassIndex);
+                //}
+                 
+            // }
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
@@ -78,7 +88,8 @@ namespace UnityEngine.Experimental.Rendering.Universal
         /// <inheritdoc/>
         public override void FrameCleanup(CommandBuffer cmd)
         {
-            if (destination == RenderTargetHandle.CameraTarget)
+            //if (destination == RenderTargetHandle.CameraTarget)
+
                 cmd.ReleaseTemporaryRT(m_TemporaryColorTexture.id);
         }
     }
