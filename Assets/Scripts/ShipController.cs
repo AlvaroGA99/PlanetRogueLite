@@ -32,6 +32,9 @@ public class ShipController : MonoBehaviour
     private float overridetakeOffEngineValue;
     private float overridelandingEngineValue;
     public Energy energyObject;
+
+    public Vector3 lastVelocity { get; private set; }
+
     //[SerializeField] private Collider enterAreaCollider;
     //public float _energy;
 
@@ -56,7 +59,9 @@ public class ShipController : MonoBehaviour
 
             Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
             Vector3 localVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
-
+            //_rb.velocity
+            lastVelocity = localVelocity;
+            
             if (breakActivated)
             {   
                 _rb.angularDrag = 0;
@@ -109,7 +114,7 @@ public class ShipController : MonoBehaviour
                 }
             }
 
-            if (mainEngineValue > 0){
+            if (mainEngineValue > 0 || breakEngineValue > 0){
                  if (localVelocity.y > 0.05)
                 {
                     speedAlignerValue2 = -1;
@@ -153,6 +158,8 @@ public class ShipController : MonoBehaviour
             _rb.AddTorque(-transform.forward * Math.Clamp(overridezxRotationValue.x, -1.0f, 0f) * -1 * 5000);
             _rb.AddTorque(-childShip.forward * overrideleftYRotationValue * 5000);
             _rb.AddTorque(childShip.forward * overriderightYRotationValue * 5000);
+
+            
         }
 
 

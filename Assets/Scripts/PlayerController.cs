@@ -207,6 +207,8 @@ public class PlayerController : MonoBehaviour
 
     void OnStopMainShipPropulsion(InputAction.CallbackContext action){
         _shipController.mainEngineValue = 0;
+        _shipController.speedAlignerValue= 0;
+        _shipController.speedAlignerValue2= 0;
     }
 
     void OnTakeOffPropulsion(InputAction.CallbackContext action){
