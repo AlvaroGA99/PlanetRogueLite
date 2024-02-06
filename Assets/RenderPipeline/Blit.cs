@@ -12,6 +12,7 @@ namespace UnityEngine.Experimental.Rendering.Universal
             public RenderPassEvent Event = RenderPassEvent.AfterRenderingOpaques;
 
             public Material blitMaterial = null;
+            public Material blitMaterial1 = null;
             public int blitMaterialPassIndex = -1;
             public Target destination = Target.Color;
             public string textureId = "_BlitPassTexture";
@@ -27,16 +28,34 @@ namespace UnityEngine.Experimental.Rendering.Universal
         public BlitSettings settings = new BlitSettings();
         RenderTargetHandle m_RenderTextureHandle;
 
+        List<BlitPass> passes;
         BlitPass blitPass;
+        BlitPass blitPass1;
 
         //List<BlitPass> passes = new List<BlitPass>();
 
         public override void Create()
-        {
+        {   
+
             var passIndex = settings.blitMaterial != null ? settings.blitMaterial.passCount - 1 : 1;
             settings.blitMaterialPassIndex = Mathf.Clamp(settings.blitMaterialPassIndex, -1, passIndex);
-            blitPass = new BlitPass(settings.Event, settings.blitMaterial, settings.blitMaterialPassIndex, name);
+            if (settings.materialList.Count > 0){
+                passes = new List<BlitPass>();
+                foreach(Material m in settings.materialList){
+                    passes.Add(new BlitPass(settings.Event, m, settings.blitMaterialPassIndex, name));
+                }
+            }else{
+                passes = new List<BlitPass>();
+                blitPass = new BlitPass(settings.Event, settings.blitMaterial, settings.blitMaterialPassIndex, name);
+                blitPass1 = new BlitPass(settings.Event, settings.blitMaterial1, settings.blitMaterialPassIndex, name);
+                passes.Add(blitPass);
+                passes.Add(blitPass1);
+            }
+            
+            
             //passes.Add(blitPass);
+            
+           
             m_RenderTextureHandle.Init(settings.textureId);
             
         }
@@ -51,48 +70,18 @@ namespace UnityEngine.Experimental.Rendering.Universal
                 Debug.LogWarningFormat("Missing Blit Material. {0} blit pass will not execute. Check for missing reference in the assigned renderer.", GetType().Name);
                 return;
             }
-            // CommandBuffer cmd = CommandBufferPool.Get(name);
-
-            // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
-            // opaqueDesc.depthBufferBits = 0;
-
-            // var src = origsrc;
-            // RenderTargetHandle dest;
-            // for (int i = 0; i < passes.Count; i++)
-            // {   
-            //     if(i == passes.Count -1){
-            //         cmd
-            //         passes[i].Setup(src,finaldest);
-            //         renderer.EnqueuePass(passes[i]);
-            //     }else{
-            //         dest = new RenderTargetHandle();
-            //         dest.Init("_Target"+i);
-            //         passes[i].Setup(src,dest);
-            //         src = dest.Identifier();
-            //         renderer.EnqueuePass(passes[i]);
-            //     }
-                
-            // }
-            //dest.Init();
-
-           
-
-            blitPass.Setup(origsrc, finaldest);
-            renderer.EnqueuePass(blitPass);
+            // blitPass0.Setup(origsrc, finaldest);
+            // blitPass0.blitMaterial.SetInteger("_index",0);
+            // renderer.EnqueuePass(blitPass0);
+            foreach(BlitPass bp in passes){
+                bp.Setup(origsrc,finaldest);
+                renderer.EnqueuePass(bp);
+            }
+            // blitPass.Setup(origsrc, finaldest);
+            // blitPass.blitMaterial.SetInteger("_index",1);
+            // renderer.EnqueuePass(blitPass);
+            // blitPass1.Setup(origsrc, finaldest);
+            // renderer.EnqueuePass(blitPass1);
         }
-
-        // public void AddMaterial(Vector3 _dirToSun,Vector3 _planetCentre){
-        //     Material aux = Material.Instantiate(settings.blitMaterial);
-        //     //blitPass.m_temporaryColorTextureList.Add(blitPass.m_TemporaryColorTexture);
-        //     aux.SetVector("_dirToSun",_dirToSun);
-        //     aux.SetVector("_planetCentre",_planetCentre);
-        //     settings.materialList.Add(aux);
-        //     //blitPass.materialList.Add(aux);   
-        // }
-
-        // public void ClearMaterials(){
-        //     // blitPass.materialList.Clear();
-        //     // blitPass.m_temporaryColorTextureList.Clear();
-        // }
     }
 }

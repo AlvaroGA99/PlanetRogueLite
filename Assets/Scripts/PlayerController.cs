@@ -1,8 +1,10 @@
 using System;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
@@ -59,7 +61,15 @@ public class PlayerController : MonoBehaviour
     private float _jetpackProp;
     private Camera cam;
 
+    public float camShakeIntesity;
+
+    [SerializeField] private VelocityDirection _vD;
+
     private Vector2 rotateCamValue;
+
+    private Vector2 offset;
+
+    [SerializeField] GameObject characterLight;
 
     //private float airTimer;
 
@@ -133,11 +143,23 @@ public class PlayerController : MonoBehaviour
         _lastLocalWieldRotation = _tWeapon.localRotation;
         cam = Camera.main;
         _lastForward = _tWeapon.transform.forward;
+        camShakeIntesity = 0;
 
     }
  
     void Update(){
+        //transform - offset
+        cam.transform.localPosition = cam.transform.localPosition - new Vector3(offset.x,offset.y,0);
         cam.transform.RotateAround(transform.position,transform.up,rotateCamValue.x);
+        //valRandom += 3*time.deltatime
+        //if val random > tamtextura 
+        //random 
+        offset = new Vector2(Mathf.PerlinNoise(Time.time*1.7f,0)-0.5f,Mathf.PerlinNoise(0,Time.time*1.7f)-0.5f)*_vD.velocityMag/1.4f;
+        cam.transform.localPosition = cam.transform.localPosition + new Vector3(offset.x,offset.y,0);
+        //var xoffset = leerTexturaenvalorrandomx*intensidad;
+        //var yoffset = leerTexturaenvalorrandomy*intensidad;
+        //transform + offset
+        
         // Vector3 axis = Vector3.Cross(transform.up,transform.position - cam.transform.position); //new Vector2(cam.transform.localPosition.x,cam.transform.localPosition.y).sqrMagnitude > 1)
         // if(axis.sqrMagnitude > 0 && rotateCamValue.y > 0){
         //     cam.transform.RotateAround(transform.position,Vector3.Cross(transform.up,transform.position - cam.transform.position),rotateCamValue.y);
@@ -148,7 +170,6 @@ public class PlayerController : MonoBehaviour
         _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp/30);
     }
    
-
     void OnMove(InputAction.CallbackContext moveAction)
     {
         Vector2 inp = moveAction.ReadValue<Vector2>();
@@ -167,6 +188,7 @@ public class PlayerController : MonoBehaviour
     
         if (onFloor)
         {
+            
             _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
             onFloor = false;
         }else{
@@ -203,12 +225,14 @@ public class PlayerController : MonoBehaviour
 
     void OnMainShipPropulsion(InputAction.CallbackContext action){
         _shipController.mainEngineValue = action.ReadValue<float>();
+        _shipController.TurnOnTrails();
     }
 
     void OnStopMainShipPropulsion(InputAction.CallbackContext action){
         _shipController.mainEngineValue = 0;
         _shipController.speedAlignerValue= 0;
         _shipController.speedAlignerValue2= 0;
+        _shipController.TurnOffTrails();
     }
 
     void OnTakeOffPropulsion(InputAction.CallbackContext action){
@@ -243,6 +267,8 @@ public class PlayerController : MonoBehaviour
 
     void OnStopBrakePropulsion(InputAction.CallbackContext action){
         _shipController.breakEngineValue = 0;
+        _shipController.speedAlignerValue= 0;
+        _shipController.speedAlignerValue2= 0;
 
     }
 
@@ -266,6 +292,8 @@ public class PlayerController : MonoBehaviour
 
     private void Eject(InputAction.CallbackContext action){
         if(onShip){
+            characterLight.SetActive(true);
+            camShakeIntesity = 0.0f;
             _rb.isKinematic = false;
             _t.position -= new Vector3(5f,0,0);
             _t.parent = null;
@@ -275,6 +303,8 @@ public class PlayerController : MonoBehaviour
             DisableShipController();
             print("EJECT");
         }else if(nearShip){
+            characterLight.SetActive(false);
+            camShakeIntesity = 1.0f;
             onShip = true;
             _rb.isKinematic = true;
             _t.parent = _shipController.transform;
@@ -367,14 +397,11 @@ public class PlayerController : MonoBehaviour
         _rb.AddForce(_toCenter,ForceMode.Acceleration);
            
         
-        
-        _rb.AddForce( _moveVector.normalized*_rotationSpeed);
-       
-
-        if (_rb.velocity.magnitude > 10)
-        {
-            _rb.velocity = Vector3.ClampMagnitude(_rb.velocity, 10);
+        if(onFloor){
+            _rb.AddForce( _moveVector.normalized*_rotationSpeed);
         }
+        
+        _rb.velocity = Vector3.ClampMagnitude(_rb.velocity, 10);
         
         if(!onShip){
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
@@ -388,7 +415,7 @@ public class PlayerController : MonoBehaviour
         _lastLocalWieldRotation = _tWeapon.localRotation;
 
         if(_energyObject.energy > 0){
-            _rb.AddForce(_tChild.up*_jetpackProp*4);
+            _rb.AddForce((_tChild.up+_tChild.forward)*_jetpackProp*4);
         }
         
  
@@ -402,6 +429,7 @@ public class PlayerController : MonoBehaviour
     {   
         if(col.gameObject.tag == "Planet"){
             onFloor = true;
+            _rotationSpeed = 100;
         }else if(col.gameObject.tag == "Projectile"){
             if(_healthPoints > 0){
                 _healthPoints-= 0.1f;
@@ -444,7 +472,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void SetupHeadLook(){
-        _tHead.parent = Camera.main.transform;
+        //_tHead.parent = Camera.main.transform;
     }
 
 }

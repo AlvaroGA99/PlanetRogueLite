@@ -12,6 +12,7 @@ using UnityEngine.UI;
 using TMPro;
 using Image = UnityEngine.UI.Image;
 using System.Linq;
+using System.Threading;
 
 public class PlanetGenerator : MonoBehaviour
 {   
@@ -45,6 +46,8 @@ public class PlanetGenerator : MonoBehaviour
     int seed;
     Mesh initialMesh;
 
+    float widthToLerp; 
+
 
     void Awake()
     {   
@@ -68,7 +71,8 @@ public class PlanetGenerator : MonoBehaviour
     // Start is called before the first frame update
     async void Start()
     {
-        
+        widthToLerp = loadingBg.sizeDelta.x;
+        StartCoroutine(LoadBar());
         generationModuleWedgesValues = new Dictionary<string, List<float>>();
         generationModuleCentresValues = new Dictionary<string, List<float>>();
 
@@ -169,13 +173,10 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
         }
         var widthToAdd = loadingBar.rect.width/_orbits.Length;
-        print(widthToAdd + "WIDTH");
         for (int i = 0; i < _orbits.Length; i++)
         {
+            widthToLerp += widthToAdd;
             await LoadLevel();
-            //text.text = "Cargando Planetas      " + (i+1) + "// " + _orbits.Length;
-            //loadingBg.anchoredPosition = new Vector2(loadingBg.anchoredPosition.x + widthToAdd/2,loadingBg.anchoredPosition.y);
-            loadingBg.sizeDelta = new Vector2(loadingBg.sizeDelta.x + widthToAdd,loadingBg.sizeDelta.y);
             (int[] triRes,Vector3[] vertRes) = await _orbits[i].GenerateSphereResolution(3, tiles);
             _orbits[i].SetMesh(triRes,vertRes);
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
@@ -185,45 +186,6 @@ public class PlanetGenerator : MonoBehaviour
         loadingBar.gameObject.SetActive(false);
         loadingBg.gameObject.SetActive(false);
 
-        // WFCGraph.StateInfo state;
-
-
-        // for (int i = 0; i < _orbits.Length; i++)
-        // {
-
-        //     _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
-        //     _orbits[i].m = _orbits[i].mF.mesh;
-
-        //     state = tiles.Step();
-        //     while (state != WFCGraph.StateInfo.SUCCESFUL)
-        //     {
-        //         if (state == WFCGraph.StateInfo.ERROR)
-        //         {   //si tamaño de lista de entropias == 0
-        //             //if(tiles.lowestEntropyElementList.Count == 0){
-        //             //print("RESET");
-        //             tiles.Reset(-1);
-        //             //}else{
-        //             //tiles.RestoreState();
-        //             //}
-        //             //si no 
-        //         }
-        //         else
-        //         {
-        //             //tiles.SaveState();
-        //             tiles.ComputeLowestEntropyElementList();
-        //         }
-
-        //         state = tiles.Step();
-        //     }
-
-        //     _orbits[i].GenerateSphereResolution(3, tiles);
-        //     _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
-        //     tiles.Reset(-1);
-        // }
-        
-        //await LoadLevel();
-
-        //StartCoroutine(FramedLoad());
     }
 
     // Update is called once per frame
@@ -329,30 +291,10 @@ public class PlanetGenerator : MonoBehaviour
 
             }
 
-            // if (r == resolution - 1)
-            // {
-            //     newVertices[0] = newVertices[0].normalized;
-            //     newVertices[1] = newVertices[1].normalized;
-            //     newVertices[2] = newVertices[2].normalized;
-            //     newVertices[3] = newVertices[3].normalized;
-            //     newVertices[4] = newVertices[4].normalized;
-            //     newVertices[5] = newVertices[5].normalized;
-            //     newVertices[6] = newVertices[6].normalized;
-            //     newVertices[7] = newVertices[7].normalized;
-            //     newVertices[8] = newVertices[8].normalized;
-            //     newVertices[9] = newVertices[9].normalized;
-            //     newVertices[10] = newVertices[10].normalized;
-            //     newVertices[11] = newVertices[11].normalized;
-
-            // }
-
             m.vertices = newVertices;
             m.triangles = newTriangles;
 
         }
-
-        //m.RecalculateNormals();
-        //m.RecalculateTangents();
         return m;
 
     }
@@ -437,150 +379,38 @@ public class PlanetGenerator : MonoBehaviour
 
     }
 
-    // public Transform GetPlanetTransform(){
-    //     return _currentPlanet.transform;
-    // }
-
-    // public bool IsInSpawnState(){
-    //     return _currentPlanet.isInSpawnState;
-    // }
-
-    IEnumerator FramedLoad()
-    {
-        
-        Dictionary<String, List<float>> generationModuleWedgesValues = new Dictionary<string, List<float>>();
-        Dictionary<String, List<float>> generationModuleCentresValues = new Dictionary<string, List<float>>();
-
-        generationModuleWedgesValues.Add("AAA", GenerateWedgesValuesList("AAA"));
-        generationModuleCentresValues.Add("AAA", GenerateCentresValuesList("AAA"));
-
-        generationModuleWedgesValues.Add("AAB", GenerateWedgesValuesList("AAB"));
-        generationModuleCentresValues.Add("AAB", GenerateCentresValuesList("AAB"));
-
-        generationModuleWedgesValues.Add("AAC", GenerateWedgesValuesList("AAC"));
-        generationModuleCentresValues.Add("AAC", GenerateCentresValuesList("AAC"));
-
-        generationModuleWedgesValues.Add("ABA", GenerateWedgesValuesList("ABA"));
-        generationModuleCentresValues.Add("ABA", GenerateCentresValuesList("ABA"));
-
-        generationModuleWedgesValues.Add("ABB", GenerateWedgesValuesList("ABB"));
-        generationModuleCentresValues.Add("ABB", GenerateCentresValuesList("ABB"));
-
-        generationModuleWedgesValues.Add("ABC", GenerateWedgesValuesList("ABC"));
-        generationModuleCentresValues.Add("ABC", GenerateCentresValuesList("ABC"));
-
-        generationModuleWedgesValues.Add("ACA", GenerateWedgesValuesList("ACA"));
-        generationModuleCentresValues.Add("ACA", GenerateCentresValuesList("ACA"));
-
-        generationModuleWedgesValues.Add("ACB", GenerateWedgesValuesList("ACB"));
-        generationModuleCentresValues.Add("ACB", GenerateCentresValuesList("ACB"));
-
-        generationModuleWedgesValues.Add("ACC", GenerateWedgesValuesList("ACC"));
-        generationModuleCentresValues.Add("ACC", GenerateCentresValuesList("ACC"));
-
-        generationModuleWedgesValues.Add("BAA", GenerateWedgesValuesList("BAA"));
-        generationModuleCentresValues.Add("BAA", GenerateCentresValuesList("BAA"));
-
-        generationModuleWedgesValues.Add("BAB", GenerateWedgesValuesList("BAB"));
-        generationModuleCentresValues.Add("BAB", GenerateCentresValuesList("BAB"));
-
-        generationModuleWedgesValues.Add("BAC", GenerateWedgesValuesList("BAC"));
-        generationModuleCentresValues.Add("BAC", GenerateCentresValuesList("BAC"));
-
-        generationModuleWedgesValues.Add("BBA", GenerateWedgesValuesList("BBA"));
-        generationModuleCentresValues.Add("BBA", GenerateCentresValuesList("BBA"));
-
-        generationModuleWedgesValues.Add("BBB", GenerateWedgesValuesList("BBB"));
-        generationModuleCentresValues.Add("BBB", GenerateCentresValuesList("BBB"));
-
-        generationModuleWedgesValues.Add("BBC", GenerateWedgesValuesList("BBC"));
-        generationModuleCentresValues.Add("BBC", GenerateCentresValuesList("BBC"));
-
-        generationModuleWedgesValues.Add("BCA", GenerateWedgesValuesList("BCA"));
-        generationModuleCentresValues.Add("BCA", GenerateCentresValuesList("BCA"));
-
-        generationModuleWedgesValues.Add("BCB", GenerateWedgesValuesList("BCB"));
-        generationModuleCentresValues.Add("BCB", GenerateCentresValuesList("BCB"));
-
-        generationModuleWedgesValues.Add("BCC", GenerateWedgesValuesList("BCC"));
-        generationModuleCentresValues.Add("BCC", GenerateCentresValuesList("BCC"));
-
-        generationModuleWedgesValues.Add("CAA", GenerateWedgesValuesList("CAA"));
-        generationModuleCentresValues.Add("CAA", GenerateCentresValuesList("CAA"));
-
-        generationModuleWedgesValues.Add("CAB", GenerateWedgesValuesList("CAB"));
-        generationModuleCentresValues.Add("CAB", GenerateCentresValuesList("CAB"));
-
-        generationModuleWedgesValues.Add("CAC", GenerateWedgesValuesList("CAC"));
-        generationModuleCentresValues.Add("CAC", GenerateCentresValuesList("CAC"));
-
-        generationModuleWedgesValues.Add("CBA", GenerateWedgesValuesList("CBA"));
-        generationModuleCentresValues.Add("CBA", GenerateCentresValuesList("CBA"));
-
-        generationModuleWedgesValues.Add("CBB", GenerateWedgesValuesList("CBB"));
-        generationModuleCentresValues.Add("CBB", GenerateCentresValuesList("CBB"));
-
-        generationModuleWedgesValues.Add("CBC", GenerateWedgesValuesList("CBC"));
-        generationModuleCentresValues.Add("CBC", GenerateCentresValuesList("CBC"));
-
-        generationModuleWedgesValues.Add("CCA", GenerateWedgesValuesList("CCA"));
-        generationModuleCentresValues.Add("CCA", GenerateCentresValuesList("CCA"));
-
-        generationModuleWedgesValues.Add("CCB", GenerateWedgesValuesList("CCB"));
-        generationModuleCentresValues.Add("CCB", GenerateCentresValuesList("CCB"));
-
-        generationModuleWedgesValues.Add("CCC", GenerateWedgesValuesList("CCC"));
-        generationModuleCentresValues.Add("CCC", GenerateCentresValuesList("CCC"));
-       Mesh initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
-       tiles = new WFCGraph(initialMesh.triangles, 0, new System.Random());
-
-        //WFCGraph.StateInfo state;
+    public async void Load(int seed){
+        if(seed > 0){
+            sampler = new System.Random();
+        }
+        sampler = new System.Random(seed);
+        Array vals = Enum.GetValues(typeof(PlanetLayerElement));
 
         for (int i = 0; i < _orbits.Length; i++)
         {
-
             _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
             _orbits[i].m = _orbits[i].mF.mesh;
-
+            _orbits[i].mass = 10000;
+            PlanetLayerElement samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+            _orbits[i].SetHighLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp)); 
+            samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length)); 
+            _orbits[i].SetMediumLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp));
+            _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
         }
-
+        var widthToAdd = loadingBar.rect.width/_orbits.Length;
         for (int i = 0; i < _orbits.Length; i++)
         {
-
-            //_orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
-            //_orbits[i].m = _orbits[i].mF.mesh;
-
-            tiles.Step();
-            yield return null;
-            while (tiles.CheckState() != WFCGraph.StateInfo.SUCCESFUL)
-            {
-                if (tiles.CheckState() == WFCGraph.StateInfo.ERROR)
-                {   //si tamaño de lista de entropias == 0
-                    //if(tiles.lowestEntropyElementList.Count == 0){
-                    //print("RESET");
-                    tiles.Reset(-1);
-                    //}else{
-                    //tiles.RestoreState();
-                    //}
-                    //si no 
-                }
-                else
-                {
-                    //tiles.SaveState();
-                    tiles.ComputeLowestEntropyElementList();
-                }
-
-                 tiles.Step();
-                yield return null;
-            }
-
-            //_orbits[i].GenerateSphereResolution(3, tiles);
-            //_orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
+            widthToLerp += widthToAdd;
+            await LoadLevel();
+            (int[] triRes,Vector3[] vertRes) = await _orbits[i].GenerateSphereResolution(3, tiles);
+            _orbits[i].SetMesh(triRes,vertRes);
+            _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
-            yield return null;
         }
+        isFinishedLoading = true;
+        loadingBar.gameObject.SetActive(false);
+        loadingBg.gameObject.SetActive(false);
     }
-
     private Task LoadLevel(){
         return Task.Run(() => {
          //_orbits[index].GenerateSphereResolution(resolution,tiles);
@@ -634,6 +464,14 @@ public class PlanetGenerator : MonoBehaviour
             tiles.Reset(-1);
         }
         isFinishedLoading = true;
+    }
+
+    private IEnumerator LoadBar(){
+        while(!isFinishedLoading){
+             loadingBg.sizeDelta = new Vector2(loadingBg.sizeDelta.x*0.9f + widthToLerp*0.1f,loadingBg.sizeDelta.y);
+            yield return null;
+        }
+        
     }
 
     private Texture2D GetTexureByLayer(PlanetLayerElement layer){
@@ -700,5 +538,13 @@ public class PlanetGenerator : MonoBehaviour
             return waterMat;
         }
 
+    }
+
+    public List<Vector4> GetPlanetPositions(){
+        List<Vector4> positions = new List<Vector4>();
+        foreach (Planet p in _orbits){
+            positions.Add(p.transform.position);
+        }
+        return positions;
     }
 }

@@ -8,10 +8,12 @@ using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 using Random = UnityEngine.Random;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {   
     public Material atmosphereMaterial;
+    public Material blackHoleMaterial;
     public Projectile _projPrefab;
     public PlayerController _playerT;
     public EnemyController _enemyPrefab;
@@ -23,6 +25,7 @@ public class GameManager : MonoBehaviour
     private GravityField _gravityField;
 
     private Coroutine _spawner;
+    private Camera cam;
 
     [SerializeField] UniversalRendererData rendererData;
     Blit blitFeature;
@@ -51,14 +54,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SampleStarfield _sf;
     [SerializeField] private SampleStarfield _sfTraveling;
 
+    private List<Vector4> planetCentres;
+
     void Awake()
-    {
+    {   
+        cam = Camera.main;
+        planetCentres = new List<Vector4>();
         _playerT.OnEnterAtmosphere += StartSpawning;
         _playerT.OnExitAtmosphere += StopSpawning;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         _wallMask = LayerMask.GetMask("DestructionMesh");
-        spawnval = 8;
+        spawnval = 20;
         _projectilePool = new ObjectPool<Projectile>(() =>
         {
             Projectile aux = Instantiate(_projPrefab);
@@ -81,7 +88,7 @@ public class GameManager : MonoBehaviour
         {
 
             EnemyController aux = Instantiate(_enemyPrefab);
-            aux.Init(_projectilePool, _playerT.transform, _wallMask);
+            aux.Init(_projectilePool, _playerT.transform, _wallMask,_gravityField);
             return aux;
         }, enemy =>
         {
@@ -103,6 +110,14 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         timer = 0;
+        planetCentres = _planetGen.GetPlanetPositions();
+        // blitFeature.settings.materialList.Clear();
+        // for (int i = 0; i < planetCentres.Count; i++)
+        // {
+        //     blitFeature.settings.materialList.Add(Material.Instantiate(atmosphereMaterial));
+        // }
+        // blitFeature.settings.blitMaterial1 = Material.Instantiate(atmosphereMaterial);
+        // rendererData.SetDirty();
         _playerT.SetupGravityField(_gravityField);
     }
 
@@ -113,6 +128,19 @@ public class GameManager : MonoBehaviour
         //     
         // }
 
+    }
+
+    void LateUpdate(){
+        //blackHoleMaterial.SetMatrix("_WorldToTransformCamera",cam.transform.worldToLocalMatrix);
+        planetCentres = _planetGen.GetPlanetPositions();
+        print(planetCentres.Count + "PLANETAS");
+        //planetCentres.Sort((x,y) => (new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0) - x).sqrMagnitude.CompareTo((new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0)-y).sqrMagnitude));
+        blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
+        blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres",planetCentres);
+        for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
+        {
+            blitFeature.settings.materialList[i].SetVectorArray("_planetCentres",planetCentres);
+        }
     }
 
 
@@ -154,6 +182,12 @@ public class GameManager : MonoBehaviour
         //_planetGen.ReloadLevel();
         StartCoroutine(WaitForLevelAndAnimationFinish());
         HideStartMenu();
+    }
+    private void OnExploreAsync(){
+         _cameraAnimation.Play();
+         HideStartMenu();
+         _planetGen.Load(-1);
+         StartSimulation();
     }
 
     private void OnOptions()
@@ -210,24 +244,47 @@ public class GameManager : MonoBehaviour
 
     private void StartSimulation()
     {   
+        _playerT.camShakeIntesity = 1.0f;
         energy.enabled = true;
-        //rendererData.rendererFeatures.Clear();
-        foreach (Planet p in _planetGen._orbits)
+        blitFeature.settings.materialList.Clear();
+        for (int i = 0; i < planetCentres.Count; i++)
         {
-            _gravityField.AddGravityBody(new GravityBody(p.transform, p.mass));
-            print(p.mass);
-            p.SetColliders();
+            blitFeature.settings.materialList.Add(Material.Instantiate(atmosphereMaterial));
+        }
+        blitFeature.settings.blitMaterial1 = Material.Instantiate(atmosphereMaterial);
+        //blitFeature.settings.blitMaterial = Material.Instantiate(atmosphereMaterial);
+        blitFeature.settings.blitMaterial.SetVector("_dirToSun", (_planetGen.transform.position));
+        blitFeature.settings.blitMaterial1.SetVector("_dirToSun", (_planetGen.transform.position));
+        for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
+        {
+            blitFeature.settings.materialList[i].SetInteger("_index",i);
+        }
+        blitFeature.settings.blitMaterial1.SetInteger("_index",0);
+        blitFeature.settings.blitMaterial.SetInteger("_index",1);
+        planetCentres = _planetGen.GetPlanetPositions();
+        // blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
+        // blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres",planetCentres);
+        //Vector4[] planetCentres = new Vector4[_planetGen._orbits.Length];
+        //Vector4[] dirsToSun = new Vector4[_planetGen._orbits.Length]; //rendererData.rendererFeatures.Clear();
+        for (int i = 0; i < _planetGen._orbits.Length; i++)
+        {
+            _gravityField.AddGravityBody(new GravityBody(_planetGen._orbits[i].transform, _planetGen._orbits[i].mass));
+            print(_planetGen._orbits[i].mass);
+           _planetGen._orbits[i].SetColliders();
             //blitFeature.ClearMaterials();
             //blitFeature.settings.textureId = "_texture"+p.GetInstanceID();
-            //blitFeature.settings.blitMaterial = Material.Instantiate(atmosphereMaterial);
-            blitFeature.settings.blitMaterial.SetVector("_dirToSun", (_planetGen.transform.position - p.transform.position).normalized);
-            blitFeature.settings.blitMaterial.SetVector("_planetCentre", p.transform.position);
+            //dirsToSun[i] = (_planetGen.transform.position - _planetGen._orbits[i].transform.position).normalized;
+            planetCentres[i] = _planetGen._orbits[i].transform.position;
+            
+            //blitFeature.settings.blitMaterial.SetVector("_planetCentre", _planetGen._orbits[i].transform.position);
+            //blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
+            //blitFeature.settings.blitMaterial.SetInteger("_numPlanets",_planetGen._orbits.Length);
             // Blit a = Instantiate(blitFeature);
             // rendererData.rendererFeatures.Add(a);
             // a.SetActive(true);
             // blitFeature.ClearMaterials();
             // blitFeature.AddMaterial((_planetGen.transform.position - p.transform.position).normalized,p.transform.position);
-            p.transform.parent = null;
+            _planetGen._orbits[i].transform.parent = null;
         }
         //rendererData.rendererFeatures[0].SetActive(false);
         rendererData.SetDirty();

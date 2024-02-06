@@ -44,20 +44,22 @@ public class EnemyController : MonoBehaviour
         timer = 0;
     }
 
-    public void Init(ObjectPool<Projectile> pool, Transform charTransform, LayerMask wallMask)
+    public void Init(ObjectPool<Projectile> pool, Transform charTransform, LayerMask wallMask, GravityField gf)
     {
         _projPool = pool;
         char_T = charTransform;
         //_SphereT = sphereTransform;
         _wallMask = wallMask;
         BehaviourState = CheckBehaviourState((char_T.position - _t.position).sqrMagnitude);
+        _gF = gf;
     }
     private void FixedUpdate()
-    {
-        //Vector3 toCenter = _t.position - _SphereT.position;
+    {   
+        
+        Vector3 toCenter = _gF.GetTotalFieldForceForBody(transform.position);
         Vector3 betweenThisAndChar = char_T.position - _t.position;
-        transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, transform.position).normalized, transform.position);
-        //_rb.AddForce(-toCenter.normalized * 115);
+        transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, toCenter).normalized, -toCenter);
+        _rb.AddForce(toCenter,ForceMode.Acceleration);
         Vector3 moveVector = Vector3.ProjectOnPlane(betweenThisAndChar, -_t.up).normalized * 200;
         _t.rotation = Quaternion.LookRotation(moveVector, _t.up);
         float sqrDistance = betweenThisAndChar.sqrMagnitude;

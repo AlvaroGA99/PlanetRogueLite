@@ -165,7 +165,7 @@ public class ShipController : MonoBehaviour
 
 
         //print(_gF.GetTotalFieldForceForBody(transform.position));
-        //_rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
+        _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
     } 
 
     void Update()
@@ -186,6 +186,16 @@ public class ShipController : MonoBehaviour
 
     public void SetupEnterShipArea(){
         
+    }
+
+    public void TurnOnTrails(){
+        _tr1.emitting = true;
+        _tr2.emitting = true;
+    }
+
+    public void TurnOffTrails(){
+        _tr1.emitting = false;
+        _tr2.emitting = false;
     }
     // public void ResetAngularDrag(){
     //     _rb.angularDrag = 0;

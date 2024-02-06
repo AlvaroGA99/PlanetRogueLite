@@ -78,8 +78,8 @@ public class SampleStarfield : MonoBehaviour
             }
             else
             {   Vector3 samp = new Vector3(2*x - 1, 2*y -1, 2*z-1);
-                if(samp.magnitude < 1 && samp.magnitude > 0.7 ){
-                    a.Add(samp*16000);
+                if(samp.magnitude < 1 && samp.magnitude > 0.6 ){
+                    a.Add(samp*35000);
                 }
                 
                 
@@ -99,7 +99,21 @@ public class SampleStarfield : MonoBehaviour
                 _dirs[i] = a[i];
                 _moveDirs[i] = Vector3.zero;
             }
+
+        for (int j = 0; j < offset.Length; j++)
+        {
+            offset[j] += Time.deltaTime;
+            while (offset[j] > 10f)
+            {
+                offset[j] = offset[j] - 10f;
+            }
+            for (int i = j * _matrices.Length / offset.Length; i < (j + 1) * _matrices.Length / offset.Length; i++)
+            {
+                _matrices[i].SetTRS(transform.position - transform.forward * 100 + _dirs[i] + _moveDirs[i] * offset[j] + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1) * 150*math.clamp(_scales[i],0.25f,0.4f));
+            }
         }
+        }
+        
         _currentDirsIndex = 0;
         _rp = new RenderParams(_starMaterial);
 
@@ -110,6 +124,9 @@ public class SampleStarfield : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (sampleType == SampleType.Conical){
+
+        
         for (int j = 0; j < offset.Length; j++)
         {
             offset[j] += Time.deltaTime;
@@ -119,8 +136,9 @@ public class SampleStarfield : MonoBehaviour
             }
             for (int i = j * _matrices.Length / offset.Length; i < (j + 1) * _matrices.Length / offset.Length; i++)
             {
-                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*math.clamp(_scales[i],0.4f,0.75f));
+                _matrices[i].SetTRS(transform.position - transform.forward * speed * 100 + _dirs[i] + _moveDirs[i] * offset[j] * 10000 + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1 + speed) * 150*math.clamp(_scales[i],0.25f,0.4f));
             }
+        }
         }
         print(_currentDirsIndex);
         

@@ -28,7 +28,8 @@ Shader "Hidden/Atmosphere"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
-            #define maxFloat 3.402823466e+38
+            // #define maxFloat 3.402823466e+38
+			#define maxFloat 2000000
             struct appdata {
 					float4 vertex : POSITION;
 					float4 uv : TEXCOORD0;
@@ -53,6 +54,7 @@ Shader "Hidden/Atmosphere"
 
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
+			float3 _planetCentre;
 
             float2 raySphere(float3 sphereCentre, float sphereRadius, float3 rayOrigin, float3 rayDir) {
                 float3 offset = rayOrigin - sphereCentre;
@@ -69,11 +71,38 @@ Shader "Hidden/Atmosphere"
 
                     // Ignore intersections that occur behind the ray
                     if (dstToSphereFar >= 0) {
-                        return float2(dstToSphereNear, dstToSphereFar - dstToSphereNear);
+                        return float2(dstToSphereNear, dstToSphereFar);
                     }
                 }
+
+
                 // Ray did not intersect sphere
-                return float2(maxFloat, 0);
+                return float2(maxFloat,maxFloat);
+            }
+
+			float2 raySphereUpdatePlanetCentre(float3 sphereCentre, float sphereRadius, float3 rayOrigin, float3 rayDir, float2 inputValue) {
+                float3 offset = rayOrigin - sphereCentre;
+                float a = 1; // Set to dot(rayDir, rayDir) if rayDir might not be normalized
+                float b = 2 * dot(offset, rayDir);
+                float c = dot (offset, offset) - sphereRadius * sphereRadius;
+                float d = b * b - 4 * a * c; // Discriminant from quadratic formula
+
+                // Number of intersections: 0 when d < 0; 1 when d = 0; 2 when d > 0
+                if (d > 0) {
+                    float s = sqrt(d);
+                    float dstToSphereNear = max(0, (-b - s) / (2 * a));
+                    float dstToSphereFar = (-b + s) / (2 * a);
+
+                    // Ignore intersections that occur behind the ray
+                    if (dstToSphereFar >= 0) {
+						//_planetCentre = sphereCentre;
+                        return float2(dstToSphereNear, dstToSphereFar);
+                    }
+                }
+
+				
+                // Ray did not intersect sphere
+                return inputValue;
             }
 
 			sampler2D _BakedOpticalDepth;
@@ -82,7 +111,7 @@ Shader "Hidden/Atmosphere"
 
 			float3 _dirToSun;
 
-			float3 _planetCentre;
+			
 			float _atmosphereRadius;
 			float _oceanRadius;
 			float _planetRadius;
@@ -95,22 +124,24 @@ Shader "Hidden/Atmosphere"
 			float _ditherStrength;
 			
 			float _densityFalloff;
-
+			float4 _planetCentres[10];
+			int _numPlanets;
+			int _index;
 			
-			float densityAtPoint(float3 densitySamplePoint) {
-				float heightAboveSurface = length(densitySamplePoint - _planetCentre) - _planetRadius;
+			float densityAtPoint(float3 densitySamplePoint,float3 planetCentre) {
+				float heightAboveSurface = length(densitySamplePoint - planetCentre) - _planetRadius;
 				float height01 = heightAboveSurface / (_atmosphereRadius - _planetRadius);
 				float localDensity = exp(-height01 * _densityFalloff) * (1 - height01);
 				return localDensity;
 			}
 			
-			float opticalDepth(float3 rayOrigin, float3 rayDir, float rayLength) {
+			float opticalDepth(float3 rayOrigin, float3 rayDir, float rayLength,float3 planetCentre) {
 				float3 densitySamplePoint = rayOrigin;
 				float stepSize = rayLength / (_numOpticalDepthPoints - 1);
 				float opticalDepth = 0;
 
 				for (int i = 0; i < _numOpticalDepthPoints; i ++) {
-					float localDensity = densityAtPoint(densitySamplePoint);
+					float localDensity = densityAtPoint(densitySamplePoint,planetCentre);
 					opticalDepth += localDensity * stepSize;
 					densitySamplePoint += rayDir * stepSize;
 				}
@@ -140,7 +171,7 @@ Shader "Hidden/Atmosphere"
 			// 	return opticalDepth;
 			// }
 			
-			float3 calculateLight(float3 rayOrigin, float3 rayDir, float rayLength, float3 originalCol, float2 uv) {
+			float3 calculateLight(float3 rayOrigin, float3 rayDir, float rayLength, float3 originalCol, float2 uv,float3 planetCentre) {
 				// float blueNoise = tex2Dlod(_BlueNoise, float4(squareUV(uv) * ditherScale,0,0));
 				// blueNoise = (blueNoise - 0.5) * _ditherStrength;
 				
@@ -150,10 +181,12 @@ Shader "Hidden/Atmosphere"
 				float viewRayOpticalDepth = 0;
 
 				for (int i = 0; i < _numInScatteringPoints; i ++) {
-					float sunRayLength = raySphere(_planetCentre, _atmosphereRadius, inScatterPoint, _dirToSun).y;
-					float sunRayOpticalDepth = opticalDepth(inScatterPoint + _dirToSun, _dirToSun,sunRayLength);
-					float localDensity = densityAtPoint(inScatterPoint);
-					viewRayOpticalDepth = opticalDepth(rayOrigin, rayDir, stepSize * i);
+					float2 noHitValue = maxFloat;
+					float3 dirToSun = normalize((_dirToSun - planetCentre).xyz);
+					float sunRayLength = raySphere(planetCentre, _atmosphereRadius, inScatterPoint, dirToSun).y;
+					float sunRayOpticalDepth = opticalDepth(inScatterPoint + dirToSun, dirToSun,sunRayLength,planetCentre);
+					float localDensity = densityAtPoint(inScatterPoint,planetCentre);
+					viewRayOpticalDepth = opticalDepth(rayOrigin, rayDir, stepSize * i,planetCentre);
 					float3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * _scatteringCoefficients);
 					
 					inScatteredLight += localDensity * transmittance;
@@ -184,24 +217,54 @@ Shader "Hidden/Atmosphere"
                 float4 originalCol = tex2D(_MainTex, i.uv);
 				float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
 				float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
-											
+
 				float3 rayOrigin = _WorldSpaceCameraPos;
 				float3 rayDir = normalize(i.viewVector);
 				
-				float dstToOcean = raySphere(_planetCentre, _oceanRadius, rayOrigin, rayDir);
+				//float4 planetCentre = maxFloat;
+
+				// float2 surfaceResult = maxFloat;
+				// float2 atmosphereResult = maxFloat;
+
+				// for(int j = 0; j < _numPlanets ; j++){
+				// 	surfaceResult = raySphere(_planetCentres[j], _oceanRadius, rayOrigin, rayDir,surfaceResult);
+				// 	atmosphereResult = raySphereUpdatePlanetCentre(_planetCentres[j], _atmosphereRadius, rayOrigin, rayDir,atmosphereResult);
+				// // //  float hit = raySphereUpdateIndex(_planetCentres[j], _oceanRadius, rayOrigin, rayDir,j);
+				// // // 	surfMin = min(surfMin,hit);
+				// // // 	float2 hitInfou = raySphere(_planetCentres[j], _atmosphereRadius, rayOrigin, rayDir);
+				// // // 	atmospherenearMin = min(atmospherenearMin,hitInfou.x);
+				// // // 	atmospherefarMin = min(atmospherefarMin,hitInfou.y);
+				// // //  _planetCentre = min((_planetCentre - rayOrigin), _planetCentres[j] - rayOrigin);
+				// // // 	_planetCentre += rayOrigin;
+				// }
+				
+				// float4 light = originalCol;
+				// for(int j = _numPlanets - 1; j >= 0; j--){
+
+				
+
+				float dstToOcean = raySphere(_planetCentres[_index], _oceanRadius, rayOrigin, rayDir);
 				float dstToSurface = min(sceneDepth, dstToOcean);
 				
-				float2 hitInfo = raySphere(_planetCentre, _atmosphereRadius, rayOrigin, rayDir);
+				float2 hitInfo = raySphere(_planetCentres[_index], _atmosphereRadius, rayOrigin, rayDir);
 				float dstToAtmosphere = hitInfo.x;
-				float dstThroughAtmosphere = min(hitInfo.y, dstToSurface - dstToAtmosphere);
+				float dstThroughAtmosphere = min(hitInfo.y - hitInfo.x , dstToSurface - dstToAtmosphere);
+
+				// float dstToSurface = min(sceneDepth,surfMin);
+				// float dstToAtmosphere = atmospherenearMin;
+				// float dstThroughAtmosphere =  min(atmospherefarMin - atmospherenearMin,dstToSurface-dstToAtmosphere);
 				
+
 				if (dstThroughAtmosphere > 0) {
 					const float epsilon = 0.0001;
 					float3 pointInAtmosphere = rayOrigin + rayDir * (dstToAtmosphere + epsilon);
-					float3 light = calculateLight(pointInAtmosphere, rayDir, dstThroughAtmosphere - epsilon * 2, originalCol, i.uv);
+					return float4(calculateLight(pointInAtmosphere, rayDir, dstThroughAtmosphere - epsilon * 2, originalCol, i.uv,_planetCentres[_index]),1.0);
 					//return float4(1.0,0.5,0.7,1.0);
-					return float4(light,1.0);
+					//return float4(light.rgb,1.0);
 				}
+
+				// }
+				//return originalCol;
 				return originalCol;
                 
                 //
