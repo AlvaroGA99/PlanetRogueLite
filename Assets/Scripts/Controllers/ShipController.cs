@@ -11,6 +11,8 @@ public class ShipController : MonoBehaviour
 
     [SerializeField]private TrailRenderer _tr1;
     [SerializeField]private TrailRenderer _tr2;
+    [SerializeField]private MeshRenderer _mtr1;
+    [SerializeField]private MeshRenderer _mtr2;
     [SerializeField] private Transform childShip;
     public Vector2 zxRotationValue;
     public float rightYRotationValue;
@@ -59,7 +61,7 @@ public class ShipController : MonoBehaviour
 
             Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
             Vector3 localVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
-            //_rb.velocity
+            
             lastVelocity = localVelocity;
             
             if (breakActivated)
@@ -124,10 +126,7 @@ public class ShipController : MonoBehaviour
                     speedAlignerValue2 = 1;
                 }
                 else if( localVelocity.y != 0){
-                    speedAlignerValue2 = 0;
-                    // localVelocity.x = 0;
-                    // _rb.velocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
-                    
+                    speedAlignerValue2 = 0;                    
                 }
 
                  if (localVelocity.x > 0.05)
@@ -139,10 +138,7 @@ public class ShipController : MonoBehaviour
                     speedAlignerValue = 1;
                 }
                 else if( localVelocity.x != 0){
-                    speedAlignerValue = 0;
-                    // localVelocity.x = 0;
-                    // _rb.velocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
-                    
+                    speedAlignerValue = 0;                
                 }
             }
             
@@ -162,20 +158,11 @@ public class ShipController : MonoBehaviour
             
         }
 
-
-
-        //print(_gF.GetTotalFieldForceForBody(transform.position));
         _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
     } 
 
     void Update()
     {
-        // if(_energy > 0){
-        //     _energy -= Time.deltaTime*(mainEngineValue+breakEngineValue+takeOffEngineValue+landingEngineValue+zxRotationValue.y+leftYRotationValue+rightYRotationValue)/7;
-        // }
-        // if(_energy< 0){
-        //     _energy = 0;
-        // }
         energyObject.UpdateEnergy(Time.deltaTime * (overridemainEngineValue + overridebreakEngineValue + overridetakeOffEngineValue + overridelandingEngineValue + Math.Abs(overridezxRotationValue.y) + Math.Abs(overridezxRotationValue.x) + overrideleftYRotationValue + overriderightYRotationValue) / 8);
     }
 
@@ -191,17 +178,14 @@ public class ShipController : MonoBehaviour
     public void TurnOnTrails(){
         _tr1.emitting = true;
         _tr2.emitting = true;
+        _mtr1.enabled = true;
+        _mtr2.enabled = true;
     }
 
     public void TurnOffTrails(){
         _tr1.emitting = false;
         _tr2.emitting = false;
+        _mtr1.enabled = false;
+        _mtr2.enabled = false;
     }
-    // public void ResetAngularDrag(){
-    //     _rb.angularDrag = 0;
-    // }
-
-    // private void UpdateEnergy(){
-    //     _energyImage.transform.localScale = new Vector3(_energy/10,1,1);
-    // }
 }

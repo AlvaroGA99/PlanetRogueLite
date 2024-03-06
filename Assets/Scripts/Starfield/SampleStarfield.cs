@@ -55,16 +55,9 @@ public class SampleStarfield : MonoBehaviour
 
         for (int i = 0; i < samples; i++)
         {
-            //     for (int i = j*_samples/_chunks; i < (j+1)*_samples/_chunks; i++)
-            // {   
-            
-
-
             x = UnityEngine.Random.value;
             y = UnityEngine.Random.value;
             z = UnityEngine.Random.value;
-
-
 
             theta = x * math.PI * 2;
             phi = y * math.PI;
@@ -109,7 +102,7 @@ public class SampleStarfield : MonoBehaviour
             }
             for (int i = j * _matrices.Length / offset.Length; i < (j + 1) * _matrices.Length / offset.Length; i++)
             {
-                _matrices[i].SetTRS(transform.position - transform.forward * 100 + _dirs[i] + _moveDirs[i] * offset[j] + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1) * 150*math.clamp(_scales[i],0.25f,0.4f));
+                _matrices[i].SetTRS(transform.position - transform.forward * 100 + _dirs[i] + _moveDirs[i] * offset[j] + _sampleAdjustment, Quaternion.identity, new Vector3(1, 1, 1) * 150*math.clamp(_scales[i],0.4f,0.5f));
             }
         }
         }
@@ -117,15 +110,11 @@ public class SampleStarfield : MonoBehaviour
         _currentDirsIndex = 0;
         _rp = new RenderParams(_starMaterial);
 
-        // cor = SwappingStars();
-        // StartCoroutine(cor);
-
     }
     // Update is called once per frame
     void Update()
     {
         if (sampleType == SampleType.Conical){
-
         
         for (int j = 0; j < offset.Length; j++)
         {

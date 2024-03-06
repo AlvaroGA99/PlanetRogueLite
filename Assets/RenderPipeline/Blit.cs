@@ -39,18 +39,19 @@ namespace UnityEngine.Experimental.Rendering.Universal
 
             var passIndex = settings.blitMaterial != null ? settings.blitMaterial.passCount - 1 : 1;
             settings.blitMaterialPassIndex = Mathf.Clamp(settings.blitMaterialPassIndex, -1, passIndex);
+            passes = new List<BlitPass>();
             if (settings.materialList.Count > 0){
-                passes = new List<BlitPass>();
                 foreach(Material m in settings.materialList){
                     passes.Add(new BlitPass(settings.Event, m, settings.blitMaterialPassIndex, name));
                 }
-            }else{
-                passes = new List<BlitPass>();
-                blitPass = new BlitPass(settings.Event, settings.blitMaterial, settings.blitMaterialPassIndex, name);
-                blitPass1 = new BlitPass(settings.Event, settings.blitMaterial1, settings.blitMaterialPassIndex, name);
-                passes.Add(blitPass);
-                passes.Add(blitPass1);
             }
+            // else{
+            //     passes = new List<BlitPass>();
+            //     blitPass = new BlitPass(settings.Event, settings.blitMaterial, settings.blitMaterialPassIndex, name);
+            //     blitPass1 = new BlitPass(settings.Event, settings.blitMaterial1, settings.blitMaterialPassIndex, name);
+            //     passes.Add(blitPass);
+            //     passes.Add(blitPass1);
+            // }
             
             
             //passes.Add(blitPass);

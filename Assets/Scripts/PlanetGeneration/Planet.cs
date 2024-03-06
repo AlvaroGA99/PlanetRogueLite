@@ -22,6 +22,8 @@ public class Planet : MonoBehaviour
     private float _planetIntegrity;
     private Material _material;
     private Material _fluidMaterial;
+
+    public PlanetProperties.PlanetLayerElement fluidPropertie;
     
     // Start is called before the first frame update
     void Start()
@@ -111,9 +113,6 @@ public class Planet : MonoBehaviour
         int[] originalTriangles = m.triangles;
         return Task<(int[] tr,Vector3[] vr)>.Run(() => {
         Dictionary<long, int> newVertexIndices = new Dictionary<long, int>();
-        //print(originalVertices.Length);
-        // auxm.vertices = originalVertices;
-        // auxm.triangles = originalTriangles;
 
         int newIndex = 0;
         int denom = 1;
@@ -187,15 +186,6 @@ public class Planet : MonoBehaviour
         }
         return (originalTriangles,originalVertices);
         });
-        // print(m.vertices.Length);
-        // print(v.Length);
-        // m.vertices = v;
-        // m.triangles = t;
-        
-        // mF.mesh = m;
-        //m.RecalculateNormals();
-        //mC.sharedMesh = m;
-        //Debug.Log(tiles.elements[0].tileVertices.Count);
     }
 
     public void SetMesh(int[] triangles,Vector3[] vertices){
@@ -216,7 +206,6 @@ public class Planet : MonoBehaviour
         Vector3 v0 = newVertices[i0];
         Vector3 v1 = newVertices[i1];
         Vector3 newVertex = ((v0 + v1) / 2f).normalized;
-        //newVertex += newVertex;//*SampleNoiseHeight(newVertex);
         newVertices[newIndex] = newVertex;
         newVertexIndices[edgeKey] = newIndex;
 
@@ -269,9 +258,10 @@ public class Planet : MonoBehaviour
         _material.SetTexture("_LowLayerNormal",normal);
     }
 
-    public void SetFluidLayerTexture(Color32 color){
+    public void SetFluidLayerTexture(Color32 color,PlanetLayerElement fp){
         _fluidMaterial.SetColor("_BaseColor",color);
         _fluidMaterial.SetColor("_EmissionColor",color);
+        fluidPropertie = fp;
 
     }
 

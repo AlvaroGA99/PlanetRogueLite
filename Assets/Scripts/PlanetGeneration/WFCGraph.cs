@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using PlanetProperties;
-using System.Linq;
-using UnityEngine.InputSystem.Interactions;
 using System;
 
 public class WFCGraph
@@ -46,11 +44,7 @@ public class WFCGraph
             edges[id0] = new Edge();
             edges[id1] = new Edge();
             edges[id2] = new Edge();
-
-            //edges[id0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            //edges[id1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
-            //edges[id2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
-
+            
             edges[id0].ResetID0Option(planetTopography);
             edges[id1].ResetID1Option(planetTopography);
             edges[id2].ResetID2Option(planetTopography);
@@ -242,11 +236,6 @@ public class WFCGraph
 
         foreach (Node n in elements)
         {
-            //n.collapsed = false;
-            //n.edges[0].options = new List<string>() { "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB" };
-            //n.edges[1].options = new List<string>() { "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB", "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB" };
-            //n.edges[2].options = new List<string>() { "AA", "BA", "AA", "BA", "AB", "BB", "AB", "BB", "AA", "AB", "BA", "BB", "AA", "AB", "BA", "BB", "AA", "AA", "AB", "AB", "BA", "BA", "BB", "BB" };
-            
              n.edges[0].ResetID0Option(planetTopography);
              n.edges[1].ResetID1Option(planetTopography);
              n.edges[2].ResetID2Option(planetTopography);

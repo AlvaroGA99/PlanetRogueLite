@@ -98,6 +98,7 @@ MonoBehaviour:
   mass: 0
   isInSpawnState: 0
   _destructionMeshPrefab: {fileID: 7690870018776814912, guid: 97bb571d3b2b90c4a87f0ee8da6a68a3, type: 3}
+  fluidPropertie: 0
 --- !u!64 &6584837813910274162
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -139,7 +140,7 @@ GameObject:
   - component: {fileID: 3419238912766618888}
   m_Layer: 9
   m_Name: PlanetFluid
-  m_TagString: Untagged
+  m_TagString: Fluid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

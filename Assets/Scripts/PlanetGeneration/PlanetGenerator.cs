@@ -5,22 +5,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using PlanetProperties;
-using UnityEngine.Rendering.Universal;
-using UnityEditor.Rendering;
-using UnityEngine.UIElements;
-using UnityEngine.UI;
 using TMPro;
-using Image = UnityEngine.UI.Image;
-using System.Linq;
-using System.Threading;
 
 public class PlanetGenerator : MonoBehaviour
 {   
     public Planet[] _orbits;
-
+    [SerializeField] GameManager _manager;
     public Planet planetPrefab;
-
-    //private Planet _currentPlanet;
 
     [SerializeField]
     private PlayerController _player;
@@ -47,32 +38,9 @@ public class PlanetGenerator : MonoBehaviour
     Mesh initialMesh;
 
     float widthToLerp; 
-
-
-    void Awake()
-    {   
-        sampler = new System.Random();
-        seed = sampler.Next();
-        sampler = new System.Random(seed);
-        _orbits = new Planet[7];
-        float angle = 0.0f;
-        for (int i = 0; i < _orbits.Length; i++)
-        {
-            angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
-            Vector3 dir = new Vector3(Mathf.Cos(angle), 0, -Mathf.Sin(angle));
-            _orbits[i] = Instantiate(planetPrefab, transform.position + dir*800 + dir*700*(i + 1), Quaternion.identity);
-            _orbits[i].Init(sampler);
-            _orbits[i].transform.SetParent(transform);
-            
-        }
-        
-        transform.localScale = Vector3.zero;
-    }
-    // Start is called before the first frame update
-    async void Start()
+    void Start()
     {
-        widthToLerp = loadingBg.sizeDelta.x;
-        StartCoroutine(LoadBar());
+       
         generationModuleWedgesValues = new Dictionary<string, List<float>>();
         generationModuleCentresValues = new Dictionary<string, List<float>>();
 
@@ -158,40 +126,8 @@ public class PlanetGenerator : MonoBehaviour
         generationModuleCentresValues.Add("CCC", GenerateCentresValuesList("CCC"));
 
         initialMesh = GenerateBaseIcosahedronAndGraphResolutionMesh(2);
-        tiles = new WFCGraph(initialMesh.triangles, 0, sampler);
-        Array vals = Enum.GetValues(typeof(PlanetLayerElement));
-
-        for (int i = 0; i < _orbits.Length; i++)
-        {
-            _orbits[i].mF.mesh = Mesh.Instantiate(initialMesh);
-            _orbits[i].m = _orbits[i].mF.mesh;
-            _orbits[i].mass = 10000;
-            PlanetLayerElement samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
-            _orbits[i].SetHighLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp)); 
-            samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length)); 
-            _orbits[i].SetMediumLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp));
-            _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
-        }
-        var widthToAdd = loadingBar.rect.width/_orbits.Length;
-        for (int i = 0; i < _orbits.Length; i++)
-        {
-            widthToLerp += widthToAdd;
-            await LoadLevel();
-            (int[] triRes,Vector3[] vertRes) = await _orbits[i].GenerateSphereResolution(3, tiles);
-            _orbits[i].SetMesh(triRes,vertRes);
-            _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
-            tiles.Reset(-1);
-        }
-        isFinishedLoading = true;
-        loadingBar.gameObject.SetActive(false);
-        loadingBg.gameObject.SetActive(false);
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        
+        
     }
 
     private Mesh GenerateBaseIcosahedronAndGraphResolutionMesh(int resolution)
@@ -299,7 +235,6 @@ public class PlanetGenerator : MonoBehaviour
 
     }
 
-
     private int GetNewVertexIndex(int i0, int i1, ref Dictionary<long, int> newVertexIndices, ref Vector3[] newVertices, ref int newIndex)
     {
         long edgeKey = EdgeKey(i0, i1);
@@ -380,10 +315,37 @@ public class PlanetGenerator : MonoBehaviour
     }
 
     public async void Load(int seed){
+        widthToLerp = loadingBg.sizeDelta.x;
+        isFinishedLoading = false;
+        StartCoroutine(LoadBar());
+        transform.localScale = new Vector3(770,770,770);
+        
+
+        for (int i = 0; i < _orbits.Length; i++)
+        {
+            Destroy(_orbits[i].gameObject);
+            
+        }
         if(seed > 0){
             sampler = new System.Random();
         }
         sampler = new System.Random(seed);
+        tiles = new WFCGraph(initialMesh.triangles, 0, sampler);
+
+        _orbits = new Planet[7];
+        float angle = 0.0f;
+        for (int i = 0; i < _orbits.Length; i++)
+        {
+            
+            angle = UnityEngine.Random.Range(0, 2*Mathf.PI );
+            Vector3 dir = new Vector3(Mathf.Cos(angle), 0, -Mathf.Sin(angle));
+            _orbits[i] = Instantiate(planetPrefab, transform.position + dir*800 + dir*700*(i + 1), Quaternion.identity);
+            _orbits[i].Init(sampler);
+            _orbits[i].transform.SetParent(transform);
+            
+        }
+        
+        transform.localScale = Vector3.zero;
         Array vals = Enum.GetValues(typeof(PlanetLayerElement));
 
         for (int i = 0; i < _orbits.Length; i++)
@@ -407,6 +369,7 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
             tiles.Reset(-1);
         }
+        _manager.Arrive();
         isFinishedLoading = true;
         loadingBar.gameObject.SetActive(false);
         loadingBg.gameObject.SetActive(false);
@@ -454,18 +417,6 @@ public class PlanetGenerator : MonoBehaviour
 
     }
 
-    public async void ReloadLevel(){
-        
-           for (int i = 0; i < _orbits.Length; i++)
-        {
-            await LoadLevel();
-            //_orbits[i].GenerateSphereResolution(3, tiles);
-            _orbits[i].UpdateVertexPositions(tiles, generationModuleWedgesValues, generationModuleCentresValues);
-            tiles.Reset(-1);
-        }
-        isFinishedLoading = true;
-    }
-
     private IEnumerator LoadBar(){
         while(!isFinishedLoading){
              loadingBg.sizeDelta = new Vector2(loadingBg.sizeDelta.x*0.9f + widthToLerp*0.1f,loadingBg.sizeDelta.y);
@@ -511,21 +462,6 @@ public class PlanetGenerator : MonoBehaviour
             return magmaNormal;
         }
     }
-    private Color32 GetColorByFluid(PlanetLayerElement layer){
-        switch(layer){
-            case PlanetLayerElement.Magma:
-                return new Color32(188,56,19,255);
-            case PlanetLayerElement.EarthWater:
-                return new Color32(46,118,207,255);
-            case PlanetLayerElement.ToxicGrass:
-                return new Color32(130,171,4,255);
-            default:
-            return new Color();
-        }
-
-    }
-
-
         private Material GetMatByFluid(PlanetLayerElement layer){
         switch(layer){
             case PlanetLayerElement.Magma:

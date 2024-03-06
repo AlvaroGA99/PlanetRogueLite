@@ -7,14 +7,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private Projectile _projPrefab;
-
     [SerializeField] private bool shouldSpawn;
     [SerializeField] private Rigidbody _rb;
     ObjectPool<Projectile> _projPool;
-
     private Transform char_T;
-    //private Transform _SphereT;
     private Transform _t;
     private bool jumping;
     private float timer;
@@ -151,7 +147,7 @@ public class EnemyController : MonoBehaviour
     {
         Projectile projRef = _projPool.Get();
         projRef.transform.position = _t.position + _t.up * 2;
-        projRef.InitEnemySource(_t);
+        // projRef.InitEnemySource(_t);
         projRef.GetComponent<Rigidbody>().AddForce((launchVector + _t.up * 4).normalized * launchVectorMag, ForceMode.Impulse);
         UnityEngine.Debug.DrawLine(_t.position, _t.position + (launchVector + _t.up * 4).normalized * launchVectorMag, Color.red, 2);
     }

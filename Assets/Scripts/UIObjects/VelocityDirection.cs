@@ -17,8 +17,6 @@ public class VelocityDirection : MonoBehaviour
     {
         
     }
-
-    // Update is called once per frame
     void Update()
     {   
         float mag = _ship.velocity.magnitude;
@@ -27,7 +25,6 @@ public class VelocityDirection : MonoBehaviour
         _velocityMagnitude.color = c;
         _mat.SetColor("_Color",c);
         _velocityMagnitude.text = (int)mag + " kms"; 
-        // _mat.SetColor("_Color",new Color(1,1,1,0));
         transform.rotation = Quaternion.LookRotation(_camTransform.worldToLocalMatrix*_ship.velocity);
     }
 }

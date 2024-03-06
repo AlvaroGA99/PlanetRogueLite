@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using PlanetProperties;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
@@ -16,8 +18,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     public event Action<GameObject> OnEnterAtmosphere;
     public event Action OnExitAtmosphere;
+    public event Action OnGameOver;
     private InputActionMap _ingameControl;
-    private float _healthPoints;
     [SerializeField] private InputActionAsset input;
     private InputAction movement;
     private InputAction jump;
@@ -39,7 +41,6 @@ public class PlayerController : MonoBehaviour
     public Transform _SphereT;
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tHead;
-    [SerializeField] private Transform _tWeapon;
     [SerializeField] private ShipController _shipController;
 
     [SerializeField] private LightManager _lM;
@@ -48,12 +49,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 _rotationVector ;
     private Vector3 _toCenter;
     private GravityField _gF;
-    private Vector3 _wieldVector;
+ 
     private Vector3 _moveVector;
-    public Vector3 _lastForward;
     private float _rotationSpeed;
     private Quaternion _lastLocalRotation;
-    private Quaternion _lastLocalWieldRotation;
     private bool onFloor;
     private bool nearShip;
     private bool onShip = true;
@@ -71,12 +70,13 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] GameObject characterLight;
 
+    Coroutine _fluidInteraction;
+
     //private float airTimer;
 
 
     void Start()
     {   
-        _healthPoints = 1.0f;
         onFloor = false;
         nearShip = true;
         _t = transform;
@@ -84,7 +84,6 @@ public class PlayerController : MonoBehaviour
         _ingameControl = input.FindActionMap("Ingame");
         movement = _ingameControl.FindAction("Movement");
         jump = _ingameControl.FindAction("Jump");
-        wield = _ingameControl.FindAction("Wield");
         shipRotation = _ingameControl.FindAction("ShipRotation");
         mainShipPropulsion = _ingameControl.FindAction("MainShipPropulsion");
         takeOffPropulsion = _ingameControl.FindAction("TakeOffPropulsion");
@@ -113,8 +112,6 @@ public class PlayerController : MonoBehaviour
         movement.canceled += OnStop;
         jump.performed += OnJump;
         jump.canceled  += OnStopJump;
-        wield.performed += OnWield;
-        wield.canceled  += OnStopWield;
         shipRotation.performed += OnShipRotation;
         shipRotation.canceled += OnStopShipRotation;
         mainShipPropulsion.performed += OnMainShipPropulsion;
@@ -140,9 +137,7 @@ public class PlayerController : MonoBehaviour
 
         _rb = GetComponent<Rigidbody>();
         _lastLocalRotation = _tChild.localRotation;
-        _lastLocalWieldRotation = _tWeapon.localRotation;
         cam = Camera.main;
-        _lastForward = _tWeapon.transform.forward;
         camShakeIntesity = 0;
 
     }
@@ -156,17 +151,6 @@ public class PlayerController : MonoBehaviour
         //random 
         offset = new Vector2(Mathf.PerlinNoise(Time.time*1.7f,0)-0.5f,Mathf.PerlinNoise(0,Time.time*1.7f)-0.5f)*_vD.velocityMag/1.4f;
         cam.transform.localPosition = cam.transform.localPosition + new Vector3(offset.x,offset.y,0);
-        //var xoffset = leerTexturaenvalorrandomx*intensidad;
-        //var yoffset = leerTexturaenvalorrandomy*intensidad;
-        //transform + offset
-        
-        // Vector3 axis = Vector3.Cross(transform.up,transform.position - cam.transform.position); //new Vector2(cam.transform.localPosition.x,cam.transform.localPosition.y).sqrMagnitude > 1)
-        // if(axis.sqrMagnitude > 0 && rotateCamValue.y > 0){
-        //     cam.transform.RotateAround(transform.position,Vector3.Cross(transform.up,transform.position - cam.transform.position),rotateCamValue.y);
-        // }else if(axis.sqrMagnitude > 0 && rotateCamValue.y < 0)
-        // {
-        //     cam.transform.RotateAround(transform.position,Vector3.Cross(-transform.up,transform.position - cam.transform.position),math.abs(rotateCamValue.y));
-        // }
         _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp/30);
     }
    
@@ -201,19 +185,7 @@ public class PlayerController : MonoBehaviour
     {
         _jetpackProp = 0;
     }
-    
-    void OnWield(InputAction.CallbackContext wieldAction)
-    {
-        
-        Vector2 inp = wieldAction.ReadValue<Vector2>();
-        _wieldVector = new Vector3(inp.x, 0, inp.y);
-        //notGamepad = false;
-    }
 
-    void OnStopWield(InputAction.CallbackContext stopWieldAction)
-    {
-        //notGamepad = true;
-    }
 
     void OnShipRotation(InputAction.CallbackContext action){
         _shipController.zxRotationValue = action.ReadValue<Vector2>();
@@ -340,13 +312,11 @@ public class PlayerController : MonoBehaviour
     public void DisablePlayerController(){
         movement.Disable();
         jump.Disable();
-        wield.Disable();
     }
 
     public void EnablePlayerController(){
         movement.Enable();
         jump.Enable();
-        wield.Enable();
     }
 
     public void DisableShipController(){
@@ -383,13 +353,8 @@ public class PlayerController : MonoBehaviour
     }
     public void FixedUpdate()
     {
-        _lastForward = _tWeapon.transform.forward;
-        
-        // _tWeapon.position = transform.position;
 
         Vector3 aux = cam.WorldToScreenPoint(_t.position);
-        _wieldVector = new Vector3(Mouse.current.position.x.ReadValue() - aux.x,0,Mouse.current.position.y.ReadValue() - aux.y)  ;
-        _wieldVector.Normalize();
           
        // print(cam.WorldToScreenPoint(_t.position));
         //print(_rotationVector);
@@ -407,12 +372,7 @@ public class PlayerController : MonoBehaviour
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
             _tChild.rotation = Quaternion.Slerp(Quaternion.LookRotation(Vector3.ProjectOnPlane(_moveVector,_toCenter).normalized, -_toCenter),_lastLocalRotation,0.8f);
         }
-       
-
         _lastLocalRotation = _tChild.rotation;
-        
-        _tWeapon.localRotation = Quaternion.Slerp(Quaternion.LookRotation(_wieldVector, Vector3.up),_lastLocalWieldRotation,0.8f);
-        _lastLocalWieldRotation = _tWeapon.localRotation;
 
         if(_energyObject.energy > 0){
             _rb.AddForce((_tChild.up+_tChild.forward)*_jetpackProp*4);
@@ -421,20 +381,13 @@ public class PlayerController : MonoBehaviour
  
     }
 
-
-    private void UpdateHealth(){
-       Health.transform.localScale = new Vector3(_healthPoints,1,1);
-    }
     private void OnCollisionEnter(Collision col)
     {   
         if(col.gameObject.tag == "Planet"){
             onFloor = true;
             _rotationSpeed = 100;
         }else if(col.gameObject.tag == "Projectile"){
-            if(_healthPoints > 0){
-                _healthPoints-= 0.1f;
-                UpdateHealth();
-            }
+
             
         }
     }
@@ -447,6 +400,22 @@ public class PlayerController : MonoBehaviour
             OnEnterAtmosphere?.Invoke(col.gameObject);
         }else if(col.gameObject.tag == "Ship"){
             nearShip = true;
+        }else if(col.gameObject.tag == "Fluid"){
+            Planet p = col.transform.parent.gameObject.GetComponent<Planet>();
+            if(p!= null){
+                switch(p.fluidPropertie){
+                    case PlanetLayerElement.Magma:
+                        MagmaInteraction();
+                        break;
+                    case PlanetLayerElement.EarthWater:
+                        _fluidInteraction = StartCoroutine(WaterInteraction());
+                        break;
+                    case PlanetLayerElement.ToxicGrass:
+                        _fluidInteraction = StartCoroutine(ToxicInteraction());
+                        break;
+                        
+                }
+            }
         }
             
     }
@@ -462,6 +431,8 @@ public class PlayerController : MonoBehaviour
         }else if(col.gameObject.tag == "Energy"){
         }else if(col.gameObject.tag == "Ship"){
             nearShip = false;
+        }else if(col.gameObject.tag == "Fluid"){
+            StopCoroutine(_fluidInteraction);
         }
             
     }
@@ -475,4 +446,51 @@ public class PlayerController : MonoBehaviour
         //_tHead.parent = Camera.main.transform;
     }
 
+    private void MagmaInteraction(){
+        _energyObject.SetToZero();
+        OnGameOver?.Invoke();
+        DisableCameraController();
+        DisablePlayerController();
+        DisableShipController();
+        UnbindCallbacks();
+    }
+
+    private IEnumerator WaterInteraction(){
+        _rb.AddForce(_tChild.up);
+        yield return new WaitForFixedUpdate();
+    }
+
+    private IEnumerator ToxicInteraction(){
+        while(true){
+            _energyObject.UpdateEnergy(-1);
+        }
+    }
+
+    private void UnbindCallbacks(){
+        movement.performed -= OnMove;
+        movement.canceled -= OnStop;
+        jump.performed -= OnJump;
+        jump.canceled  -= OnStopJump;
+        shipRotation.performed -= OnShipRotation;
+        shipRotation.canceled -= OnStopShipRotation;
+        mainShipPropulsion.performed -= OnMainShipPropulsion;
+        mainShipPropulsion.canceled -= OnStopMainShipPropulsion;
+        takeOffPropulsion.performed -= OnTakeOffPropulsion;
+        takeOffPropulsion.canceled -= OnStopTakeOffPropulsion;
+        shipYRightRotation.performed -= OnShipYRightRotation;
+        shipYRightRotation.canceled -= OnStopShipYRightRotation;
+        shipYLeftRotation.performed -= OnShipYLeftRotation;
+        shipYLeftRotation.canceled -= OnStopShipYLeftRotation;
+        brakePropulsion.performed -= OnBrakePropulsion;
+        brakePropulsion.canceled -= OnStopBrakePropulsion;
+        landingPropulsion.performed -= OnLandingPropulsion;
+        landingPropulsion.canceled -= OnStopLandingPropulsion;
+        cameraAction.performed -= OnCameraAction;
+        cameraAction.canceled -= OnStopCameraAction;
+        eject_enterShip.performed -= Eject;
+        brakeAction.performed -= OnBrake;
+        brakeAction.canceled -= OnStopBrake;
+        speedAlignAction.performed -= OnSpeedAlign;
+        speedAlignAction.canceled -= OnStopSpeedAlign;
+    }
 }

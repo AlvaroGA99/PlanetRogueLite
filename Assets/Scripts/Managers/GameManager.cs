@@ -7,11 +7,13 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 using Random = UnityEngine.Random;
-using Unity.VisualScripting;
-using System.Linq;
+using TMPro;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {   
+    public static bool SceneEntranceReload = false;
     public Material atmosphereMaterial;
     public Material blackHoleMaterial;
     public Projectile _projPrefab;
@@ -53,15 +55,23 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private SampleStarfield _sf;
     [SerializeField] private SampleStarfield _sfTraveling;
+    [SerializeField] RectTransform loadingBar;
+    [SerializeField] RectTransform loadingBg;
+
+    [SerializeField] Image _fadePanel;
+    [SerializeField] Button _mainMenu;
+    [SerializeField] Button _newExploration;
+    [SerializeField] TextMeshProUGUI _titleText;
 
     private List<Vector4> planetCentres;
 
     void Awake()
-    {   
+    {
         cam = Camera.main;
         planetCentres = new List<Vector4>();
         _playerT.OnEnterAtmosphere += StartSpawning;
         _playerT.OnExitAtmosphere += StopSpawning;
+        _playerT.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         _wallMask = LayerMask.GetMask("DestructionMesh");
@@ -69,11 +79,11 @@ public class GameManager : MonoBehaviour
         _projectilePool = new ObjectPool<Projectile>(() =>
         {
             Projectile aux = Instantiate(_projPrefab);
-            aux.Init(_playerT.transform, _projectilePool);
+            aux.Init(_projectilePool,_gravityField);
             return aux;
         }, proj =>
         {
-            proj.Reset(_playerT.transform);
+            proj.Reset();
             proj.gameObject.SetActive(true);
         }, proj =>
         {
@@ -88,7 +98,7 @@ public class GameManager : MonoBehaviour
         {
 
             EnemyController aux = Instantiate(_enemyPrefab);
-            aux.Init(_projectilePool, _playerT.transform, _wallMask,_gravityField);
+            aux.Init(_projectilePool, _playerT.transform, _wallMask, _gravityField);
             return aux;
         }, enemy =>
         {
@@ -101,14 +111,22 @@ public class GameManager : MonoBehaviour
             Destroy(enemy.gameObject);
         }, false, 5, 15);
 
-        _explore.onClick.AddListener(OnExplore);
+        _explore.onClick.AddListener(OnExploreAsync);
         _starCoords.onClick.AddListener(OnStarCoords);
         _options.onClick.AddListener(OnOptions);
         _cancel.onClick.AddListener(OnCancel);
+        _travel.onClick.AddListener(OnTravel);
+        _mainMenu.onClick.AddListener(MainMenu);
+        _newExploration.onClick.AddListener(NewExploration);
     }
+
+  
+
     // Start is called before the first frame update
     void Start()
     {
+        blitFeature.settings.materialList.Clear();
+        rendererData.SetDirty();
         timer = 0;
         planetCentres = _planetGen.GetPlanetPositions();
         // blitFeature.settings.materialList.Clear();
@@ -119,28 +137,28 @@ public class GameManager : MonoBehaviour
         // blitFeature.settings.blitMaterial1 = Material.Instantiate(atmosphereMaterial);
         // rendererData.SetDirty();
         _playerT.SetupGravityField(_gravityField);
+
+        if(SceneEntranceReload){
+            OnExploreAsync();
+        }
     }
 
-    void Update()
+    void LateUpdate()
     {
-        // if (_planetGen.IsInSpawnState())
-        // {
-        //     
-        // }
-
-    }
-
-    void LateUpdate(){
         //blackHoleMaterial.SetMatrix("_WorldToTransformCamera",cam.transform.worldToLocalMatrix);
         planetCentres = _planetGen.GetPlanetPositions();
         print(planetCentres.Count + "PLANETAS");
-        //planetCentres.Sort((x,y) => (new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0) - x).sqrMagnitude.CompareTo((new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0)-y).sqrMagnitude));
-        blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
-        blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres",planetCentres);
-        for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
+        if (planetCentres.Count > 0)
         {
-            blitFeature.settings.materialList[i].SetVectorArray("_planetCentres",planetCentres);
+            // blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres", planetCentres);
+            // blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres", planetCentres);
+            for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
+            {
+                blitFeature.settings.materialList[i].SetVectorArray("_planetCentres", planetCentres);
+            }
         }
+        //planetCentres.Sort((x,y) => (new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0) - x).sqrMagnitude.CompareTo((new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0)-y).sqrMagnitude));
+
     }
 
 
@@ -149,29 +167,23 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            if (timer > spawnval)
-            {
-                float xRandomOffset = Random.Range(-8, 8);
-                float zRandomOffset = Random.Range(-8, 8);
-                Vector3 spawnPos = _playerT.transform.position + _playerT.transform.up*6 + _playerT.transform.forward * zRandomOffset + _playerT.transform.right * xRandomOffset;
-                Vector3 dir = planet.transform.position - spawnPos;
-                RaycastHit hit;
-
-                // while(!Physics.Raycast(spawnPos,dir,out hit,_wallMask)){
-                //     xRandomOffset = Random.Range(-8,8);
-                //     zRandomOffset = Random.Range(-8,8);
-                //     spawnPos = transform.localToWorldMatrix*new Vector3(xRandomOffset,0,zRandomOffset);
-                // }
-                if (Physics.Raycast(spawnPos, dir, out hit, _wallMask))
-                {
-                    a = _enemyPool.Get();
-                    print("SPAWN ENEMY");
-                    a.transform.position = hit.point - dir.normalized;
-                }
-                spawnval = Random.Range(8, 15);
-                timer = 0;
-            }
-            timer += Time.deltaTime;
+            // if (timer > spawnval)
+            // {
+            //     float xRandomOffset = Random.Range(-8, 8);
+            //     float zRandomOffset = Random.Range(-8, 8);
+            //     Vector3 spawnPos = _playerT.transform.position + _playerT.transform.up * 6 + _playerT.transform.forward * zRandomOffset + _playerT.transform.right * xRandomOffset;
+            //     Vector3 dir = planet.transform.position - spawnPos;
+            //     RaycastHit hit;
+            //     if (Physics.Raycast(spawnPos, dir, out hit, _wallMask))
+            //     {
+            //         a = _enemyPool.Get();
+            //         print("SPAWN ENEMY");
+            //         a.transform.position = hit.point - dir.normalized;
+            //     }
+            //     spawnval = Random.Range(8, 15);
+            //     timer = 0;
+            // }
+            // timer += Time.deltaTime;
             yield return null;
         }
     }
@@ -180,14 +192,17 @@ public class GameManager : MonoBehaviour
     {
         _cameraAnimation.Play();
         //_planetGen.ReloadLevel();
-        StartCoroutine(WaitForLevelAndAnimationFinish());
+        StartCoroutine(WaitForAnimationFinish());
         HideStartMenu();
     }
-    private void OnExploreAsync(){
-         _cameraAnimation.Play();
-         HideStartMenu();
-         _planetGen.Load(-1);
-         StartSimulation();
+    private void OnExploreAsync()
+    {
+        _titleText.gameObject.SetActive(false);
+        _cameraAnimation.Play();
+        ShowLoadingBar();
+        HideStartMenu();
+        _planetGen.Load(13);
+
     }
 
     private void OnOptions()
@@ -203,7 +218,10 @@ public class GameManager : MonoBehaviour
 
     private void OnTravel()
     {
-
+        _cameraAnimation.Play();
+        ShowLoadingBar();
+        HideCoordsMenu();
+        _planetGen.Load(int.Parse(_starCoordsInput.text));
     }
 
     private void OnCancel()
@@ -242,8 +260,14 @@ public class GameManager : MonoBehaviour
         _travel.gameObject.SetActive(true);
     }
 
-    private void StartSimulation()
-    {   
+    private void ShowLoadingBar(){
+        loadingBar.gameObject.SetActive(true);
+        loadingBar.gameObject.SetActive(true);
+    }
+
+    public void StartSimulation()
+    {
+
         _playerT.camShakeIntesity = 1.0f;
         energy.enabled = true;
         blitFeature.settings.materialList.Clear();
@@ -257,36 +281,21 @@ public class GameManager : MonoBehaviour
         blitFeature.settings.blitMaterial1.SetVector("_dirToSun", (_planetGen.transform.position));
         for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
         {
-            blitFeature.settings.materialList[i].SetInteger("_index",i);
+            blitFeature.settings.materialList[i].SetInteger("_index", i);
         }
-        blitFeature.settings.blitMaterial1.SetInteger("_index",0);
-        blitFeature.settings.blitMaterial.SetInteger("_index",1);
+        blitFeature.settings.blitMaterial1.SetInteger("_index", 0);
+        blitFeature.settings.blitMaterial.SetInteger("_index", 1);
         planetCentres = _planetGen.GetPlanetPositions();
-        // blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
-        // blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres",planetCentres);
-        //Vector4[] planetCentres = new Vector4[_planetGen._orbits.Length];
-        //Vector4[] dirsToSun = new Vector4[_planetGen._orbits.Length]; //rendererData.rendererFeatures.Clear();
+
         for (int i = 0; i < _planetGen._orbits.Length; i++)
         {
             _gravityField.AddGravityBody(new GravityBody(_planetGen._orbits[i].transform, _planetGen._orbits[i].mass));
             print(_planetGen._orbits[i].mass);
-           _planetGen._orbits[i].SetColliders();
-            //blitFeature.ClearMaterials();
-            //blitFeature.settings.textureId = "_texture"+p.GetInstanceID();
-            //dirsToSun[i] = (_planetGen.transform.position - _planetGen._orbits[i].transform.position).normalized;
+            _planetGen._orbits[i].SetColliders();
             planetCentres[i] = _planetGen._orbits[i].transform.position;
-            
-            //blitFeature.settings.blitMaterial.SetVector("_planetCentre", _planetGen._orbits[i].transform.position);
-            //blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres",planetCentres);
-            //blitFeature.settings.blitMaterial.SetInteger("_numPlanets",_planetGen._orbits.Length);
-            // Blit a = Instantiate(blitFeature);
-            // rendererData.rendererFeatures.Add(a);
-            // a.SetActive(true);
-            // blitFeature.ClearMaterials();
-            // blitFeature.AddMaterial((_planetGen.transform.position - p.transform.position).normalized,p.transform.position);
             _planetGen._orbits[i].transform.parent = null;
         }
-        //rendererData.rendererFeatures[0].SetActive(false);
+
         rendererData.SetDirty();
         _playerT.SetupHeadLook();
         _playerT.EnableShipController();
@@ -295,12 +304,12 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private IEnumerator WaitForLevelAndAnimationFinish()
+    private IEnumerator WaitForAnimationFinish()
     {
-        while (!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying)
-        {
-            yield return null;
-        }
+        // while (!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying)
+        // {
+        //     yield return null;
+        // }
         _sf.gameObject.SetActive(true);
         _sfTraveling.gameObject.SetActive(false);
         _cameraAnimation.Play("SpeedDown");
@@ -312,13 +321,33 @@ public class GameManager : MonoBehaviour
         StartSimulation();
         yield return null;
     }
-
+    public void Arrive()
+    {
+        StartCoroutine(WaitForAnimationFinish());
+    }
     private void StartSpawning(GameObject planet)
-    {   
+    {
         timer = 0;
         _spawner = StartCoroutine(SpawnEnemy(planet));
     }
+    private void GameOver()
+    {
+        _titleText.gameObject.SetActive(true);
+        _titleText.text = "Misión Fallida";
+        _fadePanel.color = new Color(_fadePanel.color.r,_fadePanel.color.g,_fadePanel.color.b,0.6f);
+        _mainMenu.gameObject.SetActive(true);
+        _newExploration.gameObject.SetActive(true);
+    }
 
+    private void NewExploration(){
+        SceneEntranceReload = true;
+        SceneManager.LoadScene(0);
+    }
+
+    private void MainMenu(){
+        SceneEntranceReload = false;
+        SceneManager.LoadScene(0);
+    }
     private void StopSpawning()
     {
         StopCoroutine(_spawner);

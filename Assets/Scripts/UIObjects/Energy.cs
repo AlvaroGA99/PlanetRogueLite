@@ -21,4 +21,9 @@ public class Energy : MonoBehaviour
         }
         transform.localScale = new Vector3(energy/10,1,1);
     }
+
+    public void SetToZero(){
+        energy = 0;
+        transform.localScale = new Vector3(0,1,1);
+    }
 }
