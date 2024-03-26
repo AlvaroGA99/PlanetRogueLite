@@ -57,10 +57,8 @@ public class Planet : MonoBehaviour
     public void UpdateVertexPositions(WFCGraph nodeGraph, Dictionary<String, List<float>> generationModuleWedgesValues, Dictionary<String, List<float>> generationModuleCentresValues)
     {   _destructionMeshes = new List<DestructionMeshData>();
         Vector3[] vertices = new Vector3[m.vertexCount];
-        //print(m.vertices.Length + "DEBUG");
         Dictionary<int, int> meshVertexMatching = new Dictionary<int, int>();
         Array.Copy(m.vertices, 0, vertices, 0, m.vertexCount);
-        //print(nodeGraph.elements.Length);
         List<float> WedgeValues;
         List<float> CentreValues;
         foreach (WFCGraph.Node n in nodeGraph.elements)
@@ -265,9 +263,10 @@ public class Planet : MonoBehaviour
 
     }
 
-      public void SetFluidMat(Material mat){
+      public void SetFluidMat(Material mat, PlanetLayerElement fp){
         MeshRenderer mr = transform.GetChild(0).gameObject.GetComponentInChildren<MeshRenderer>();
         mr.material = mat;
+        fluidPropertie = fp;
     }
     private class DestructionMeshData{
         public Mesh mesh;

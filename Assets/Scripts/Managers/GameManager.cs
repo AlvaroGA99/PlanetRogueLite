@@ -147,7 +147,6 @@ public class GameManager : MonoBehaviour
     {
         //blackHoleMaterial.SetMatrix("_WorldToTransformCamera",cam.transform.worldToLocalMatrix);
         planetCentres = _planetGen.GetPlanetPositions();
-        print(planetCentres.Count + "PLANETAS");
         if (planetCentres.Count > 0)
         {
             // blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres", planetCentres);
@@ -290,17 +289,15 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < _planetGen._orbits.Length; i++)
         {
             _gravityField.AddGravityBody(new GravityBody(_planetGen._orbits[i].transform, _planetGen._orbits[i].mass));
-            print(_planetGen._orbits[i].mass);
+            
             _planetGen._orbits[i].SetColliders();
             planetCentres[i] = _planetGen._orbits[i].transform.position;
             _planetGen._orbits[i].transform.parent = null;
         }
-
         rendererData.SetDirty();
         _playerT.SetupHeadLook();
         _playerT.EnableShipController();
         _playerT.EnableCameraController();
-        print("SIMULATION STARTED");
     }
 
 

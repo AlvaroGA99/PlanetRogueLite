@@ -27,7 +27,7 @@ public class WFCGraph
         toProcess = new List<Node>();
         Array vals = Enum.GetValues(typeof(PlanetTopography));
         planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
-        Debug.Log(planetTopography);
+        
         // Data extraction from triangleList, and element initialization
         edgeMatching = new Dictionary<EdgeId, int>();
 
@@ -61,7 +61,7 @@ public class WFCGraph
             edgeMatching.Add(edges[id0].edgeId, id0);
             if (edgeMatching.TryGetValue(edges[id0].GetReversedEdgeId(), out matchId))
             {
-                // Debug.Log("ALREADY MATCHED");
+                
                 edges[id0].adjacentEdge = edges[matchId];
                 edges[matchId].adjacentEdge = edges[id0];
             }
@@ -69,7 +69,7 @@ public class WFCGraph
             edgeMatching.Add(edges[id1].edgeId, id1);
             if (edgeMatching.TryGetValue(edges[id1].GetReversedEdgeId(), out matchId))
             {
-                // Debug.Log("ALREADY MATCHED");
+                
                 edges[id1].adjacentEdge = edges[matchId];
                 edges[matchId].adjacentEdge = edges[id1];
             }
@@ -77,7 +77,7 @@ public class WFCGraph
             edgeMatching.Add(edges[id2].edgeId, id2);
             if (edgeMatching.TryGetValue(edges[id2].GetReversedEdgeId(), out matchId))
             {
-                // Debug.Log("ALREADY MATCHED");
+                
                 edges[id2].adjacentEdge = edges[matchId];
                 edges[matchId].adjacentEdge = edges[id2];
             }

@@ -204,7 +204,7 @@ public class PlayerController : MonoBehaviour
         _shipController.mainEngineValue = 0;
         _shipController.speedAlignerValue= 0;
         _shipController.speedAlignerValue2= 0;
-        _shipController.TurnOffTrails();
+        // _shipController.TurnOffTrails();
     }
 
     void OnTakeOffPropulsion(InputAction.CallbackContext action){
@@ -273,7 +273,7 @@ public class PlayerController : MonoBehaviour
             GetComponent<BoxCollider>().enabled = true;
             EnablePlayerController();
             DisableShipController();
-            print("EJECT");
+            
         }else if(nearShip){
             characterLight.SetActive(false);
             camShakeIntesity = 1.0f;
@@ -355,9 +355,6 @@ public class PlayerController : MonoBehaviour
     {
 
         Vector3 aux = cam.WorldToScreenPoint(_t.position);
-          
-       // print(cam.WorldToScreenPoint(_t.position));
-        //print(_rotationVector);
         _toCenter = _gF.GetTotalFieldForceForBody(_tChild.position);
         _rb.AddForce(_toCenter,ForceMode.Acceleration);
            
@@ -402,6 +399,7 @@ public class PlayerController : MonoBehaviour
             nearShip = true;
         }else if(col.gameObject.tag == "Fluid"){
             Planet p = col.transform.parent.gameObject.GetComponent<Planet>();
+            print(p.fluidPropertie);
             if(p!= null){
                 switch(p.fluidPropertie){
                     case PlanetLayerElement.Magma:
@@ -463,6 +461,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator ToxicInteraction(){
         while(true){
             _energyObject.UpdateEnergy(-1);
+            yield return null;
         }
     }
 

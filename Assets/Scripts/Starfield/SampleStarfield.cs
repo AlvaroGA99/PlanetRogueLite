@@ -129,7 +129,6 @@ public class SampleStarfield : MonoBehaviour
             }
         }
         }
-        print(_currentDirsIndex);
         
         int first = 0;
         int batches = _matrices.Length/1023;

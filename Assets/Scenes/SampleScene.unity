@@ -690,7 +690,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &363474954
 Transform:
   m_ObjectHideFlags: 0
@@ -699,8 +699,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363474953}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.68, y: -6.49, z: -0.07}
-  m_LocalScale: {x: 0.64, y: 1.4226439, z: 0.64}
+  m_LocalPosition: {x: -1.68, y: -5.91, z: -0.07}
+  m_LocalScale: {x: 0.64, y: 0.5730147, z: 0.64}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2287902868220934306}
@@ -2238,7 +2238,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 758942591}
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: -0.5}
-  m_LocalPosition: {x: 0.704, y: 0, z: 3.606}
+  m_LocalPosition: {x: 0.704, y: 0, z: 2.239}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2352,7 +2352,7 @@ TrailRenderer:
     generateLightingData: 0
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
-  m_Emitting: 0
+  m_Emitting: 1
 --- !u!1 &781472273
 GameObject:
   m_ObjectHideFlags: 0
@@ -5226,7 +5226,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1688493742
 Transform:
   m_ObjectHideFlags: 0
@@ -5235,8 +5235,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1688493741}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.58, y: -6.49, z: 6.3e-14}
-  m_LocalScale: {x: 0.65, y: 1.417585, z: 0.65}
+  m_LocalPosition: {x: 1.58, y: -5.779, z: 0}
+  m_LocalScale: {x: 0.65, y: 0.5574086, z: 0.65}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2287902868220934306}
@@ -8660,7 +8660,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3428290869958125018}
   m_LocalRotation: {x: -0.5, y: 0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: -0.75, y: -0.032, z: 3.635}
+  m_LocalPosition: {x: -0.75, y: -0.032, z: 2.269}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8774,4 +8774,4 @@ TrailRenderer:
     generateLightingData: 0
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
-  m_Emitting: 0
+  m_Emitting: 1

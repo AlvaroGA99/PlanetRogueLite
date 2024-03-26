@@ -6,8 +6,6 @@ using UnityEngine;
 public class GravityBody
 {
     [SerializeField]
-    private Vector3 _frameDragVector = Vector3.zero;
-    [SerializeField]
     public float mass;
     [SerializeField]
     public Transform position;
@@ -17,9 +15,4 @@ public class GravityBody
         mass = bodyMass;
     }
     
-    public GravityBody(Transform pos,Vector3 frameDrag,float bodyMass){
-        position = pos;
-        _frameDragVector = frameDrag;
-        mass = bodyMass;
-    }
 }

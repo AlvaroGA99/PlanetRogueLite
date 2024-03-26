@@ -357,7 +357,8 @@ public class PlanetGenerator : MonoBehaviour
             _orbits[i].SetHighLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp)); 
             samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length)); 
             _orbits[i].SetMediumLayerTexture(GetTexureByLayer(samp),GetNormalByLayer(samp));
-            _orbits[i].SetFluidMat(GetMatByFluid((PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length))));
+            samp = (PlanetLayerElement)vals.GetValue(sampler.Next(vals.Length));
+            _orbits[i].SetFluidMat(GetMatByFluid(samp),samp);
         }
         var widthToAdd = loadingBar.rect.width/_orbits.Length;
         for (int i = 0; i < _orbits.Length; i++)
@@ -389,11 +390,11 @@ public class PlanetGenerator : MonoBehaviour
             state = tiles.Step();
             while (state != WFCGraph.StateInfo.SUCCESFUL)
             {
-                //print("dgfgdgdgf");
+                
                 if (state == WFCGraph.StateInfo.ERROR)
                 {   //si tamaño de lista de entropias == 0
                     //if(tiles.lowestEntropyElementList.Count == 0){
-                    //print("RESET");
+                
                     tiles.Reset(-1);
                     print("ERROR");
                     //}else{
