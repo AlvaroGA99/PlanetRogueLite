@@ -31,13 +31,13 @@ public class Projectile : MonoBehaviour
 
     public void Reset()
     {
-        _rb.velocity = new Vector3(0, 0, 0);
-        _rb.angularVelocity = new Vector3(0, 0, 0);
+        // _rb.velocity = new Vector3(0, 0, 0);
+        // _rb.angularVelocity = new Vector3(0, 0, 0);
     }
 
     private void FixedUpdate()
     {
-        _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
+        // _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
     }
 
     private void OnTriggerEnter(Collider other)

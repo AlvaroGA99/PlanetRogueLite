@@ -11,6 +11,8 @@ TagManager:
   - Energy
   - Ship
   - Fluid
+  - Hole
+  - Ring
   layers:
   - Default
   - TransparentFX

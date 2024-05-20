@@ -9,8 +9,8 @@ public class ShipController : MonoBehaviour
     private Rigidbody _rb;
     private GravityField _gF;
 
-    [SerializeField]private TrailRenderer _tr1;
-    [SerializeField]private TrailRenderer _tr2;
+    private TrailRenderer _tr1;
+    private TrailRenderer _tr2;
     [SerializeField]private MeshRenderer _mtr1;
     [SerializeField]private MeshRenderer _mtr2;
     [SerializeField] private Transform childShip;
@@ -34,16 +34,22 @@ public class ShipController : MonoBehaviour
     private float overridetakeOffEngineValue;
     private float overridelandingEngineValue;
     public Energy energyObject;
-    private float speed;
+    public float speed;
 
     public Vector3 lastVelocity { get; private set; }
 
     //[SerializeField] private Collider enterAreaCollider;
     //public float _energy;
 
+    void Awake(){
+        
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        _tr1 = GameObject.Find("MainEngine").GetComponent<TrailRenderer>();
+        _tr2 = GameObject.Find("MainEngine1").GetComponent<TrailRenderer>();
         _rb = GetComponent<Rigidbody>();
         speed = 2;
         //enterAreaCollider.enabled = true;
@@ -61,11 +67,17 @@ public class ShipController : MonoBehaviour
             overridetakeOffEngineValue = takeOffEngineValue;
             overridelandingEngineValue = landingEngineValue;
 
-            Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
-            Vector3 localVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
+            // Vector3 localAngularVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.angularVelocity);
+            // Vector3 localVelocity = transform.worldToLocalMatrix.MultiplyVector(_rb.velocity);
             
-            _rb.MovePosition(_rb.position - transform.forward*speed);
-            _rb.drag = 10*speed;
+            if(speed > 0.01){
+                // _rb.MovePosition(_rb.position - transform.forward*speed);
+                // localVelocity = new Vector3(localVelocity.x,localVelocity.y,-speed);
+                // _rb.velocity = transform.localToWorldMatrix.MultiplyVector(localVelocity);
+                _rb.velocity = -transform.forward*speed;  
+            }
+                      
+            // _rb.drag = 10*speed;
             _rb.angularDrag = 10;
             // if (breakActivated)
             // {   
@@ -152,14 +164,20 @@ public class ShipController : MonoBehaviour
             // _rb.AddForce(transform.up * overridetakeOffEngineValue * 10000);
             // _rb.AddForce(-transform.up * overridelandingEngineValue * 10000);
             
-
+            speed += overridemainEngineValue/5;
+            speed -= overridebreakEngineValue/5;
+            if (speed < 0){
+                speed = 0;
+            }
+            
             _rb.AddTorque(transform.right * Math.Clamp(overridezxRotationValue.y, -1.0f, 0f) * -1 * 10000);
             _rb.AddTorque(-transform.right * Math.Clamp(overridezxRotationValue.y, 0.0f, 1.0f) * 10000);
             _rb.AddTorque(transform.forward * Math.Clamp(overridezxRotationValue.x, 0.0f, 1.0f) * 10000);
             _rb.AddTorque(-transform.forward * Math.Clamp(overridezxRotationValue.x, -1.0f, 0f) * -1 * 10000);
             _rb.AddTorque(-childShip.forward * overrideleftYRotationValue * 10000);
             _rb.AddTorque(childShip.forward * overriderightYRotationValue * 10000);
-            
+            _rb.AddForce(childShip.forward*overridetakeOffEngineValue*5000);
+            _rb.AddForce(-childShip.forward*overridelandingEngineValue*5000);
             
         }
 
@@ -192,5 +210,29 @@ public class ShipController : MonoBehaviour
         _tr2.emitting = false;
         // _mtr1.enabled = false;
         // _mtr2.enabled = false;
+    }
+
+    public void OnCollisionStay(Collision other){
+        
+        
+        if(!(breakEngineValue >0 || mainEngineValue > 0))
+            speed *= 0.7f;
+        energyObject.energy -= speed*speed/1000;
+    }
+
+    private void OnTriggerStay(Collider col){
+        if(col.gameObject.tag == "Ring"){
+        //     energyObject.UpdateEnergy(13);
+            if((transform.position - col.gameObject.transform.position).sqrMagnitude < 400){
+                GameManager.OnReload?.Invoke();
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider col){
+        if(col.gameObject.tag == "Projectile" ){
+            energyObject.UpdateEnergy(-20);
+            Destroy(col.gameObject);
+        }
     }
 }

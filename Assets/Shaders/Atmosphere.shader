@@ -5,9 +5,9 @@ Shader "Hidden/Atmosphere"
         _MainTex ("Texture", 2D) = "white" {}
         _planetCentre ("Sphere Position", Vector) = (1000,0,0,0)
 		_scatteringCoefficients ("Scattering Coefficient", Vector) = (0.15,0.74,0.3,1)
-		_planetRadius ("Planet Radius", Float) = 1
-		_atmosphereRadius ("Atmosphere Radius", Float) = 1
-		_oceanRadius ("Ocean Radius", Float) = 1
+		_planetRadius ("Planet Radius", Float) = 0.5
+		_atmosphereRadius ("Atmosphere Radius", Float) = 0.5
+		_oceanRadius ("Ocean Radius", Float) = 0.5
 		_BakedOpticalDepth ("Texture", 2D) = "white" {}
 		_numInScatteringPoints("In Scattering Points", Int) = 1
 		_numOpticalDepthPoints("Optical Depth Points", Int) = 1

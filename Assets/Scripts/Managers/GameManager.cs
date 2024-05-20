@@ -10,6 +10,8 @@ using Random = UnityEngine.Random;
 using TMPro;
 using UnityEditor.SearchService;
 using UnityEngine.SceneManagement;
+using Unity.Mathematics;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {   
@@ -63,7 +65,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button _newExploration;
     [SerializeField] TextMeshProUGUI _titleText;
 
+    [SerializeField] Button _backFromPause;
+
     private List<Vector4> planetCentres;
+
+    public static Action OnReload;
+
+    private InputActionMap _menuControl;
+    [SerializeField] private InputActionAsset input;
+    private InputAction _sceneMenu;
+
 
     void Awake()
     {
@@ -71,7 +82,10 @@ public class GameManager : MonoBehaviour
         planetCentres = new List<Vector4>();
         _playerT.OnEnterAtmosphere += StartSpawning;
         _playerT.OnExitAtmosphere += StopSpawning;
-        _playerT.OnGameOver += GameOver;
+        // _playerT.OnGameOver += GameOver;
+
+        OnReload += NewExploration;
+        Energy.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         _wallMask = LayerMask.GetMask("DestructionMesh");
@@ -118,13 +132,19 @@ public class GameManager : MonoBehaviour
         _travel.onClick.AddListener(OnTravel);
         _mainMenu.onClick.AddListener(MainMenu);
         _newExploration.onClick.AddListener(NewExploration);
+        _backFromPause.onClick.AddListener(BackFromPause);
+        _playerT.OnBlackHole += NewExploration;
     }
 
   
 
     // Start is called before the first frame update
     void Start()
-    {
+    {   
+        _menuControl = input.FindActionMap("Menu");
+        _sceneMenu = _menuControl.FindAction("SceneMenu");
+
+        _sceneMenu.performed += SceneMenu;
         blitFeature.settings.materialList.Clear();
         rendererData.SetDirty();
         timer = 0;
@@ -200,7 +220,7 @@ public class GameManager : MonoBehaviour
         _cameraAnimation.Play();
         ShowLoadingBar();
         HideStartMenu();
-        _planetGen.Load(13);
+        _planetGen.Load(-1);
 
     }
 
@@ -252,6 +272,21 @@ public class GameManager : MonoBehaviour
         _options.gameObject.SetActive(true);
     }
 
+    private void SceneMenu(InputAction.CallbackContext action ){
+
+        
+            _fadePanel.color = new Color(_fadePanel.color.r,_fadePanel.color.g,_fadePanel.color.b,0.6f);
+            _mainMenu.gameObject.SetActive(true);
+            _backFromPause.gameObject.SetActive(true);
+            _playerT.DisableCameraController();
+            _playerT.DisablePlayerController();
+            _playerT.DisableShipController();
+        
+      
+        
+    }
+
+
     private void ShowCoordMenu()
     {
         _starCoordsInput.gameObject.SetActive(true);
@@ -266,7 +301,8 @@ public class GameManager : MonoBehaviour
 
     public void StartSimulation()
     {
-
+        
+        _sceneMenu.Enable();
         _playerT.camShakeIntesity = 1.0f;
         energy.enabled = true;
         blitFeature.settings.materialList.Clear();
@@ -281,18 +317,41 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
         {
             blitFeature.settings.materialList[i].SetInteger("_index", i);
+            
         }
         blitFeature.settings.blitMaterial1.SetInteger("_index", 0);
         blitFeature.settings.blitMaterial.SetInteger("_index", 1);
         planetCentres = _planetGen.GetPlanetPositions();
 
+        _gravityField.AddGravityBody(new GravityBody(_planetGen.transform,300000));
+        _gravityField.AddGravityBody(new GravityBody(_planetGen.blackHoleInstance.transform,100000));
         for (int i = 0; i < _planetGen._orbits.Length; i++)
-        {
+        {   
+            // blitFeature.settings.materialList[i].SetFloat("_atmosphereRadius",97.3f*_planetGen._orbits[i].transform.localScale.x/44.0f);
+            // blitFeature.settings.materialList[i].SetFloat("_oceanRadius",42.5f*_planetGen._orbits[i].transform.localScale.x/44.0f);
+            // blitFeature.settings.materialList[i].SetFloat("_planetRadius",42.9f*_planetGen._orbits[i].transform.localScale.x/44.0f);
             _gravityField.AddGravityBody(new GravityBody(_planetGen._orbits[i].transform, _planetGen._orbits[i].mass));
             
             _planetGen._orbits[i].SetColliders();
             planetCentres[i] = _planetGen._orbits[i].transform.position;
             _planetGen._orbits[i].transform.parent = null;
+
+            for(int j = 0; j <20; j++){
+                float theta = UnityEngine.Random.value*math.PI*2;
+                float phi = UnityEngine.Random.value*math.PI;
+                Vector3 direction = new Vector3(math.sin(theta)*math.cos(phi),math.sin(theta)*math.sin(phi),math.cos(theta));
+                
+                // _projectilePool.Get().transform.position = _planetGen._orbits[i].transform.position + direction*60;
+
+                RaycastHit hit;
+                if (Physics.Raycast(_planetGen._orbits[i].transform.position + direction*(60*_planetGen._orbits[i].transform.localScale.x/44), -direction, out hit, _wallMask))
+                {
+                    // Instantiate(_projectilePrefab,,Quaternion.identity);
+                    _projectilePool.Get().transform.position = hit.point ;
+                }
+
+                
+            }
         }
         rendererData.SetDirty();
         _playerT.SetupHeadLook();
@@ -328,7 +387,14 @@ public class GameManager : MonoBehaviour
         _spawner = StartCoroutine(SpawnEnemy(planet));
     }
     private void GameOver()
-    {
+    {   
+        
+        _sceneMenu.Disable();
+        _backFromPause.gameObject.SetActive(false);
+        
+        _playerT.DisableCameraController();
+        _playerT.DisablePlayerController();
+        _playerT.DisableShipController();
         _titleText.gameObject.SetActive(true);
         _titleText.text = "Misión Fallida";
         _fadePanel.color = new Color(_fadePanel.color.r,_fadePanel.color.g,_fadePanel.color.b,0.6f);
@@ -337,11 +403,29 @@ public class GameManager : MonoBehaviour
     }
 
     private void NewExploration(){
+        OnReload -= NewExploration;
+        Energy.OnGameOver -= GameOver;
+        _sceneMenu.performed -= SceneMenu;
+        _playerT.UnbindCallbacks();
         SceneEntranceReload = true;
         SceneManager.LoadScene(0);
     }
 
+
+    private void BackFromPause(){
+        _fadePanel.color = new Color(_fadePanel.color.r,_fadePanel.color.g,_fadePanel.color.b,0.0f);
+            _newExploration.gameObject.SetActive(false);
+            _mainMenu.gameObject.SetActive(false);
+            _backFromPause.gameObject.SetActive(false);
+            _playerT.EnableCameraController();
+            _playerT.EnablePlayerController();
+            _playerT.EnableShipController();
+    }
+
     private void MainMenu(){
+        Energy.OnGameOver -= GameOver;
+        _sceneMenu.performed -= SceneMenu;
+        _playerT.UnbindCallbacks();
         SceneEntranceReload = false;
         SceneManager.LoadScene(0);
     }

@@ -7,9 +7,9 @@ public class WFCGraph
 {
     
     private PlanetTopography planetTopography;
-    public Node currentNode;
+    // public Node currentNode;
     public Node[] elements;
-    public Dictionary<EdgeId, int> edgeMatching;
+    
     public readonly HashSet<string> compatibilityList  =  new HashSet<string>(){
        "AAAAAA","AABBAA","AACCAA","ABAABA","ABBBBA","ABCCBA","ACAACA","ACBBCA","ACCCCA",
        "BAAAAB","BABBAB","BACCAB","BBAABB","BBBBBB","BBCCBB","BCAACB","BCBBCB","BCCCCB",
@@ -18,9 +18,9 @@ public class WFCGraph
     System.Random sampler;
     List<Node> toProcess;
     StateInfo state;
-    public List<int> lowestEntropyElementList;
+    private List<int> lowestEntropyElementList;
 
-    public WFCGraph(int[] triangleList, int resolution, System.Random sampler)
+    public WFCGraph(int[] triangleList, System.Random sampler)
     {
         int dim = triangleList.Length / 3;
         elements = new Node[((dim))];
@@ -29,7 +29,7 @@ public class WFCGraph
         planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
         
         // Data extraction from triangleList, and element initialization
-        edgeMatching = new Dictionary<EdgeId, int>();
+        Dictionary<EdgeId, int> edgeMatching = new Dictionary<EdgeId, int>();
 
         Edge[] edges = new Edge[elements.Length * 3];
 
@@ -82,11 +82,11 @@ public class WFCGraph
                 edges[matchId].adjacentEdge = edges[id2];
             }
 
-            elements[i] = new Node(i, edges[id0], edges[id1], edges[id2], resolution);
+            elements[i] = new Node(i, edges[id0], edges[id1], edges[id2]);
         }
 
         this.sampler = sampler;
-        currentNode = elements[sampler.Next(0, elements.Length - 1)];
+        // currentNode = elements[sampler.Next(0, elements.Length - 1)];
         ComputeLowestEntropyElementList();
 
     }
@@ -129,9 +129,6 @@ public class WFCGraph
 
     public StateInfo Step()
     {
-        //for(int i = 0; i < propagated.Length; i++){
-          //  propagated[i] = false;
-        //}
         toProcess.Clear();
         int collapsingId = GetLowestEntropyElementId();
         state = StateInfo.SUCCESFUL;
@@ -219,17 +216,12 @@ public class WFCGraph
         }
     }
 
-    public void Reset(int seed)
+    public void Reset()
     {
 
-        if (seed >= 0)
-        {
-            sampler = new System.Random(seed);
-        }
-        else
-        {
-            sampler = new System.Random(sampler.Next());
-        }
+        
+        sampler = new System.Random(sampler.Next());
+        
 
         Array vals = Enum.GetValues(typeof(PlanetTopography));
         planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
@@ -243,7 +235,7 @@ public class WFCGraph
             n.entropy = n.edges[0].options.Count;
 
             n.tileVertices = new List<int> {n.edges[0].edgeId.a,n.edges[1].edgeId.a,n.edges[2].edgeId.a};
-            n.tileTriangles = new List<int>();
+            //n.tileTriangles = new List<int>();
         }
         ComputeLowestEntropyElementList();
     }
@@ -252,38 +244,38 @@ public class WFCGraph
         return state;
     }
 
-    public bool CheckTopography(Edge edge,int index){
-            if(planetTopography == PlanetTopography.Laky ){
-                //if(edge.options[index].Contains('C')){
-                    return edge.nextInternalEdge.options[index].Contains('C') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('C');
-                //}else{
-                  //  return true;
-                //}   
-            }else if(planetTopography == PlanetTopography.Rocky ){
-                //if(edge.options[index].Contains('A')){
-                    return edge.nextInternalEdge.options[index].Contains('A') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('A');
-                //}else{
-                  //  return true;
-                //}   
-            }else{
-                //if(edge.options[index].Contains('B')){
-                    return edge.nextInternalEdge.options[index].Contains('B') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('B');
-                //}else{
-                  //  return true;
-                //}   
-            }
-        }
+    // public bool CheckTopography(Edge edge,int index){
+    //         if(planetTopography == PlanetTopography.Laky ){
+    //             //if(edge.options[index].Contains('C')){
+    //                 return edge.nextInternalEdge.options[index].Contains('C') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('C');
+    //             //}else{
+    //               //  return true;
+    //             //}   
+    //         }else if(planetTopography == PlanetTopography.Rocky ){
+    //             //if(edge.options[index].Contains('A')){
+    //                 return edge.nextInternalEdge.options[index].Contains('A') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('A');
+    //             //}else{
+    //               //  return true;
+    //             //}   
+    //         }else{
+    //             //if(edge.options[index].Contains('B')){
+    //                 return edge.nextInternalEdge.options[index].Contains('B') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('B');
+    //             //}else{
+    //               //  return true;
+    //             //}   
+    //         }
+    //     }
     public class Node
     {
         public int id;
         public int entropy;
         public Edge[] edges;
         public Vector3 reference;
-        public List<Vector3> meshVertices;
+        //public List<Vector3> meshVertices;
         public List<int> tileVertices;
-        public List<int> tileTriangles;
+        //public List<int> tileTriangles;
 
-        public Node(int id, Edge a_Edge, Edge b_Edge, Edge c_Edge, int resolution)
+        public Node(int id, Edge a_Edge, Edge b_Edge, Edge c_Edge)
 
         {
             this.id = id;
@@ -305,8 +297,8 @@ public class WFCGraph
             }
 
             this.tileVertices = new List<int> {edges[0].edgeId.a,edges[1].edgeId.a,edges[2].edgeId.a};
-            this.tileTriangles = new List<int>();
-            this.meshVertices = new List<Vector3>();
+            //this.tileTriangles = new List<int>();
+            //this.meshVertices = new List<Vector3>();
             
         }
 

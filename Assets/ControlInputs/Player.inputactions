@@ -503,7 +503,7 @@
             "id": "28e77ffd-d288-4e8d-b2fb-0db07a5ef127",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "SceneMenu",
                     "type": "Button",
                     "id": "3520ada9-445f-479a-a0c1-a9620e3add49",
                     "expectedControlType": "Button",
@@ -516,11 +516,11 @@
                 {
                     "name": "",
                     "id": "fb3858b2-fbc1-41e9-bea7-837928aad175",
-                    "path": "",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "SceneMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

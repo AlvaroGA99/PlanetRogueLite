@@ -525,7 +525,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
             ""id"": ""28e77ffd-d288-4e8d-b2fb-0db07a5ef127"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""SceneMenu"",
                     ""type"": ""Button"",
                     ""id"": ""3520ada9-445f-479a-a0c1-a9620e3add49"",
                     ""expectedControlType"": ""Button"",
@@ -538,11 +538,11 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""fb3858b2-fbc1-41e9-bea7-837928aad175"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""SceneMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -569,7 +569,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_Ingame_SpeedAlign = m_Ingame.FindAction("SpeedAlign", throwIfNotFound: true);
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
-        m_Menu_Newaction = m_Menu.FindAction("New action", throwIfNotFound: true);
+        m_Menu_SceneMenu = m_Menu.FindAction("SceneMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -766,12 +766,12 @@ public partial class @Player : IInputActionCollection2, IDisposable
     // Menu
     private readonly InputActionMap m_Menu;
     private IMenuActions m_MenuActionsCallbackInterface;
-    private readonly InputAction m_Menu_Newaction;
+    private readonly InputAction m_Menu_SceneMenu;
     public struct MenuActions
     {
         private @Player m_Wrapper;
         public MenuActions(@Player wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Menu_Newaction;
+        public InputAction @SceneMenu => m_Wrapper.m_Menu_SceneMenu;
         public InputActionMap Get() { return m_Wrapper.m_Menu; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -781,16 +781,16 @@ public partial class @Player : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_MenuActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnNewaction;
+                @SceneMenu.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnSceneMenu;
+                @SceneMenu.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnSceneMenu;
+                @SceneMenu.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnSceneMenu;
             }
             m_Wrapper.m_MenuActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @SceneMenu.started += instance.OnSceneMenu;
+                @SceneMenu.performed += instance.OnSceneMenu;
+                @SceneMenu.canceled += instance.OnSceneMenu;
             }
         }
     }
@@ -814,6 +814,6 @@ public partial class @Player : IInputActionCollection2, IDisposable
     }
     public interface IMenuActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnSceneMenu(InputAction.CallbackContext context);
     }
 }

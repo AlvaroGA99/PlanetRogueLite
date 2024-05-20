@@ -18,7 +18,9 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     public event Action<GameObject> OnEnterAtmosphere;
     public event Action OnExitAtmosphere;
-    public event Action OnGameOver;
+
+    public event Action OnBlackHole;
+    // public event Action OnGameOver;
     private InputActionMap _ingameControl;
     [SerializeField] private InputActionAsset input;
     private InputAction movement;
@@ -70,7 +72,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] GameObject characterLight;
 
-    Coroutine _fluidInteraction;
 
     //private float airTimer;
 
@@ -274,7 +275,7 @@ public class PlayerController : MonoBehaviour
             EnablePlayerController();
             DisableShipController();
             
-        }else if(nearShip){
+        }else if((_tChild.position - _shipController.transform.position).sqrMagnitude <25){
             characterLight.SetActive(false);
             camShakeIntesity = 1.0f;
             onShip = true;
@@ -383,9 +384,6 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             onFloor = true;
             _rotationSpeed = 100;
-        }else if(col.gameObject.tag == "Projectile"){
-
-            
         }
     }
 
@@ -405,16 +403,19 @@ public class PlayerController : MonoBehaviour
                     case PlanetLayerElement.Magma:
                         MagmaInteraction();
                         break;
-                    case PlanetLayerElement.EarthWater:
-                        _fluidInteraction = StartCoroutine(WaterInteraction());
-                        break;
-                    case PlanetLayerElement.ToxicGrass:
-                        _fluidInteraction = StartCoroutine(ToxicInteraction());
-                        break;
                         
                 }
             }
+        }else if(col.gameObject.tag == "Hole" && _energyObject.energy > 0){
+            OnBlackHole?.Invoke();
+            
+        }else{
+            if(col.gameObject.tag == "Projectile"){
+                _energyObject.UpdateEnergy(-20);
+                Destroy(col.gameObject);
+            }
         }
+
             
     }
 
@@ -430,9 +431,31 @@ public class PlayerController : MonoBehaviour
         }else if(col.gameObject.tag == "Ship"){
             nearShip = false;
         }else if(col.gameObject.tag == "Fluid"){
-            StopCoroutine(_fluidInteraction);
+            
         }
             
+    }
+
+    private void OnTriggerStay(Collider col){
+        if(col.gameObject.tag == "Fluid"){
+            Planet p = col.transform.parent.gameObject.GetComponent<Planet>();
+            print(p.fluidPropertie);
+            if(p!= null){
+                switch(p.fluidPropertie){
+                    case PlanetLayerElement.EarthWater:
+                        // _fluidInteraction = StartCoroutine(WaterInteraction());
+                        _rb.AddForce(_tChild.up*100);
+                        break;
+                    case PlanetLayerElement.ToxicGrass:
+                        // _fluidInteraction = StartCoroutine(ToxicInteraction());
+                        _energyObject.UpdateEnergy(5);
+                        break;
+                        
+                }
+            }
+        }
+        
+        
     }
 
     public void SetupGravityField(GravityField gravity){
@@ -446,15 +469,14 @@ public class PlayerController : MonoBehaviour
 
     private void MagmaInteraction(){
         _energyObject.SetToZero();
-        OnGameOver?.Invoke();
-        DisableCameraController();
-        DisablePlayerController();
-        DisableShipController();
-        UnbindCallbacks();
+        // OnGameOver?.Invoke();
+        
+        
     }
 
     private IEnumerator WaterInteraction(){
-        _rb.AddForce(_tChild.up);
+        _rb.AddForce(_tChild.up*1000);
+        print("interacciooon");
         yield return new WaitForFixedUpdate();
     }
 
@@ -465,7 +487,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void UnbindCallbacks(){
+    public void UnbindCallbacks(){
         movement.performed -= OnMove;
         movement.canceled -= OnStop;
         jump.performed -= OnJump;
