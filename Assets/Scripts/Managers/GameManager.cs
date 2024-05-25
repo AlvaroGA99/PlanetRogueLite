@@ -80,10 +80,6 @@ public class GameManager : MonoBehaviour
     {
         cam = Camera.main;
         planetCentres = new List<Vector4>();
-        _playerT.OnEnterAtmosphere += StartSpawning;
-        _playerT.OnExitAtmosphere += StopSpawning;
-        // _playerT.OnGameOver += GameOver;
-
         OnReload += NewExploration;
         Energy.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
@@ -381,11 +377,7 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(WaitForAnimationFinish());
     }
-    private void StartSpawning(GameObject planet)
-    {
-        timer = 0;
-        _spawner = StartCoroutine(SpawnEnemy(planet));
-    }
+
     private void GameOver()
     {   
         

@@ -38,6 +38,11 @@ public class ShipController : MonoBehaviour
 
     public Vector3 lastVelocity { get; private set; }
 
+
+ 
+    public static event Action OnExitAtmosphere;
+    public static event Action<GameObject> OnEnterAtmosphere;
+
     //[SerializeField] private Collider enterAreaCollider;
     //public float _energy;
 
@@ -233,6 +238,14 @@ public class ShipController : MonoBehaviour
         if(col.gameObject.tag == "Projectile" ){
             energyObject.UpdateEnergy(-20);
             Destroy(col.gameObject);
+        }else if(col.gameObject.tag == "Planet"){
+            OnEnterAtmosphere?.Invoke(col.gameObject);
+        }
+    }
+
+    private void OnTriggerExit(Collider col){
+        if(col.gameObject.tag == "Planet"){
+            OnExitAtmosphere?.Invoke();
         }
     }
 }

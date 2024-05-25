@@ -16,9 +16,7 @@ using Vector4 = UnityEngine.Vector4;
 public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
-    public event Action<GameObject> OnEnterAtmosphere;
-    public event Action OnExitAtmosphere;
-
+    
     public event Action OnBlackHole;
     // public event Action OnGameOver;
     private InputActionMap _ingameControl;
@@ -166,6 +164,7 @@ public class PlayerController : MonoBehaviour
     void OnStop(InputAction.CallbackContext moveAction)
     {
         _rotationSpeed = 0;
+        _moveVector = Vector3.zero;
     }
 
     void OnJump(InputAction.CallbackContext jumpAction)
@@ -392,7 +391,7 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             _lM.Target(col.transform);
             col.gameObject.layer = 0;
-            OnEnterAtmosphere?.Invoke(col.gameObject);
+            // OnEnterAtmosphere?.Invoke(col.gameObject);
         }else if(col.gameObject.tag == "Ship"){
             nearShip = true;
         }else if(col.gameObject.tag == "Fluid"){
@@ -424,7 +423,7 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             _lM.ResetTarget();
             col.gameObject.layer = 9;
-            OnExitAtmosphere?.Invoke();
+
         }else if(col.gameObject.tag == "Projectile"){
 
         }else if(col.gameObject.tag == "Energy"){

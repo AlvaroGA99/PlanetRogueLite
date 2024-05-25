@@ -952,6 +952,7 @@ MonoBehaviour:
   waterMat: {fileID: 2100000, guid: 710c0eb43282d234c95b2a6599c7ccb3, type: 2}
   toxicMat: {fileID: 2100000, guid: dc3a4d879d48ecf47ac096625ad72e0f, type: 2}
   blackHolePrefab: {fileID: 5459974747089622741, guid: c13a3084696827d419aab0e0536af33a, type: 3}
+  blackHoleInstance: {fileID: 0}
 --- !u!111 &402258816
 Animation:
   m_ObjectHideFlags: 0
@@ -3036,7 +3037,7 @@ Transform:
   - {fileID: 1843149482}
   - {fileID: 2053850080}
   m_Father: {fileID: 1591222659}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 13.48, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
@@ -5171,7 +5172,6 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 543450652550570387}
-  - {fileID: 7894100977344015497}
   - {fileID: 963194228}
   - {fileID: 1702871100}
   m_Father: {fileID: 543450652466382686}
@@ -5441,7 +5441,7 @@ Transform:
   m_Children:
   - {fileID: 581711228}
   m_Father: {fileID: 1591222659}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1708240310
 GameObject:
@@ -6190,6 +6190,7 @@ Transform:
   m_Children:
   - {fileID: 4083501150410514389}
   - {fileID: 548381121}
+  - {fileID: 7894100977344015497}
   m_Father: {fileID: 1591222659}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8233,14 +8234,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3432773267105312912}
-  m_LocalRotation: {x: 0.5, y: -0.50000006, z: 0.5, w: -0.50000006}
-  m_LocalPosition: {x: 0, y: 0.11000309, z: 0}
-  m_LocalScale: {x: 180.00009, y: 180.00006, z: 180.00003}
+  m_LocalRotation: {x: -0.5, y: 0.50000006, z: -0.5, w: 0.50000006}
+  m_LocalPosition: {x: 0, y: 0.35550138, z: 0}
+  m_LocalScale: {x: 81.00003, y: 81.000015, z: 81}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9164408777405358625}
-  m_Father: {fileID: 1591222659}
-  m_RootOrder: 1
+  m_Father: {fileID: 543450652550570387}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!4 &7924972857901953642
 Transform:
