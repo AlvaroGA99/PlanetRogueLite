@@ -13,6 +13,7 @@ TagManager:
   - Fluid
   - Hole
   - Ring
+  - Sun
   layers:
   - Default
   - TransparentFX

@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
     public float camShakeIntesity;
 
     [SerializeField] private VelocityDirection _vD;
+    [SerializeField] private RectTransform _uiEnterShip;
+
 
     private Vector2 rotateCamValue;
 
@@ -264,6 +266,7 @@ public class PlayerController : MonoBehaviour
 
     private void Eject(InputAction.CallbackContext action){
         if(onShip){
+            _uiEnterShip.gameObject.SetActive(true);
             characterLight.SetActive(true);
             camShakeIntesity = 0.0f;
             _rb.isKinematic = false;
@@ -275,6 +278,7 @@ public class PlayerController : MonoBehaviour
             DisableShipController();
             
         }else if((_tChild.position - _shipController.transform.position).sqrMagnitude <25){
+            _uiEnterShip.gameObject.SetActive(false);
             characterLight.SetActive(false);
             camShakeIntesity = 1.0f;
             onShip = true;

@@ -9,6 +9,7 @@ public class ShipController : MonoBehaviour
     private Rigidbody _rb;
     private GravityField _gF;
 
+    [SerializeField] private RectTransform _uiEnterShip;
     private TrailRenderer _tr1;
     private TrailRenderer _tr2;
     [SerializeField]private MeshRenderer _mtr1;
@@ -190,7 +191,7 @@ public class ShipController : MonoBehaviour
     } 
 
     void Update()
-    {
+    {   _uiEnterShip.transform.LookAt(Camera.main.transform,Camera.main.transform.up);
         energyObject.UpdateEnergy(Time.deltaTime * (overridemainEngineValue + overridebreakEngineValue + overridetakeOffEngineValue + overridelandingEngineValue + Math.Abs(overridezxRotationValue.y) + Math.Abs(overridezxRotationValue.x) + overrideleftYRotationValue + overriderightYRotationValue) / 8);
     }
 
