@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
     void OnStop(InputAction.CallbackContext moveAction)
     {
         _rotationSpeed = 0;
-        _moveVector = Vector3.zero;
+        _moveVector = _tChild.forward;
     }
 
     void OnJump(InputAction.CallbackContext jumpAction)
@@ -174,7 +174,7 @@ public class PlayerController : MonoBehaviour
         {
             
             _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
-            onFloor = false;
+            // onFloor = false;
         }else{
             _jetpackProp = 10f;
         }
@@ -352,8 +352,7 @@ public class PlayerController : MonoBehaviour
         cameraAction.Disable();
     }
     public void FixedUpdate()
-    {
-
+    { 
         Vector3 aux = cam.WorldToScreenPoint(_t.position);
         _toCenter = _gF.GetTotalFieldForceForBody(_tChild.position);
         _rb.AddForce(_toCenter,ForceMode.Acceleration);
@@ -375,14 +374,14 @@ public class PlayerController : MonoBehaviour
             _rb.AddForce((_tChild.up+_tChild.forward)*_jetpackProp*4);
         }
         
- 
+        onFloor = false;
     }
 
-    private void OnCollisionEnter(Collision col)
+    private void OnCollisionStay(Collision col)
     {   
         if(col.gameObject.tag == "Planet"){
             onFloor = true;
-            _rotationSpeed = 100;
+            print(onFloor);
         }
     }
 
@@ -434,7 +433,6 @@ public class PlayerController : MonoBehaviour
         }
             
     }
-
     private void OnTriggerStay(Collider col){
         if(col.gameObject.tag == "Fluid"){
             Planet p = col.transform.parent.gameObject.GetComponent<Planet>();
