@@ -411,6 +411,10 @@ public class PlayerController : MonoBehaviour
         }else if(col.gameObject.tag == "Hole" && _energyObject.energy > 0){
             OnBlackHole?.Invoke();
             
+        }else if(col.gameObject.tag = "Sun"){
+
+            _energyObject.SetToZero();
+
         }else{
             if(col.gameObject.tag == "Projectile"){
                 _energyObject.UpdateEnergy(-20);

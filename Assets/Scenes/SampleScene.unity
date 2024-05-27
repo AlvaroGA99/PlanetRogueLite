@@ -1083,9 +1083,9 @@ MonoBehaviour:
   grassNormal: {fileID: 2800000, guid: 8e9ad237ef15752409f56e9940bd50a0, type: 3}
   earthTexture: {fileID: 2800000, guid: 6c4d1c44fdecd3f42b2b912081614269, type: 3}
   earthNormal: {fileID: 2800000, guid: 7dd6c06b4a9be874d98c9d55a5097e43, type: 3}
-  magmaMat: {fileID: 2100000, guid: 2bf306ed20992224db8e4172d21443b7, type: 2}
+  magmaMat: {fileID: 2100000, guid: e67a3204375af744bb1c6c8c46421802, type: 2}
   waterMat: {fileID: 2100000, guid: 710c0eb43282d234c95b2a6599c7ccb3, type: 2}
-  toxicMat: {fileID: 2100000, guid: dc3a4d879d48ecf47ac096625ad72e0f, type: 2}
+  toxicMat: {fileID: 2100000, guid: 5432ebee934b8fb47b2267830697434e, type: 2}
   blackHolePrefab: {fileID: 5459974747089622741, guid: c13a3084696827d419aab0e0536af33a, type: 3}
   blackHoleInstance: {fileID: 0}
 --- !u!111 &402258816
@@ -5146,7 +5146,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0015373, y: -31}
+  m_AnchoredPosition: {x: -0.0015373, y: 39}
   m_SizeDelta: {x: 242.4, y: 36.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1564701686
