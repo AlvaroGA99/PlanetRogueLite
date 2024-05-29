@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PlanetProperties;
 using UnityEngine.UI;
 
 public class ShipController : MonoBehaviour
@@ -36,13 +37,14 @@ public class ShipController : MonoBehaviour
     private float overridelandingEngineValue;
     public Energy energyObject;
     public float speed;
+    public bool onShip = true;
 
     public Vector3 lastVelocity { get; private set; }
 
 
  
-    public static event Action OnExitAtmosphere;
-    public static event Action<GameObject> OnEnterAtmosphere;
+    public event Action OnExitAtmosphere;
+    public event Action<GameObject> OnEnterAtmosphere;
 
     //[SerializeField] private Collider enterAreaCollider;
     //public float _energy;
@@ -182,8 +184,8 @@ public class ShipController : MonoBehaviour
             _rb.AddTorque(-transform.forward * Math.Clamp(overridezxRotationValue.x, -1.0f, 0f) * -1 * 10000);
             _rb.AddTorque(-childShip.forward * overrideleftYRotationValue * 10000);
             _rb.AddTorque(childShip.forward * overriderightYRotationValue * 10000);
-            _rb.AddForce(childShip.forward*overridetakeOffEngineValue*5000);
-            _rb.AddForce(-childShip.forward*overridelandingEngineValue*5000);
+            _rb.AddForce(childShip.forward*overridetakeOffEngineValue*6000);
+            _rb.AddForce(-childShip.forward*overridelandingEngineValue*6000);
             
         }
 
@@ -227,20 +229,35 @@ public class ShipController : MonoBehaviour
     }
 
     private void OnTriggerStay(Collider col){
-        if(col.gameObject.tag == "Ring"){
-        //     energyObject.UpdateEnergy(13);
-            if((transform.position - col.gameObject.transform.position).sqrMagnitude < 400){
+        if(col.gameObject.tag == "Ring" && energyObject.energy > 0){
+            
+                energyObject.UpdateEnergy(0.1f);
+                if((transform.position - col.gameObject.transform.position).sqrMagnitude < 1200 && onShip){
                 GameManager.OnReload?.Invoke();
+            
             }
+        //     energyObject.UpdateEnergy(13);
+            
         }
     }
 
     private void OnTriggerEnter(Collider col){
         if(col.gameObject.tag == "Projectile" ){
-            energyObject.UpdateEnergy(-20);
+            energyObject.UpdateEnergy(-3);
             Destroy(col.gameObject);
         }else if(col.gameObject.tag == "Planet"){
             OnEnterAtmosphere?.Invoke(col.gameObject);
+        }else if(col.gameObject.tag == "Sun"){
+                energyObject.SetToZero();
+            
+            
+        }else if(col.gameObject.tag == "Fluid"){
+            Planet p = col.transform.parent.gameObject.GetComponent<Planet>();
+            if(p!=null){
+                if(p.fluidPropertie == PlanetLayerElement.Magma){
+                    energyObject.SetToZero();
+                }
+            }
         }
     }
 

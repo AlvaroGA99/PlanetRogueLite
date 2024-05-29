@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour
     {
         cam = Camera.main;
         planetCentres = new List<Vector4>();
+        
         OnReload += NewExploration;
         Energy.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
@@ -129,7 +130,6 @@ public class GameManager : MonoBehaviour
         _mainMenu.onClick.AddListener(MainMenu);
         _newExploration.onClick.AddListener(NewExploration);
         _backFromPause.onClick.AddListener(BackFromPause);
-        _playerT.OnBlackHole += NewExploration;
     }
 
   
@@ -382,11 +382,11 @@ public class GameManager : MonoBehaviour
     {   
         
         _sceneMenu.Disable();
-        _backFromPause.gameObject.SetActive(false);
-        
         _playerT.DisableCameraController();
         _playerT.DisablePlayerController();
         _playerT.DisableShipController();
+        _playerT.UnbindCallbacks();
+        _backFromPause.gameObject.SetActive(false);
         _titleText.gameObject.SetActive(true);
         _titleText.text = "Misión Fallida";
         _fadePanel.color = new Color(_fadePanel.color.r,_fadePanel.color.g,_fadePanel.color.b,0.6f);
@@ -395,6 +395,10 @@ public class GameManager : MonoBehaviour
     }
 
     private void NewExploration(){
+         _playerT.DisableCameraController();
+        _playerT.DisablePlayerController();
+        _playerT.DisableShipController();
+        _sceneMenu.Disable();
         OnReload -= NewExploration;
         Energy.OnGameOver -= GameOver;
         _sceneMenu.performed -= SceneMenu;
@@ -425,4 +429,6 @@ public class GameManager : MonoBehaviour
     {
         StopCoroutine(_spawner);
     }
+
+
 }

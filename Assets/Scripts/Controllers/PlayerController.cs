@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
     
-    public event Action OnBlackHole;
     // public event Action OnGameOver;
     private InputActionMap _ingameControl;
     [SerializeField] private InputActionAsset input;
@@ -55,7 +54,7 @@ public class PlayerController : MonoBehaviour
     private Quaternion _lastLocalRotation;
     private bool onFloor;
     private bool nearShip;
-    private bool onShip = true;
+    
     public Energy _energyObject;
     private float _jetpackProp;
     private Camera cam;
@@ -72,6 +71,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] GameObject characterLight;
 
+    private Transform _targetPlanet;
+
 
     //private float airTimer;
 
@@ -81,7 +82,7 @@ public class PlayerController : MonoBehaviour
         onFloor = false;
         nearShip = true;
         _t = transform;
-
+        _targetPlanet = null;
         _ingameControl = input.FindActionMap("Ingame");
         movement = _ingameControl.FindAction("Movement");
         jump = _ingameControl.FindAction("Jump");
@@ -109,6 +110,8 @@ public class PlayerController : MonoBehaviour
 
         eject_enterShip.Enable();
 
+        _shipController.OnEnterAtmosphere += EnterAtmosphere;
+        _shipController.OnExitAtmosphere += ExitAtmosphere;
         movement.performed += OnMove;
         movement.canceled += OnStop;
         jump.performed += OnJump;
@@ -265,29 +268,35 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Eject(InputAction.CallbackContext action){
-        if(onShip){
+        if(_shipController.onShip){
             _uiEnterShip.gameObject.SetActive(true);
             characterLight.SetActive(true);
             camShakeIntesity = 0.0f;
             _rb.isKinematic = false;
-            _t.position -= new Vector3(5f,0,0);
+            if(_targetPlanet != null){
+
+                _t.position += (_shipController.transform.position - _targetPlanet.position).normalized*2;
+            }else{
+                _t.position -= new Vector3(5f,0,0);
+            }
+            
             _t.parent = null;
-            onShip = false;
+            _shipController.onShip = false;
             GetComponent<BoxCollider>().enabled = true;
             EnablePlayerController();
             DisableShipController();
             
-        }else if((_tChild.position - _shipController.transform.position).sqrMagnitude <25){
+        }else if((_tChild.position - _shipController.transform.position).sqrMagnitude <100){
             _uiEnterShip.gameObject.SetActive(false);
             characterLight.SetActive(false);
             camShakeIntesity = 1.0f;
-            onShip = true;
+            _shipController.onShip = true;
             _rb.isKinematic = true;
             _t.parent = _shipController.transform;
             _t.localPosition = new Vector3(-0.09f,0.316f,-1.659f);
             _t.localRotation = Quaternion.identity;//Quaternion.LookRotation(Vector3.forward,Vector3.up);
             
-            onShip = true;
+            _shipController.onShip = true;
             GetComponent<BoxCollider>().enabled = false;
             DisablePlayerController();
             EnableShipController();
@@ -368,7 +377,7 @@ public class PlayerController : MonoBehaviour
         
         _rb.velocity = Vector3.ClampMagnitude(_rb.velocity, 10);
         
-        if(!onShip){
+        if(!_shipController.onShip){
             _t.rotation = Quaternion.LookRotation( Vector3.ProjectOnPlane(_t.forward,-_toCenter).normalized,-_toCenter);
             _tChild.rotation = Quaternion.Slerp(Quaternion.LookRotation(Vector3.ProjectOnPlane(_moveVector,_toCenter).normalized, -_toCenter),_lastLocalRotation,0.8f);
         }
@@ -408,16 +417,15 @@ public class PlayerController : MonoBehaviour
                         
                 }
             }
-        }else if(col.gameObject.tag == "Hole" && _energyObject.energy > 0){
-            OnBlackHole?.Invoke();
+        }else if(col.gameObject.tag == "Sun"){
             
-        }else if(col.gameObject.tag = "Sun"){
-
-            _energyObject.SetToZero();
+                _energyObject.SetToZero();
+            
+            
 
         }else{
             if(col.gameObject.tag == "Projectile"){
-                _energyObject.UpdateEnergy(-20);
+                _energyObject.UpdateEnergy(-3f);
                 Destroy(col.gameObject);
             }
         }
@@ -449,15 +457,19 @@ public class PlayerController : MonoBehaviour
                 switch(p.fluidPropertie){
                     case PlanetLayerElement.EarthWater:
                         // _fluidInteraction = StartCoroutine(WaterInteraction());
-                        _rb.AddForce(_tChild.up*100);
+                        _rb.AddForce(_tChild.up*25);
                         break;
                     case PlanetLayerElement.ToxicGrass:
                         // _fluidInteraction = StartCoroutine(ToxicInteraction());
-                        _energyObject.UpdateEnergy(5);
+                        _energyObject.UpdateEnergy(0.05f);
                         break;
                         
                 }
             }
+        }else if(col.gameObject.tag == "Ring" && _energyObject.energy > 0){
+
+            _energyObject.UpdateEnergy(0.1f);
+            
         }
         
         
@@ -477,19 +489,6 @@ public class PlayerController : MonoBehaviour
         // OnGameOver?.Invoke();
         
         
-    }
-
-    private IEnumerator WaterInteraction(){
-        _rb.AddForce(_tChild.up*1000);
-        print("interacciooon");
-        yield return new WaitForFixedUpdate();
-    }
-
-    private IEnumerator ToxicInteraction(){
-        while(true){
-            _energyObject.UpdateEnergy(-1);
-            yield return null;
-        }
     }
 
     public void UnbindCallbacks(){
@@ -518,5 +517,16 @@ public class PlayerController : MonoBehaviour
         brakeAction.canceled -= OnStopBrake;
         speedAlignAction.performed -= OnSpeedAlign;
         speedAlignAction.canceled -= OnStopSpeedAlign;
+        _shipController.OnEnterAtmosphere -= EnterAtmosphere;
+        _shipController.OnExitAtmosphere -= ExitAtmosphere;
+    }
+
+        private void EnterAtmosphere(GameObject col){
+        _targetPlanet = col.transform;
+        print("Enter");
+    }
+        private void ExitAtmosphere(){
+        _targetPlanet = null;
+        print("Exit");
     }
 }
