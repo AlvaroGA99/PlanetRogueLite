@@ -8,42 +8,32 @@ using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering.Universal;
 using Random = UnityEngine.Random;
 using TMPro;
-using UnityEditor.SearchService;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {   
+    public static Action OnReload;
     public static bool SceneEntranceReload = false;
     public Material atmosphereMaterial;
     public Material blackHoleMaterial;
     public Projectile _projPrefab;
     public PlayerController _playerT;
-    public EnemyController _enemyPrefab;
-
     public Image energy;
-
     public PlanetGenerator _planetGen;
-
     private GravityField _gravityField;
-
     private Coroutine _spawner;
     private Camera cam;
 
     [SerializeField] UniversalRendererData rendererData;
     Blit blitFeature;
     ObjectPool<Projectile> _projectilePool;
-
-    ObjectPool<EnemyController> _enemyPool;
-
     [SerializeField] Animation _cameraAnimation;
     [SerializeField] Animation _systemAnimation;
 
     private float timer;
     private float spawnval;
-    private LayerMask _wallMask;
-    EnemyController a;
 
     [SerializeField] Button _explore;
     [SerializeField] Button _starCoords;
@@ -69,8 +59,6 @@ public class GameManager : MonoBehaviour
 
     private List<Vector4> planetCentres;
 
-    public static Action OnReload;
-
     private InputActionMap _menuControl;
     [SerializeField] private InputActionAsset input;
     private InputAction _sceneMenu;
@@ -85,7 +73,6 @@ public class GameManager : MonoBehaviour
         Energy.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
-        _wallMask = LayerMask.GetMask("DestructionMesh");
         spawnval = 20;
         _projectilePool = new ObjectPool<Projectile>(() =>
         {
@@ -94,7 +81,7 @@ public class GameManager : MonoBehaviour
             return aux;
         }, proj =>
         {
-            proj.Reset();
+            // proj.Reset();
             proj.gameObject.SetActive(true);
         }, proj =>
         {
@@ -104,23 +91,6 @@ public class GameManager : MonoBehaviour
             Destroy(proj.gameObject);
         }, false, 50, 150);
 
-
-        _enemyPool = new ObjectPool<EnemyController>(() =>
-        {
-
-            EnemyController aux = Instantiate(_enemyPrefab);
-            aux.Init(_projectilePool, _playerT.transform, _wallMask, _gravityField);
-            return aux;
-        }, enemy =>
-        {
-            enemy.gameObject.SetActive(true);
-        }, enemy =>
-        {
-            enemy.gameObject.SetActive(false);
-        }, enemy =>
-        {
-            Destroy(enemy.gameObject);
-        }, false, 5, 15);
 
         _explore.onClick.AddListener(OnExploreAsync);
         _starCoords.onClick.AddListener(OnStarCoords);
@@ -132,9 +102,6 @@ public class GameManager : MonoBehaviour
         _backFromPause.onClick.AddListener(BackFromPause);
     }
 
-  
-
-    // Start is called before the first frame update
     void Start()
     {   
         _menuControl = input.FindActionMap("Menu");
@@ -145,13 +112,6 @@ public class GameManager : MonoBehaviour
         rendererData.SetDirty();
         timer = 0;
         planetCentres = _planetGen.GetPlanetPositions();
-        // blitFeature.settings.materialList.Clear();
-        // for (int i = 0; i < planetCentres.Count; i++)
-        // {
-        //     blitFeature.settings.materialList.Add(Material.Instantiate(atmosphereMaterial));
-        // }
-        // blitFeature.settings.blitMaterial1 = Material.Instantiate(atmosphereMaterial);
-        // rendererData.SetDirty();
         _playerT.SetupGravityField(_gravityField);
 
         if(SceneEntranceReload){
@@ -161,52 +121,22 @@ public class GameManager : MonoBehaviour
 
     void LateUpdate()
     {
-        //blackHoleMaterial.SetMatrix("_WorldToTransformCamera",cam.transform.worldToLocalMatrix);
         planetCentres = _planetGen.GetPlanetPositions();
         if (planetCentres.Count > 0)
         {
-            // blitFeature.settings.blitMaterial.SetVectorArray("_planetCentres", planetCentres);
-            // blitFeature.settings.blitMaterial1.SetVectorArray("_planetCentres", planetCentres);
             for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
             {
                 blitFeature.settings.materialList[i].SetVectorArray("_planetCentres", planetCentres);
             }
         }
-        //planetCentres.Sort((x,y) => (new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0) - x).sqrMagnitude.CompareTo((new Vector4(cam.transform.position.x,cam.transform.position.y,cam.transform.position.z,0)-y).sqrMagnitude));
-
     }
 
 
 
-    private IEnumerator SpawnEnemy(GameObject planet)
-    {
-        while (true)
-        {
-            // if (timer > spawnval)
-            // {
-            //     float xRandomOffset = Random.Range(-8, 8);
-            //     float zRandomOffset = Random.Range(-8, 8);
-            //     Vector3 spawnPos = _playerT.transform.position + _playerT.transform.up * 6 + _playerT.transform.forward * zRandomOffset + _playerT.transform.right * xRandomOffset;
-            //     Vector3 dir = planet.transform.position - spawnPos;
-            //     RaycastHit hit;
-            //     if (Physics.Raycast(spawnPos, dir, out hit, _wallMask))
-            //     {
-            //         a = _enemyPool.Get();
-            //         print("SPAWN ENEMY");
-            //         a.transform.position = hit.point - dir.normalized;
-            //     }
-            //     spawnval = Random.Range(8, 15);
-            //     timer = 0;
-            // }
-            // timer += Time.deltaTime;
-            yield return null;
-        }
-    }
 
     private void OnExplore()
     {
         _cameraAnimation.Play();
-        //_planetGen.ReloadLevel();
         StartCoroutine(WaitForAnimationFinish());
         HideStartMenu();
     }
@@ -232,11 +162,17 @@ public class GameManager : MonoBehaviour
     }
 
     private void OnTravel()
-    {
+    {   
         _cameraAnimation.Play();
+        _titleText.gameObject.SetActive(false);
         ShowLoadingBar();
         HideCoordsMenu();
-        _planetGen.Load(int.Parse(_starCoordsInput.text));
+        if(_starCoordsInput.text == ""){
+            _planetGen.Load(-1);
+        }else{
+            _planetGen.Load(int.Parse(_starCoordsInput.text));
+        }
+        
     }
 
     private void OnCancel()
@@ -307,7 +243,6 @@ public class GameManager : MonoBehaviour
             blitFeature.settings.materialList.Add(Material.Instantiate(atmosphereMaterial));
         }
         blitFeature.settings.blitMaterial1 = Material.Instantiate(atmosphereMaterial);
-        //blitFeature.settings.blitMaterial = Material.Instantiate(atmosphereMaterial);
         blitFeature.settings.blitMaterial.SetVector("_dirToSun", (_planetGen.transform.position));
         blitFeature.settings.blitMaterial1.SetVector("_dirToSun", (_planetGen.transform.position));
         for (int i = 0; i < blitFeature.settings.materialList.Count; i++)
@@ -323,9 +258,7 @@ public class GameManager : MonoBehaviour
         _gravityField.AddGravityBody(new GravityBody(_planetGen.blackHoleInstance.transform,100000));
         for (int i = 0; i < _planetGen._orbits.Length; i++)
         {   
-            // blitFeature.settings.materialList[i].SetFloat("_atmosphereRadius",97.3f*_planetGen._orbits[i].transform.localScale.x/44.0f);
-            // blitFeature.settings.materialList[i].SetFloat("_oceanRadius",42.5f*_planetGen._orbits[i].transform.localScale.x/44.0f);
-            // blitFeature.settings.materialList[i].SetFloat("_planetRadius",42.9f*_planetGen._orbits[i].transform.localScale.x/44.0f);
+
             _gravityField.AddGravityBody(new GravityBody(_planetGen._orbits[i].transform, _planetGen._orbits[i].mass));
             
             _planetGen._orbits[i].SetColliders();
@@ -337,12 +270,10 @@ public class GameManager : MonoBehaviour
                 float phi = UnityEngine.Random.value*math.PI;
                 Vector3 direction = new Vector3(math.sin(theta)*math.cos(phi),math.sin(theta)*math.sin(phi),math.cos(theta));
                 
-                // _projectilePool.Get().transform.position = _planetGen._orbits[i].transform.position + direction*60;
 
                 RaycastHit hit;
-                if (Physics.Raycast(_planetGen._orbits[i].transform.position + direction*(60*_planetGen._orbits[i].transform.localScale.x/44), -direction, out hit, _wallMask))
+                if (Physics.Raycast(_planetGen._orbits[i].transform.position + direction*(60*_planetGen._orbits[i].transform.localScale.x/44), -direction, out hit))
                 {
-                    // Instantiate(_projectilePrefab,,Quaternion.identity);
                     _projectilePool.Get().transform.position = hit.point ;
                 }
 
@@ -350,7 +281,6 @@ public class GameManager : MonoBehaviour
             }
         }
         rendererData.SetDirty();
-        _playerT.SetupHeadLook();
         _playerT.EnableShipController();
         _playerT.EnableCameraController();
     }
@@ -358,10 +288,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForAnimationFinish()
     {
-        // while (!_planetGen.isFinishedLoading || _cameraAnimation.isPlaying)
-        // {
-        //     yield return null;
-        // }
         _sf.gameObject.SetActive(true);
         _sfTraveling.gameObject.SetActive(false);
         _cameraAnimation.Play("SpeedDown");

@@ -12,6 +12,7 @@ public class SampleStarfield : MonoBehaviour
     [SerializeField] private Transform _camTransform;
     [SerializeField] private Material _starMaterial;
     [SerializeField] private Mesh _starMesh;
+    [SerializeField] private SampleType sampleType;
     private RenderParams _rp;
     public int speed;
     public int samples;
@@ -22,12 +23,10 @@ public class SampleStarfield : MonoBehaviour
     private int _currentDirsIndex;
     private Matrix4x4[] _matrices;
     private float[] offset;
-    [SerializeField] private SampleType sampleType;
+   
 
     void Start()
     {
-        //_starMaterial.renderQueue = 1000;
-        //samples = 1000;
         float x;
         float y;
         float z;
@@ -111,7 +110,7 @@ public class SampleStarfield : MonoBehaviour
         _rp = new RenderParams(_starMaterial);
 
     }
-    // Update is called once per frame
+
     void Update()
     {
         if (sampleType == SampleType.Conical){

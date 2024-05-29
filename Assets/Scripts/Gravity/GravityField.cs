@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class GravityField 
 {
-    // Start is called before the first frame update
     List<GravityBody> gravityBodies;
 
     public GravityField(){

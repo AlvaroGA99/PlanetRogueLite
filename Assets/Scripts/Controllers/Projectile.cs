@@ -4,7 +4,7 @@ using UnityEngine.Pool;
 
 public class Projectile : MonoBehaviour
 {
-    public static event Action OnDestroyEnemy;
+    // public static event Action OnDestroyEnemy;
     private Rigidbody _rb;
     private GravityField _gF;
 
@@ -29,16 +29,14 @@ public class Projectile : MonoBehaviour
 
     }
 
-    public void Reset()
-    {
-        // _rb.velocity = new Vector3(0, 0, 0);
-        // _rb.angularVelocity = new Vector3(0, 0, 0);
-    }
+    // public void Reset()
+    // {
 
-    private void FixedUpdate()
-    {
-        // _rb.AddForce(_gF.GetTotalFieldForceForBody(transform.position), ForceMode.Acceleration);
-    }
+    // }
+
+    // private void FixedUpdate()
+    // {
+    // }
 
     private void OnTriggerEnter(Collider other)
     {

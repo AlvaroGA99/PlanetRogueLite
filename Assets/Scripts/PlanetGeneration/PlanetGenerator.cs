@@ -11,20 +11,25 @@ using Unity.Mathematics;
 public class PlanetGenerator : MonoBehaviour
 {
     public Planet[] _orbits;
-    [SerializeField] GameManager _manager;
     public Planet planetPrefab;
+    public Material magmaMat;
+    public Material waterMat;
+    public Material toxicMat;
+    public GameObject blackHolePrefab;
+    public GameObject blackHoleInstance;
+    public bool isFinishedLoading;
+    public int seed = -1;
 
+    System.Random sampler;
+    [SerializeField] GameManager _manager;
     [SerializeField]
     private PlayerController _player;
-    public int seed = -1;
     [SerializeField] RectTransform loadingBar;
     [SerializeField] RectTransform loadingBg;
     [SerializeField] TextMeshProUGUI text;
     private WFCGraph tiles;
-    public bool isFinishedLoading;
     Dictionary<String, List<float>> generationModuleWedgesValues;
-    Dictionary<String, List<float>> generationModuleCentresValues;
-    System.Random sampler;
+    Dictionary<String, List<float>> generationModuleCentresValues;  
     [SerializeField] Texture2D magmaTexture;
     [SerializeField] Texture2D magmaNormal;
     [SerializeField] Texture2D grassTexture;
@@ -32,14 +37,10 @@ public class PlanetGenerator : MonoBehaviour
     [SerializeField] Texture2D earthTexture;
     [SerializeField] Texture2D earthNormal;
 
-    public Material magmaMat;
-    public Material waterMat;
-    public Material toxicMat;
+    
     Mesh initialMesh;
 
-    public GameObject blackHolePrefab;
-
-    public GameObject blackHoleInstance;
+    
 
     float widthToLerp;
     void Start()

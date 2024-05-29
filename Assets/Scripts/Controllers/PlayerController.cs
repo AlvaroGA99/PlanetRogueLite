@@ -15,9 +15,12 @@ using Vector4 = UnityEngine.Vector4;
 
 public class PlayerController : MonoBehaviour
 {
-    // Start is called before the first frame update
     
-    // public event Action OnGameOver;
+    public Image Health;
+    public Transform _SphereT;
+    public Energy _energyObject;
+    public float camShakeIntesity;
+
     private InputActionMap _ingameControl;
     [SerializeField] private InputActionAsset input;
     private InputAction movement;
@@ -33,48 +36,29 @@ public class PlayerController : MonoBehaviour
     private InputAction cameraAction;
     private InputAction brakeAction;
     private InputAction speedAlignAction;
-
     private InputAction eject_enterShip;
-
-    public Image Health;
-    public Transform _SphereT;
     [SerializeField] private Transform _tChild;
     [SerializeField] private Transform _tHead;
     [SerializeField] private ShipController _shipController;
-
     [SerializeField] private LightManager _lM;
     private Transform _t;
     private Rigidbody _rb;
     private Vector3 _rotationVector ;
     private Vector3 _toCenter;
     private GravityField _gF;
- 
     private Vector3 _moveVector;
     private float _rotationSpeed;
     private Quaternion _lastLocalRotation;
     private bool onFloor;
-    private bool nearShip;
-    
-    public Energy _energyObject;
+    private bool nearShip; 
     private float _jetpackProp;
     private Camera cam;
-
-    public float camShakeIntesity;
-
     [SerializeField] private VelocityDirection _vD;
     [SerializeField] private RectTransform _uiEnterShip;
-
-
     private Vector2 rotateCamValue;
-
     private Vector2 offset;
-
     [SerializeField] GameObject characterLight;
-
     private Transform _targetPlanet;
-
-
-    //private float airTimer;
 
 
     void Start()
@@ -97,16 +81,6 @@ public class PlayerController : MonoBehaviour
         eject_enterShip = _ingameControl.FindAction("Eject_EnterShip");
         brakeAction = _ingameControl.FindAction("Brake");
         speedAlignAction = _ingameControl.FindAction("SpeedAlign");
-
-        // movement.Enable();
-        // jump.Enable();
-        // wield.Enable();
-        //shipRotation.Enable();
-        //mainShipPropulsion.Enable();
-        //takeOffPropulsion.Enable();
-        //shipYRightRotation.Enable();
-        //shipYLeftRotation.Enable();
-        //brakePropulsion.Enable();
 
         eject_enterShip.Enable();
 
@@ -147,12 +121,8 @@ public class PlayerController : MonoBehaviour
     }
  
     void Update(){
-        //transform - offset
         cam.transform.localPosition = cam.transform.localPosition - new Vector3(offset.x,offset.y,0);
         cam.transform.RotateAround(transform.position,transform.up,rotateCamValue.x);
-        //valRandom += 3*time.deltatime
-        //if val random > tamtextura 
-        //random 
         offset = new Vector2(Mathf.PerlinNoise(Time.time*1.7f,0)-0.5f,Mathf.PerlinNoise(0,Time.time*1.7f)-0.5f)*_vD.velocityMag/1.4f;
         cam.transform.localPosition = cam.transform.localPosition + new Vector3(offset.x,offset.y,0);
         _energyObject.UpdateEnergy(Time.deltaTime*_jetpackProp/30);
@@ -177,9 +147,7 @@ public class PlayerController : MonoBehaviour
     
         if (onFloor)
         {
-            
             _rb.AddForce( -_toCenter*4 ,ForceMode.Impulse);  
-            // onFloor = false;
         }else{
             _jetpackProp = 10f;
         }
@@ -202,14 +170,12 @@ public class PlayerController : MonoBehaviour
 
     void OnMainShipPropulsion(InputAction.CallbackContext action){
         _shipController.mainEngineValue = action.ReadValue<float>();
-        _shipController.TurnOnTrails();
     }
 
     void OnStopMainShipPropulsion(InputAction.CallbackContext action){
         _shipController.mainEngineValue = 0;
         _shipController.speedAlignerValue= 0;
         _shipController.speedAlignerValue2= 0;
-        // _shipController.TurnOffTrails();
     }
 
     void OnTakeOffPropulsion(InputAction.CallbackContext action){
@@ -260,7 +226,6 @@ public class PlayerController : MonoBehaviour
 
     void OnCameraAction(InputAction.CallbackContext action){
         rotateCamValue = action.ReadValue<Vector2>();
-        //cam.transform.RotateAround(transform.position,transform.up,input.x);
     }
 
     void OnStopCameraAction(InputAction.CallbackContext action){
@@ -294,7 +259,7 @@ public class PlayerController : MonoBehaviour
             _rb.isKinematic = true;
             _t.parent = _shipController.transform;
             _t.localPosition = new Vector3(-0.09f,0.316f,-1.659f);
-            _t.localRotation = Quaternion.identity;//Quaternion.LookRotation(Vector3.forward,Vector3.up);
+            _t.localRotation = Quaternion.identity;
             
             _shipController.onShip = true;
             GetComponent<BoxCollider>().enabled = false;
@@ -403,7 +368,6 @@ public class PlayerController : MonoBehaviour
         if(col.gameObject.tag == "Planet"){
             _lM.Target(col.transform);
             col.gameObject.layer = 0;
-            // OnEnterAtmosphere?.Invoke(col.gameObject);
         }else if(col.gameObject.tag == "Ship"){
             nearShip = true;
         }else if(col.gameObject.tag == "Fluid"){
@@ -456,11 +420,9 @@ public class PlayerController : MonoBehaviour
             if(p!= null){
                 switch(p.fluidPropertie){
                     case PlanetLayerElement.EarthWater:
-                        // _fluidInteraction = StartCoroutine(WaterInteraction());
                         _rb.AddForce(_tChild.up*25);
                         break;
                     case PlanetLayerElement.ToxicGrass:
-                        // _fluidInteraction = StartCoroutine(ToxicInteraction());
                         _energyObject.UpdateEnergy(0.05f);
                         break;
                         
@@ -480,14 +442,8 @@ public class PlayerController : MonoBehaviour
         _shipController.SetupGravityField(gravity);
     }
 
-    public void SetupHeadLook(){
-        //_tHead.parent = Camera.main.transform;
-    }
-
     private void MagmaInteraction(){
         _energyObject.SetToZero();
-        // OnGameOver?.Invoke();
-        
         
     }
 

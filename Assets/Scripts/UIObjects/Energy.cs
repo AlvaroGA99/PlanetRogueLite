@@ -8,13 +8,13 @@ public class Energy : MonoBehaviour
 {
     public float energy;
     public static event Action OnGameOver;
-    // Start is called before the first frame update
+
     void Start()
     {
         energy = 10;
     }
 
-    // Update is called once per frame
+
     public void UpdateEnergy(float input)
     {
         energy -= input;

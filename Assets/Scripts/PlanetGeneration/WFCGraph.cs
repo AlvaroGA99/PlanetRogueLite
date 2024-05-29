@@ -6,8 +6,7 @@ using System;
 public class WFCGraph
 {
     
-    private PlanetTopography planetTopography;
-    // public Node currentNode;
+    
     public Node[] elements;
     
     public readonly HashSet<string> compatibilityList  =  new HashSet<string>(){
@@ -18,6 +17,7 @@ public class WFCGraph
     System.Random sampler;
     List<Node> toProcess;
     StateInfo state;
+    private PlanetTopography planetTopography;
     private List<int> lowestEntropyElementList;
 
     public WFCGraph(int[] triangleList, System.Random sampler)
@@ -28,7 +28,6 @@ public class WFCGraph
         Array vals = Enum.GetValues(typeof(PlanetTopography));
         planetTopography = (PlanetTopography)vals.GetValue(sampler.Next(vals.Length));
         
-        // Data extraction from triangleList, and element initialization
         Dictionary<EdgeId, int> edgeMatching = new Dictionary<EdgeId, int>();
 
         Edge[] edges = new Edge[elements.Length * 3];
@@ -86,7 +85,6 @@ public class WFCGraph
         }
 
         this.sampler = sampler;
-        // currentNode = elements[sampler.Next(0, elements.Length - 1)];
         ComputeLowestEntropyElementList();
 
     }
@@ -113,12 +111,11 @@ public class WFCGraph
 
     private int GetLowestEntropyElementId()
     {
-        //Returns the id of a random Node with the non-one(collasped) lowest entropy
         
         if (lowestEntropyElementList.Count > 0)
         {
             return lowestEntropyElementList[sampler.Next(0, lowestEntropyElementList.Count - 1)];
-            //return sampler.Next(0, lowestEntropyElements.Count - 1);
+            
         }
         else
         {
@@ -235,7 +232,7 @@ public class WFCGraph
             n.entropy = n.edges[0].options.Count;
 
             n.tileVertices = new List<int> {n.edges[0].edgeId.a,n.edges[1].edgeId.a,n.edges[2].edgeId.a};
-            //n.tileTriangles = new List<int>();
+            
         }
         ComputeLowestEntropyElementList();
     }
@@ -244,27 +241,6 @@ public class WFCGraph
         return state;
     }
 
-    // public bool CheckTopography(Edge edge,int index){
-    //         if(planetTopography == PlanetTopography.Laky ){
-    //             //if(edge.options[index].Contains('C')){
-    //                 return edge.nextInternalEdge.options[index].Contains('C') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('C');
-    //             //}else{
-    //               //  return true;
-    //             //}   
-    //         }else if(planetTopography == PlanetTopography.Rocky ){
-    //             //if(edge.options[index].Contains('A')){
-    //                 return edge.nextInternalEdge.options[index].Contains('A') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('A');
-    //             //}else{
-    //               //  return true;
-    //             //}   
-    //         }else{
-    //             //if(edge.options[index].Contains('B')){
-    //                 return edge.nextInternalEdge.options[index].Contains('B') || edge.nextInternalEdge.nextInternalEdge.options[index].Contains('B');
-    //             //}else{
-    //               //  return true;
-    //             //}   
-    //         }
-    //     }
     public class Node
     {
         public int id;
@@ -297,8 +273,6 @@ public class WFCGraph
             }
 
             this.tileVertices = new List<int> {edges[0].edgeId.a,edges[1].edgeId.a,edges[2].edgeId.a};
-            //this.tileTriangles = new List<int>();
-            //this.meshVertices = new List<Vector3>();
             
         }
 

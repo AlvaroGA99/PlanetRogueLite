@@ -12,7 +12,6 @@ public class VelocityDirection : MonoBehaviour
 
     public float velocityMag;
 
-    // Start is called before the first frame update
     void Start()
     {
         
