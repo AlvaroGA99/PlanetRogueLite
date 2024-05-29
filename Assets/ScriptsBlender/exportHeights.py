@@ -9,11 +9,14 @@ class InvalidNamingException(Exception):
 EXPORTNAME = "BBB"
 PATH = "D:\clase\Master\TFM\ScriptsBlender\\"
 
-#try :
+naming = {'A','B','C'}
     
-if(len(EXPORTNAME) !=3 or not(("B" in EXPORTNAME) or ("A" in EXPORTNAME) or ("C" in EXPORTNAME) )):
+
+if(len(EXPORTNAME) != 3):
     raise InvalidNamingException("La nomenclatura introducida no es valida. Introduzca una cadena de tres caracteres con las letras A,B o C para represesentar las adyacencias deseadas.")
-    
+if(not all(char in naming for char in EXPORTNAME)):
+       raise InvalidNamingException("La nomenclatura introducida no es valida. Introduzca una cadena de tres caracteres con las letras A,B o C para represesentar las adyacencias deseadas.")
+
 if(PATH == ""):
     raise NoPathException("No ha introducido ninguna ruta del sistema en la que guardar el archivo. Especifique una para poder exportar el archivo.")
     
