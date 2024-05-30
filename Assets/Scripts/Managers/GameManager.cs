@@ -69,8 +69,6 @@ public class GameManager : MonoBehaviour
         cam = Camera.main;
         planetCentres = new List<Vector4>();
         
-        OnReload += NewExploration;
-        Energy.OnGameOver += GameOver;
         blitFeature = (Blit)rendererData.rendererFeatures[0];
         _gravityField = new GravityField();
         spawnval = 20;
@@ -104,6 +102,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {   
+        Energy.OnGameOver += GameOver;
+        OnReload += NewExploration;
         _menuControl = input.FindActionMap("Menu");
         _sceneMenu = _menuControl.FindAction("SceneMenu");
 
@@ -347,6 +347,7 @@ public class GameManager : MonoBehaviour
     private void MainMenu(){
         Energy.OnGameOver -= GameOver;
         _sceneMenu.performed -= SceneMenu;
+        _sceneMenu.Disable();
         _playerT.UnbindCallbacks();
         SceneEntranceReload = false;
         SceneManager.LoadScene(0);
