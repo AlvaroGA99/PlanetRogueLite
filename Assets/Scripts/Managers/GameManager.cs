@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Button _explore;
     [SerializeField] Button _starCoords;
-    [SerializeField] Button _options;
 
     [SerializeField] InputField _starCoordsInput;
 
@@ -92,7 +91,6 @@ public class GameManager : MonoBehaviour
 
         _explore.onClick.AddListener(OnExploreAsync);
         _starCoords.onClick.AddListener(OnStarCoords);
-        _options.onClick.AddListener(OnOptions);
         _cancel.onClick.AddListener(OnCancel);
         _travel.onClick.AddListener(OnTravel);
         _mainMenu.onClick.AddListener(MainMenu);
@@ -186,7 +184,6 @@ public class GameManager : MonoBehaviour
     {
         _explore.gameObject.SetActive(false);
         _starCoords.gameObject.SetActive(false);
-        _options.gameObject.SetActive(false);
     }
 
     private void HideCoordsMenu()
@@ -201,7 +198,6 @@ public class GameManager : MonoBehaviour
     {
         _explore.gameObject.SetActive(true);
         _starCoords.gameObject.SetActive(true);
-        _options.gameObject.SetActive(true);
     }
 
     private void SceneMenu(InputAction.CallbackContext action ){
