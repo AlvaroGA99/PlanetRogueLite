@@ -1,4 +1,4 @@
-# Plane Generation
+# Planet Generation
 #### Unity Version 2021.3.7f1
 
 Deterministic procedural terrain planet generation system wrapped into a technical demo game, that features space travel and exploration through different biomes, fuel managment, and gravity mechanics. The system uses a Simple Tiled Wave Function Collapse based algorithm, that uses a spherical graph as the solution space, and get a solution using a set of terrain different portions or "modules" as the tile to reach succesful state. 
